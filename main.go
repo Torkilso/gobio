@@ -1,46 +1,50 @@
 package main
 
+import (
+	"fmt"
+	"math"
+)
+
 func main() {
-	imagePath := "./Test Images Project 2/216066/Test image.jpg"
+
+
+	imagePath := "./data/216066/Test image_tn.jpg"
 	image := readJPEGFile(imagePath)
 
-	solutions := nsgaII(&image, 100, 100)
-	_ = solutions
+	//solutions := nsgaII(&image, 100, 100)
+	//_ = solutions
 
+	runGenerations(&image)
 }
-/*
 
-func runGenerations(){
-	pop := GeneratePopulation(&src, 4)
 
-	for i := 0 ; i < 10 ; i++ {
-		pop = RunGeneration(&src, pop)
-		fmt.Println("Generation done")
-		rgba2 := image.NewRGBA(image.Rect(0, 0, b.Dx(), b.Dy()))
-		fmt.Println("Generating", src.Bounds().Max, b.Dx(), b.Dy())
+func runGenerations(img *Image){
+
+	pop := GeneratePopulation(img, 10)
+
+	for i := 0 ; i < 100 ; i++ {
+		pop = RunGeneration(img, pop)
 		sol := pop.solutions[0]
-		groups := sol.graph.ConnectedComponents()
-		fmt.Println("Num groups", len(groups))
-		maxX := 0
-		maxY := 0
+		graph := GenoToGraph(img, sol.genotype)
+		groups := graph.ConnectedComponents()
+		width := len(*img)
+
+		thisImg := img.toRGBA()
 		for _, g := range groups {
-			c := Centroid(&src, g)
+			c := Centroid(img, g)
 			for k := range g {
-				x, y := Flatten(rect, int(k))
-				rgba2.Set(x, y, c)
-				if x > maxX {
-					maxX = x
-				}
-				if y > maxY {
-					maxY = y
-				}
+				x, y := Flatten(width, int(k))
+				thisImg.Set(x, y, c.toRGBA())
 			}
+			SaveJPEGRaw(thisImg)
+
 		}
-
-		fmt.Println("Drawing", maxX, maxY)
-		imageDrawer(rgba2)
+		var best float64
+		var avg float64
+		for _, s := range pop.solutions {
+			best = math.Max(best, s.weightedSum())
+			avg += s.weightedSum()
+		}
+		fmt.Println("Gen", i, "Best", best, "Avg", avg / float64(len(pop.solutions)) )
 	}
-	imageDrawer(rgba)
-
 }
-*/

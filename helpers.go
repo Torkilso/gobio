@@ -1,54 +1,49 @@
 package main
 
 import (
-	"image"
-	"image/color"
 	"math"
 )
 
-func Flatten(rect image.Rectangle, idx int) (x, y int) {
-	w := rect.Dx()
-	x = idx % w
-	y = (idx - x) / w
+func Flatten(width int, idx int) (x, y int) {
+	x = idx % width
+	y = (idx - x) / width
 	return x, y
 }
 
-func Expand(rect image.Rectangle, x, y int) int {
-	return y * rect.Dx() + x
+func Expand(width int, x, y int) int {
+	return y * width + x
 }
-func Dist(img *image.Image, idx1, idx2 int) float64 {
-	rect := (*img).Bounds()
-	x1, y1 := Flatten(rect, idx1)
-	x2, y2 := Flatten(rect, idx2)
+func Dist(img *Image, idx1, idx2 int) float64 {
 
-	fromPx := (*img).At(x1, y1)
-	toPx := (*img).At(x2, y2)
-	return ColorDist(fromPx, toPx)
+	width := len(*img)
+	x1, y1 := Flatten(width, idx1)
+	x2, y2 := Flatten(width, idx2)
+
+	fromPx := (*img)[x1][y1]
+	toPx := (*img)[x2][y2]
+	return ColorDist(&fromPx, &toPx)
 }
 
-func ColorDist(c1 color.Color, c2 color.Color) float64 {
-	r1, g1, b1, _ := c1.RGBA()
-	r2, g2, b2, _ := c2.RGBA()
-
-	return math.Pow(float64(r1-r2), 2) + math.Pow(float64(g1-g2), 2) + math.Pow(float64(b1-b2), 2)
-
+func ColorDist(p1 *Pixel, p2 *Pixel) float64 {
+	return math.Sqrt(math.Pow(float64(p1.r-p2.r), 2) + math.Pow(float64(p1.g-p2.g), 2) + math.Pow(float64(p1.b-p2.b), 2))
 }
 
 
 
-func Centroid(img *image.Image, group map[uint64]bool) color.Color {
+func Centroid(img *Image, group map[uint64]bool) *Pixel {
 
-	rect := (*img).Bounds()
-	var r uint32
-	var g uint32
-	var b uint32
+	var r int
+	var g int
+	var b int
 
-	var count uint32
+	var count int
+
+	width := len(*img)
 
 	for k := range group {
-		x, y := Flatten(rect, int(k))
-		c := (*img).At(x, y)
-		r1, g1, b1, _ := c.RGBA()
+		x, y := Flatten(width, int(k))
+		px := (*img)[x][y]
+		r1, g1, b1 := int(px.r), int(px.g), int(px.b)
 		r += r1
 		g += g1
 		b += b1
@@ -58,5 +53,5 @@ func Centroid(img *image.Image, group map[uint64]bool) color.Color {
 	g = g / count
 	b = b / count
 
-	return color.RGBA{uint8(r / 257), uint8(g / 257), uint8(b / 257), uint8(0xFF)}
+	return &Pixel{int16(r), int16(g), int16(b)}
 }
