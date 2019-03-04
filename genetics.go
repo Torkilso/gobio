@@ -1,0 +1,126 @@
+package main
+
+import (
+	"github.com/alonsovidales/go_graph"
+	"image"
+	"math"
+	"math/rand"
+)
+
+
+
+func GraphToGeno(gr *graphs.Graph) []uint64 {
+	geno := make([]uint64, len(gr.RawEdges))
+	for _, edge := range gr.RawEdges {
+		geno[edge.From] = edge.To
+	}
+	return geno
+}
+
+func GenoToGraph(img *image.Image, geno []uint64) *graphs.Graph {
+	edges := make([]graphs.Edge, len(geno))
+	for i, val := range geno {
+		edges[i] = graphs.Edge{uint64(i), val, Dist(img, i, int(val))}
+	}
+	return graphs.GetGraph(edges, true)
+}
+func GeneratePopulation(img *image.Image, n int) *Population {
+	solutions := make([]Solution, n)
+
+	imgAsGraph := GenerateGraph(img)
+
+	for i := 0 ; i < n ; i++ {
+		mstGraph := graphs.GetGraph(imgAsGraph.Mst(), true)
+		deviation := deviation(img, mstGraph)
+		connectivity := 0.0
+		crowdingDistance := 0.0
+		solutions[i] = Solution{GraphToGeno(mstGraph), deviation, connectivity, crowdingDistance }
+	}
+	return &Population{solutions}
+}
+
+func Tournament(img *image.Image, p *Population, k int) int {
+
+	bestIdx := -1
+	bestCost := math.MaxFloat64
+	for i := 0; i < k; i++ {
+		idx := rand.Intn(len((*p).solutions))
+		c := (*p).solutions[i].weightedSum()
+		if c < bestCost {
+			bestIdx = idx
+			bestCost = c
+		}
+	}
+	return bestIdx
+
+}
+
+func RunGeneration(img *image.Image, pop *Population) *Population {
+	result := make([]Solution, len((*pop).solutions))
+
+	for i := 0 ; i < len((*pop).solutions); i += 2 {
+		p1Idx := Tournament(img, pop, 2)
+		p2Idx := Tournament(img, pop, 2)
+
+		p1 := (*pop).solutions[p1Idx]
+		p2 := (*pop).solutions[p2Idx]
+
+		result[i], result[i+1] = Crossover(img, &p1, &p2)
+
+		if rand.Float32() < .2 {
+			result[i] = Mutate(result[i].genotype, img)
+		}
+		if rand.Float32() < .2 {
+			result[i+1] = Mutate(result[i+1].genotype, img)
+		}
+
+	}
+	return &Population{result}
+}
+
+func Mutate(genotype []uint64, img* image.Image) Solution {
+	for i := range genotype {
+		if rand.Float32() < .2 {
+			possibleValues := GetTargets(img, i)
+			chosen := rand.Intn(len(possibleValues))
+			genotype[i] = uint64(possibleValues[chosen])
+		}
+	}
+	graph := GenoToGraph(img, genotype)
+	return SolutionFromGenotype(img, graph)
+}
+
+
+func SolutionFromGenotype(img *image.Image, g *graphs.Graph) Solution {
+	deviation := deviation(img, g)
+	connectivity := 0.0
+	crowdingDistance := 0.0
+	return Solution{GraphToGeno(g), deviation, connectivity, crowdingDistance }
+
+}
+func Crossover(img *image.Image, parent1, parent2 *Solution) (Solution, Solution) {
+
+	n := len((*parent1).genotype)
+
+	offspring1 := make([]uint64, n)
+	offspring2 := make([]uint64, n)
+
+	for i := 0; i < n; i++ {
+		// Update with 50% change
+		if rand.Float32() < .5 {
+			offspring1[i], offspring2[i] = (*parent2).genotype[i], (*parent1).genotype[i]
+		}else {
+			offspring1[i], offspring2[i] = (*parent1).genotype[i], (*parent2).genotype[i]
+		}
+	}
+	graph1 := GenoToGraph(img, offspring1)
+	graph2 := GenoToGraph(img, offspring2)
+
+	return SolutionFromGenotype(img, graph1), SolutionFromGenotype(img, graph2)
+
+}
+
+
+func createPopulationFromParents(parents []*Solution) []*Solution {
+	return parents
+}
