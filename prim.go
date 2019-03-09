@@ -14,18 +14,22 @@ func (a byWeight) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a byWeight) Less(i, j int) bool { return a[i].Weight < a[j].Weight }
 
 
-func Prim(start uint64, gr *graphs.Graph) (mst []graphs.Edge) {
+func PreparePrim(gr *graphs.Graph) (*graph.LabeledUndirected, []graph.LI) {
+	labels := make([]graph.LI, len((*gr).RawEdges))
+	var g graph.LabeledUndirected
+
+	for i, edge := range (*gr).RawEdges {
+		l := graph.LI(i)
+		labels[i] = l
+		g.AddEdge(graph.Edge{graph.NI(edge.From), graph.NI(edge.To)}, l)
+	}
+	return &g, labels
+}
+
+func Prim(start uint64, g *graph.LabeledUndirected, labels []graph.LI, gr *graphs.Graph) (mst []graphs.Edge) {
 
 
 	actualStart := graph.NI(start)
-	var g graph.LabeledUndirected
-
-	labels := make([]graph.LI, len((*gr).RawEdges))
-
-	for i, edge := range (*gr).RawEdges {
-		labels[i] = graph.LI(i)
-		g.AddEdge(graph.Edge{graph.NI(edge.From), graph.NI(edge.To)}, graph.LI(i))
-	}
 
 	// weight function
 	w := func(arcLabel graph.LI) float64 { return (*gr).RawEdges[int(arcLabel)].Weight }

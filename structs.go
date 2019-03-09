@@ -3,6 +3,7 @@ package main
 import (
 	"image"
 	"image/color"
+	"math"
 )
 
 type Genotype []uint64
@@ -20,6 +21,19 @@ func (s *Solution) weightedSum() float64 {
 
 type Population struct {
 	solutions []Solution
+}
+
+func (p *Population) BestSolution() Solution {
+	bestFitness := math.MaxFloat64
+	bestIdx := -1
+	for i, s := range p.solutions {
+		f := s.weightedSum()
+		if f < bestFitness {
+			bestIdx = i
+			bestFitness = f
+		}
+	}
+	return p.solutions[bestIdx]
 }
 
 type Pixel struct {

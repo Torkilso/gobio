@@ -2,13 +2,12 @@ package main
 
 import (
 	"fmt"
-	"math"
 )
 
 func main() {
 
 
-	imagePath := "./data/216066/Test image_tn.jpg"
+	imagePath := "./data/216066/Test_image.jpg"
 	image := readJPEGFile(imagePath)
 
 	//solutions := nsgaII(&image, 100, 100)
@@ -24,7 +23,7 @@ func runGenerations(img *Image){
 
 	for i := 0 ; i < 100 ; i++ {
 		pop = RunGeneration(img, pop)
-		sol := pop.solutions[0]
+		sol := pop.BestSolution()
 		graph := GenoToGraph(img, sol.genotype)
 		groups := graph.ConnectedComponents()
 		width := len(*img)
@@ -39,12 +38,7 @@ func runGenerations(img *Image){
 			SaveJPEGRaw(thisImg)
 
 		}
-		var best float64
-		var avg float64
-		for _, s := range pop.solutions {
-			best = math.Max(best, s.weightedSum())
-			avg += s.weightedSum()
-		}
-		fmt.Println("Gen", i, "Best", best, "Avg", avg / float64(len(pop.solutions)) )
+
+		fmt.Println("Gen", i, "Best", sol.weightedSum(), "Segments", len(groups) )
 	}
 }

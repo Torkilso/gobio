@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/alonsovidales/go_graph"
+	"log"
 	"math"
 	"math/rand"
 )
@@ -30,9 +31,13 @@ func GeneratePopulation(img *Image, n int) *Population {
 
 	imgAsGraph := GenerateGraph(img)
 
+	log.Println("Prim graph start")
+	primGraph, labels := PreparePrim(imgAsGraph)
+	log.Println("Prim graph end")
+
 	for i := 0 ; i < n ; i++ {
 		start := rand.Intn(n)
-		mstGraph := graphs.GetGraph(Prim(uint64(start), imgAsGraph), true)
+		mstGraph := graphs.GetGraph(Prim(uint64(start), primGraph, labels, imgAsGraph), true)
 		solutions[i] = SolutionFromGenotype(img, mstGraph)
 	}
 	return &Population{solutions}
@@ -91,8 +96,9 @@ func Mutate(genotype []uint64, img *Image) Solution {
 
 
 func SolutionFromGenotype(img *Image, g *graphs.Graph) Solution {
-	deviation := deviation(img, g)
-	connectivity := 0.0
+	groups := g.ConnectedComponents()
+	deviation := deviation(img, groups)
+	connectivity := connectiviy(img, groups)
 	crowdingDistance := 0.0
 	return Solution{GraphToGeno(g), deviation, connectivity, crowdingDistance }
 

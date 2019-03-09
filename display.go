@@ -48,5 +48,8 @@ func SaveJPEGRaw(img *image.RGBA) {
 	}
 	defer f.Close()
 	jpeg.Encode(f, img, nil)
-
 }
+/*
+func DrawImageBoundries(img *image.RGBA) *image.RGBA {
+
+}*/

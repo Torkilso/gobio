@@ -1,9 +1,5 @@
 package main
 
-import (
-	"github.com/alonsovidales/go_graph"
-)
-
 var (
 	maxDeviation    float64 = 100
 	minDeviation    float64 = 0
@@ -12,8 +8,7 @@ var (
 )
 
 
-func deviation(img *Image, graph *graphs.Graph) float64 {
-	connectedGroups := graph.ConnectedComponents()
+func deviation(img *Image, connectedGroups []map[uint64]bool) float64 {
 
 	var dist float64
 	width := len(*img)
@@ -29,6 +24,20 @@ func deviation(img *Image, graph *graphs.Graph) float64 {
 }
 
 
-func connectiviy() float64 {
-	return 0.0
+func connectiviy(img *Image, connectedGroups []map[uint64]bool) float64 {
+
+	var dist float64
+	for _, group := range connectedGroups {
+		for k := range group {
+			intK := int(k)
+			for j, neighbour := range GetTargets(img, intK){
+				if _, ok := group[uint64(neighbour)]; ok { // To nothing
+				} else {
+					dist += float64(1 / (j+1))
+				}
+
+			}
+		}
+	}
+	return dist
 }
