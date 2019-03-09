@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"image/color"
+	"log"
 )
 
 func main() {
@@ -19,7 +21,7 @@ func main() {
 
 func runGenerations(img *Image){
 
-	pop := GeneratePopulation(img, 10)
+	pop := GeneratePopulation(img, 100)
 
 	for i := 0 ; i < 100 ; i++ {
 		pop = RunGeneration(img, pop)
@@ -29,15 +31,20 @@ func runGenerations(img *Image){
 		width := len(*img)
 
 		thisImg := img.toRGBA()
+		imgCopy := GoImageToImage(thisImg)
 		for _, g := range groups {
 			c := Centroid(img, g)
+			log.Println("Centroid", c)
 			for k := range g {
 				x, y := Flatten(width, int(k))
 				thisImg.Set(x, y, c.toRGBA())
 			}
-			SaveJPEGRaw(thisImg)
-
+			SaveJPEGRaw(thisImg, "img.jpg")
 		}
+
+		edgedImg := DrawImageBoundries(&imgCopy, graph, color.Black)
+		SaveJPEGRaw(edgedImg, "edges.jpg")
+
 
 		fmt.Println("Gen", i, "Best", sol.weightedSum(), "Segments", len(groups) )
 	}

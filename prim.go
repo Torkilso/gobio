@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/alonsovidales/go_graph"
 	"github.com/soniakeys/bits"
 	"github.com/soniakeys/graph"
@@ -40,14 +41,16 @@ func Prim(start uint64, g *graph.LabeledUndirected, labels []graph.LI, gr *graph
 	f := graph.NewFromList(len(a))
 
 	var leaves bits.Bits
-	_, _ = g.Prim(actualStart, w, &f, labels, &leaves)
+	numSpanned, dist := g.Prim(actualStart, w, &f, labels, &leaves)
 
-
+	fmt.Println("numSpanned",numSpanned, "dist", dist)
 	res, _ := f.LabeledUndirected(labels, nil)
 	edges := make([]graphs.Edge, 0)
 	res.Edges(func(e graph.LabeledEdge) {
-		edges = append(edges, graphs.Edge{uint64(e.Edge.N1), uint64(e.Edge.N2), float64(1)})
+		edges = append(edges, graphs.Edge{uint64(e.Edge.N1), uint64(e.Edge.N2), w(e.LI)})
 	})
+
+	fmt.Println()
 
 	return edges
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/alonsovidales/go_graph"
-	"log"
 	"math"
 	"math/rand"
 )
@@ -24,19 +23,31 @@ func GenoToGraph(img *Image, geno []uint64) *graphs.Graph {
 	}
 	return graphs.GetGraph(edges, true)
 }
+
+func TotalDist(edges []graphs.Edge) {
+	var tot float64
+
+	for _, edge := range edges {
+		tot += edge.Weight
+	}
+}
 func GeneratePopulation(img *Image, n int) *Population {
 	solutions := make([]Solution, n)
 
 	imgAsGraph := GenerateGraph(img)
 
-	log.Println("Prim graph start")
+	width := len(*img)
+	height := len((*img)[0])
+
 	primGraph, labels := PreparePrim(imgAsGraph)
-	log.Println("Prim graph end")
 
 	for i := 0 ; i < n ; i++ {
-		start := rand.Intn(n)
-		mstGraph := graphs.GetGraph(Prim(uint64(start), primGraph, labels, imgAsGraph), true)
+		start := rand.Intn(width * height)
+		mst := Prim(uint64(start), primGraph, labels, imgAsGraph)
+		mstGraph := graphs.GetGraph(mst, true)
 		solutions[i] = SolutionFromGenotype(img, mstGraph)
+
+
 	}
 	return &Population{solutions}
 }
@@ -69,20 +80,21 @@ func RunGeneration(img *Image, pop *Population) *Population {
 
 		result[i], result[i+1] = Crossover(img, &p1, &p2)
 
+		/*
 		if rand.Float32() < .1 {
 			result[i] = Mutate(result[i].genotype, img)
 		}
 		if rand.Float32() < .1 {
 			result[i+1] = Mutate(result[i+1].genotype, img)
 		}
-
+		*/
 	}
 	return &Population{result}
 }
 
 func Mutate(genotype []uint64, img *Image) Solution {
 	for i := range genotype {
-		if rand.Float32() < .2 {
+		if rand.Float32() < .1 {
 			possibleValues := GetTargets(img, i)
 			chosen := rand.Intn(len(possibleValues))
 			genotype[i] = uint64(possibleValues[chosen])

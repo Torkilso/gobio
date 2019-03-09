@@ -5,6 +5,7 @@ import (
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
 	"gonum.org/v1/plot/vg/draw"
+	"image"
 	"image/color"
 	"image/jpeg"
 	"os"
@@ -52,20 +53,7 @@ func visualizeFronts(population []*Solution, fronts map[int][]int) {
 	}
 }
 
-func readJPEGFile(path string) Image {
-	infile, err := os.Open(path)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	defer infile.Close()
-
-	src, err := jpeg.Decode(infile)
-
-	if err != nil {
-		panic(err.Error())
-	}
-
+func GoImageToImage(src image.Image) Image {
 	width := src.Bounds().Dx()
 	height := src.Bounds().Dy()
 
@@ -90,6 +78,23 @@ func readJPEGFile(path string) Image {
 			}
 		}
 	}
-
 	return pixels
+
+}
+func readJPEGFile(path string) Image {
+	infile, err := os.Open(path)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	defer infile.Close()
+
+	src, err := jpeg.Decode(infile)
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+
+	return GoImageToImage(src)
 }

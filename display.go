@@ -1,9 +1,11 @@
 package main
 
 import (
+	"github.com/alonsovidales/go_graph"
 	"github.com/google/gxui"
 	"github.com/google/gxui/themes/dark"
 	"image"
+	"image/color"
 	"image/jpeg"
 	"os"
 )
@@ -41,15 +43,36 @@ func SaveJPEG(img *Image) {
 
 }
 
-func SaveJPEGRaw(img *image.RGBA) {
-	f, err := os.Create("img.jpg")
+func SaveJPEGRaw(img *image.RGBA, name string) {
+	f, err := os.Create(name)
 	if err != nil {
 		panic(err)
 	}
 	defer f.Close()
 	jpeg.Encode(f, img, nil)
 }
-/*
-func DrawImageBoundries(img *image.RGBA) *image.RGBA {
 
-}*/
+func DrawImageBoundries(img *Image, gr *graphs.Graph, color color.Color ) *image.RGBA {
+	res := img.toRGBA()
+	groups := gr.ConnectedComponents()
+	width := len(*img)
+	for _, group := range groups {
+		for k := range group {
+			intK := int(k)
+			for _, neighbour := range GetTargets(img, intK) {
+				if _, ok := group[uint64(neighbour)]; ok { // Same segments
+				} else {
+					// Two neighbours are not in same segment.
+					// Draw edge in this and neighbour
+					x1, y1 := Flatten(width, intK)
+					x2, y2 := Flatten(width, neighbour)
+
+					res.Set(x1, y1, color)
+					res.Set(x2, y2, color)
+
+				}
+			}
+		}
+	}
+	return res
+}

@@ -16,7 +16,7 @@ type Solution struct {
 }
 
 func (s *Solution) weightedSum() float64 {
-	return s.deviation + s.connectivity
+	return s.deviation + s.connectivity * 1000000
 }
 
 type Population struct {
