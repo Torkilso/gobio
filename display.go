@@ -10,13 +10,12 @@ import (
 	"os"
 )
 
-type ImageDrawer func (img *image.RGBA)
+type ImageDrawer func(img *image.RGBA)
 
-
-func GenerateImageDrawer(driver gxui.Driver, rect image.Rectangle)  ImageDrawer {
+func GenerateImageDrawer(driver gxui.Driver, rect image.Rectangle) ImageDrawer {
 	theme := dark.CreateTheme(driver)
 	window := theme.CreateWindow(rect.Max.X, rect.Max.Y, "Image viewer")
-		window.OnClose(driver.Terminate)
+	window.OnClose(driver.Terminate)
 	return func(rgba *image.RGBA) {
 		f, err := os.Create("img.jpg")
 		if err != nil {
@@ -51,6 +50,7 @@ func SaveJPEGRaw(img *image.RGBA, name string) {
 	defer f.Close()
 	jpeg.Encode(f, img, nil)
 }
+
 
 func DrawImageBoundries(img *Image, gr *graphs.Graph, color color.Color ) *image.RGBA {
 	res := img.toRGBA()

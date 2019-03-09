@@ -40,7 +40,7 @@ func visualizeFronts(population []*Solution, fronts map[int][]int) {
 
 		if front == 0 {
 			lpPoints.Color = color.RGBA{B: 255, A: 255}
-			p.Legend.Add("Pareto front", lpLine, lpPoints)
+			//p.Legend.Add("Pareto front", lpLine, lpPoints)
 		} else {
 			lpPoints.Color = color.RGBA{R: 255, A: 255}
 		}

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/alonsovidales/go_graph"
 	"github.com/soniakeys/bits"
 	"github.com/soniakeys/graph"
@@ -13,7 +12,6 @@ type byWeight []graphs.Edge
 func (a byWeight) Len() int           { return len(a) }
 func (a byWeight) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a byWeight) Less(i, j int) bool { return a[i].Weight < a[j].Weight }
-
 
 func PreparePrim(gr *graphs.Graph) (*graph.LabeledUndirected, []graph.LI) {
 	labels := make([]graph.LI, len((*gr).RawEdges))
@@ -29,7 +27,6 @@ func PreparePrim(gr *graphs.Graph) (*graph.LabeledUndirected, []graph.LI) {
 
 func Prim(start uint64, g *graph.LabeledUndirected, labels []graph.LI, gr *graphs.Graph) (mst []graphs.Edge) {
 
-
 	actualStart := graph.NI(start)
 
 	// weight function
@@ -41,16 +38,14 @@ func Prim(start uint64, g *graph.LabeledUndirected, labels []graph.LI, gr *graph
 	f := graph.NewFromList(len(a))
 
 	var leaves bits.Bits
-	numSpanned, dist := g.Prim(actualStart, w, &f, labels, &leaves)
+	_, _ = g.Prim(actualStart, w, &f, labels, &leaves)
 
-	fmt.Println("numSpanned",numSpanned, "dist", dist)
 	res, _ := f.LabeledUndirected(labels, nil)
 	edges := make([]graphs.Edge, 0)
 	res.Edges(func(e graph.LabeledEdge) {
 		edges = append(edges, graphs.Edge{uint64(e.Edge.N1), uint64(e.Edge.N2), w(e.LI)})
 	})
 
-	fmt.Println()
 
 	return edges
 }
