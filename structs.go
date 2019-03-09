@@ -1,6 +1,5 @@
 package main
 
-
 type Genotype []uint64
 
 type Solution struct {

@@ -7,8 +7,6 @@ import (
 	"math/rand"
 )
 
-
-
 func GraphToGeno(gr *graphs.Graph) []uint64 {
 	geno := make([]uint64, len(gr.RawEdges))
 	for _, edge := range gr.RawEdges {
@@ -29,12 +27,12 @@ func GeneratePopulation(img *image.Image, n int) *Population {
 
 	imgAsGraph := GenerateGraph(img)
 
-	for i := 0 ; i < n ; i++ {
+	for i := 0; i < n; i++ {
 		mstGraph := graphs.GetGraph(imgAsGraph.Mst(), true)
 		deviation := deviation(img, mstGraph)
 		connectivity := 0.0
 		crowdingDistance := 0.0
-		solutions[i] = Solution{GraphToGeno(mstGraph), deviation, connectivity, crowdingDistance }
+		solutions[i] = Solution{GraphToGeno(mstGraph), deviation, connectivity, crowdingDistance}
 	}
 	return &Population{solutions}
 }
@@ -58,7 +56,7 @@ func Tournament(img *image.Image, p *Population, k int) int {
 func RunGeneration(img *image.Image, pop *Population) *Population {
 	result := make([]Solution, len((*pop).solutions))
 
-	for i := 0 ; i < len((*pop).solutions); i += 2 {
+	for i := 0; i < len((*pop).solutions); i += 2 {
 		p1Idx := Tournament(img, pop, 2)
 		p2Idx := Tournament(img, pop, 2)
 
@@ -78,7 +76,7 @@ func RunGeneration(img *image.Image, pop *Population) *Population {
 	return &Population{result}
 }
 
-func Mutate(genotype []uint64, img* image.Image) Solution {
+func Mutate(genotype []uint64, img *image.Image) Solution {
 	for i := range genotype {
 		if rand.Float32() < .2 {
 			possibleValues := GetTargets(img, i)
@@ -90,14 +88,14 @@ func Mutate(genotype []uint64, img* image.Image) Solution {
 	return SolutionFromGenotype(img, graph)
 }
 
-
 func SolutionFromGenotype(img *image.Image, g *graphs.Graph) Solution {
 	deviation := deviation(img, g)
 	connectivity := 0.0
 	crowdingDistance := 0.0
-	return Solution{GraphToGeno(g), deviation, connectivity, crowdingDistance }
+	return Solution{GraphToGeno(g), deviation, connectivity, crowdingDistance}
 
 }
+
 func Crossover(img *image.Image, parent1, parent2 *Solution) (Solution, Solution) {
 
 	n := len((*parent1).genotype)
@@ -109,7 +107,7 @@ func Crossover(img *image.Image, parent1, parent2 *Solution) (Solution, Solution
 		// Update with 50% change
 		if rand.Float32() < .5 {
 			offspring1[i], offspring2[i] = (*parent2).genotype[i], (*parent1).genotype[i]
-		}else {
+		} else {
 			offspring1[i], offspring2[i] = (*parent1).genotype[i], (*parent2).genotype[i]
 		}
 	}
@@ -120,7 +118,7 @@ func Crossover(img *image.Image, parent1, parent2 *Solution) (Solution, Solution
 
 }
 
-
 func createPopulationFromParents(parents []*Solution) []*Solution {
+
 	return parents
 }

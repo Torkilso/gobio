@@ -14,7 +14,7 @@ func Flatten(rect image.Rectangle, idx int) (x, y int) {
 }
 
 func Expand(rect image.Rectangle, x, y int) int {
-	return y * rect.Dx() + x
+	return y*rect.Dx() + x
 }
 func Dist(img *image.Image, idx1, idx2 int) float64 {
 	rect := (*img).Bounds()
@@ -33,8 +33,6 @@ func ColorDist(c1 color.Color, c2 color.Color) float64 {
 	return math.Pow(float64(r1-r2), 2) + math.Pow(float64(g1-g2), 2) + math.Pow(float64(b1-b2), 2)
 
 }
-
-
 
 func Centroid(img *image.Image, group map[uint64]bool) color.Color {
 

@@ -33,7 +33,6 @@ func deviation(img *image.Image, graph *graphs.Graph) float64 {
 	return dist
 }
 
-
 func connectiviy() float64 {
 	return 0.0
 }

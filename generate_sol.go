@@ -5,8 +5,6 @@ import (
 	"image"
 )
 
-
-
 func GetTargets(img *image.Image, idx int) []int {
 	rect := (*img).Bounds()
 	x, y := Flatten((*img).Bounds(), idx)
@@ -52,8 +50,8 @@ func GenerateGraph(img *image.Image) *graphs.Graph {
 	rect := (*img).Bounds()
 	numPixels := rect.Max.X * rect.Max.Y
 
-	edges := make([]graphs.Edge, 0, numPixels * 8)
-	for i := 0 ; i < numPixels ; i++ {
+	edges := make([]graphs.Edge, 0, numPixels*8)
+	for i := 0; i < numPixels; i++ {
 		targets := GetTargets(img, i)
 		for _, target := range targets {
 			edges = append(edges, graphs.Edge{uint64(i), uint64(target), Dist(img, i, target)})
