@@ -13,14 +13,14 @@ type SearchHelper struct {
 func fastNonDominatedSort(population []*Solution) map[int][]int {
 
 	fronts := make(map[int][]int)
-	SearchHelperMap := make(map[int]*SearchHelper)
+	searchHelperMap := make(map[int]*SearchHelper)
 
 	for i, solution := range population {
 		searchHelper := SearchHelper{
 			dominatedByAmount: 0,
 		}
 
-		SearchHelperMap[i] = &searchHelper
+		searchHelperMap[i] = &searchHelper
 
 		for j, opponent := range population {
 			if i == j {
@@ -28,7 +28,7 @@ func fastNonDominatedSort(population []*Solution) map[int][]int {
 			}
 
 			if solution.dominate(opponent) {
-				searchHelper.dominates = append(SearchHelperMap[i].dominates, j)
+				searchHelper.dominates = append(searchHelperMap[i].dominates, j)
 			} else if opponent.dominate(solution) {
 				searchHelper.dominatedByAmount++
 			}
@@ -37,7 +37,6 @@ func fastNonDominatedSort(population []*Solution) map[int][]int {
 		if searchHelper.dominatedByAmount == 0 {
 			fronts[0] = append(fronts[0], i)
 		}
-
 	}
 
 	frontRank := 0
@@ -46,16 +45,18 @@ func fastNonDominatedSort(population []*Solution) map[int][]int {
 		newFront := make([]int, 0)
 
 		for _, frontSolution := range fronts[frontRank] {
-			for _, solution := range SearchHelperMap[frontSolution].dominates {
-				SearchHelperMap[solution].dominatedByAmount--
-				if SearchHelperMap[solution].dominatedByAmount == 0 {
+			for _, solution := range searchHelperMap[frontSolution].dominates {
+				searchHelperMap[solution].dominatedByAmount--
+				if searchHelperMap[solution].dominatedByAmount == 0 {
 					newFront = append(newFront, solution)
 				}
 			}
 		}
 
 		frontRank++
-		fronts[frontRank] = newFront
+		if len(newFront) > 0 {
+			fronts[frontRank] = newFront
+		}
 	}
 
 	return fronts
@@ -88,7 +89,7 @@ func crowdingDistanceAssignment(ids []int, population []*Solution) {
 
 func nsgaII(image *Image, generations, populationSize int) []*Solution {
 
-	parents := createInitialPopulation(*image, populationSize)
+	parents := createInitialPopulation(image, populationSize)
 	children := make([]*Solution, 0)
 
 	for t := 0; t < generations; t++ {
@@ -99,6 +100,9 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 		i := 0
 
 		for len(newParents)+len(fronts[i]) <= populationSize {
+			if len(fronts[i]) == 0 {
+				break
+			}
 
 			crowdingDistanceAssignment(fronts[i], population)
 			frontSolutions := make([]*Solution, 0)
@@ -112,16 +116,26 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 		}
 
 		lastFrontier := make([]*Solution, 0)
-		crowdingDistanceAssignment(fronts[i], population)
 
-		for _, id := range fronts[i] {
-			if len(newParents) < populationSize {
-				lastFrontier = append(lastFrontier, population[id])
+		if len(fronts[i]) > 0 {
+			crowdingDistanceAssignment(fronts[i], population)
+
+			for _, id := range fronts[i] {
+				if len(lastFrontier)+len(newParents) < populationSize {
+					lastFrontier = append(lastFrontier, population[id])
+				} else {
+					break
+				}
 			}
 		}
 
 		parents = append(newParents, lastFrontier...)
-		children = createPopulationFromParents(parents)
+		//children = createPopulationFromParents(parents)
+		children = createInitialPopulation(image, populationSize)
+		newParents = make([]*Solution, 0)
+		i = 0
+
+		//fmt.Printf("\rGeneration: %d", t)
 	}
 
 	return children

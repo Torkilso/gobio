@@ -2,94 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="709675ca-c79c-4f1e-9448-6dffda1a7cbd" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/data/147091/GT_10.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/147091/GT_16.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/147091/GT_16_1.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/147091/GT_26.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/147091/GT_30.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/147091/Test image.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/147091/s10.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/147091/s16.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/147091/s16_1.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/147091/s26.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/147091/s30.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/160068/GT_10.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/160068/GT_7.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/160068/GT_7_2.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/160068/GT_8.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/160068/GT_8_1.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/160068/Test image.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/160068/s10.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/160068/s7.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/160068/s7_1.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/160068/s8.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/160068/s8_1.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/176035/GT_10.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/176035/GT_15.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/176035/GT_24.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/176035/GT_26.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/176035/GT_39.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/176035/GT_8.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/176035/Test image.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/176035/s10.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/176035/s15.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/176035/s24.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/176035/s26.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/176035/s39.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/176035/s8.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/178054/GT_3.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/178054/GT_5.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/178054/GT_7.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/178054/GT_8.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/178054/GT_9.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/178054/Test image.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/178054/s3.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/178054/s5.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/178054/s7.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/178054/s8.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/178054/s9.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/216066/GT_28.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/216066/GT_3.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/216066/GT_5.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/216066/GT_8.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/216066/GT_9.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/216066/Test image.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/216066/Test image_tn.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/216066/s28.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/216066/s3.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/216066/s5.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/216066/s8.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/216066/s9.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/353013/GT_10.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/353013/GT_15_1.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/353013/GT_6.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/353013/GT_8.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/353013/GT_8_1.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/353013/Test image.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/353013/s10.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/353013/s15.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/353013/s6.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/353013/s8.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/353013/s8_1.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/86016/GT_17.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/86016/GT_23.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/86016/GT_24.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/86016/GT_4.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/86016/GT_41.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/86016/image.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/86016/s17.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/86016/s23.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/86016/s24.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/86016/s4.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/86016/s41.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/display.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/prim.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/files.go" beforeDir="false" afterPath="$PROJECT_DIR$/files.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/generate_sol.go" beforeDir="false" afterPath="$PROJECT_DIR$/generate_sol.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genetics.go" beforeDir="false" afterPath="$PROJECT_DIR$/genetics.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/helpers.go" beforeDir="false" afterPath="$PROJECT_DIR$/helpers.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nsga.go" beforeDir="false" afterPath="$PROJECT_DIR$/nsga.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/objectives.go" beforeDir="false" afterPath="$PROJECT_DIR$/objectives.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/populations.go" beforeDir="false" afterPath="$PROJECT_DIR$/populations.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/structs.go" beforeDir="false" afterPath="$PROJECT_DIR$/structs.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -99,35 +20,32 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/objectives.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="22" column="23" lean-forward="true" selection-start-line="22" selection-start-column="23" selection-end-line="22" selection-end-column="23" />
-              <folding>
-                <element signature="e#14#78#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="152">
+              <caret line="8" selection-start-line="8" selection-end-line="8" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/nsga.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="463">
-              <caret line="107" column="13" selection-start-line="107" selection-start-column="13" selection-end-line="107" selection-end-column="13" />
+            <state relative-caret-position="416">
+              <caret line="91" column="61" lean-forward="true" selection-start-line="91" selection-start-column="61" selection-end-line="91" selection-end-column="61" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main.go">
+        <entry file="file://$PROJECT_DIR$/genetics.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="312">
-              <caret line="39" lean-forward="true" selection-start-line="39" selection-end-line="39" />
+            <state relative-caret-position="677">
+              <caret line="104" selection-start-line="104" selection-end-line="104" />
               <folding>
-                <element signature="e#14#39#0" expanded="true" />
+                <element signature="e#14#91#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -141,8 +59,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/genetics.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
-              <caret line="68" column="30" selection-start-line="68" selection-start-column="30" selection-end-line="68" selection-end-column="30" />
+            <state relative-caret-position="361">
+              <caret line="19" column="43" selection-start-line="19" selection-start-column="43" selection-end-line="19" selection-end-column="43" />
+              <folding>
+                <element signature="e#14#45#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -150,17 +71,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/helpers.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="45">
-              <caret line="3" selection-start-line="3" selection-end-line="3" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/generate_sol.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="342">
-              <caret line="54" column="43" lean-forward="true" selection-start-line="54" selection-start-column="43" selection-end-line="54" selection-end-column="43" />
+            <state relative-caret-position="114">
+              <caret line="9" column="41" selection-start-line="9" selection-start-column="41" selection-end-line="9" selection-end-column="41" />
             </state>
           </provider>
         </entry>
@@ -168,8 +80,11 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/populations.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="5" column="38" lean-forward="true" selection-start-line="5" selection-start-column="38" selection-end-line="5" selection-end-column="38" />
+            <state relative-caret-position="418">
+              <caret line="22" column="20" selection-start-line="22" selection-start-column="20" selection-end-line="22" selection-end-column="20" />
+              <folding>
+                <element signature="e#14#78#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -177,19 +92,15 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/structs.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="143">
-              <caret line="22" column="1" selection-start-line="22" selection-start-column="1" selection-end-line="22" selection-end-column="1" />
+            <state relative-caret-position="152">
+              <caret line="16" column="5" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/prim.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="615">
-              <caret line="45" column="6" lean-forward="true" selection-start-line="45" selection-start-column="6" selection-end-line="45" selection-end-column="6" />
-            </state>
-          </provider>
+        <entry file="file://$PROJECT_DIR$/points.png">
+          <provider selected="true" editor-type-id="images" />
         </entry>
       </file>
     </leaf>
@@ -201,41 +112,27 @@
       </list>
     </option>
   </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>width :=</find>
-      <find>height</find>
-      <find>Flatten</find>
-      <find>GenoTO</find>
-      <find>GenoToGraph</find>
-      <find>image.</find>
-      <find>GraphToGeno</find>
-      <find>reps</find>
-      <find>fmt</find>
-    </findStrings>
-  </component>
-  <component name="GOROOT" path="/usr/local/Cellar/go/1.11.5/libexec" />
+  <component name="GOROOT" path="C:\Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/files.go" />
-        <option value="$PROJECT_DIR$/structs.go" />
-        <option value="$PROJECT_DIR$/objectives.go" />
-        <option value="$PROJECT_DIR$/generate_sol.go" />
-        <option value="$PROJECT_DIR$/display.go" />
-        <option value="$PROJECT_DIR$/prim.go" />
         <option value="$PROJECT_DIR$/helpers.go" />
+        <option value="$PROJECT_DIR$/objectives.go" />
+        <option value="$PROJECT_DIR$/structs.go" />
+        <option value="$PROJECT_DIR$/populations.go" />
         <option value="$PROJECT_DIR$/main.go" />
+        <option value="$PROJECT_DIR$/files.go" />
         <option value="$PROJECT_DIR$/genetics.go" />
+        <option value="$PROJECT_DIR$/nsga.go" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="91" />
-    <option name="y" value="37" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="103" />
+    <option name="y" value="70" />
     <option name="width" value="1519" />
     <option name="height" value="1007" />
   </component>
@@ -254,14 +151,7 @@
             </path>
             <path>
               <item name="gobio" type="b2602c69:ProjectViewProjectNode" />
-              <item name="gobio" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="gobio" type="b2602c69:ProjectViewProjectNode" />
-              <item name="gobio" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-              <item name="216066" type="462c0819:PsiDirectoryNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
             </path>
           </expand>
           <select />
@@ -299,17 +189,12 @@
     </option>
   </component>
   <component name="ToolWindowManager">
-    <frame x="91" y="37" width="1519" height="1007" extended-state="0" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Favorites" side_tool="true" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24983074" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.1953125" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Docker" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Database Changes" />
-      <window_info anchor="bottom" id="Version Control" />
-      <window_info anchor="bottom" id="Terminal" visible="true" weight="0.32896176" />
-      <window_info anchor="bottom" id="Event Log" side_tool="true" />
+      <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32896176" />
@@ -317,41 +202,54 @@
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="right" id="Database" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Database Changes" order="8" />
+      <window_info anchor="bottom" id="Version Control" order="9" />
+      <window_info anchor="bottom" id="Terminal" order="10" />
+      <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Database" order="3" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../assignment2/ai/objectives.go">
+    <entry file="file://$PROJECT_DIR$/../assignment2/ai/objectives.go" />
+    <entry file="file://$PROJECT_DIR$/helpers.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" column="78" selection-start-line="12" selection-start-column="78" selection-end-line="12" selection-end-column="78" />
+        <state relative-caret-position="456">
+          <caret line="28" column="42" selection-start-line="28" selection-start-column="42" selection-end-line="28" selection-end-column="42" />
         </state>
       </provider>
     </entry>
     <entry file="file:///usr/local/Cellar/go/1.11.5/libexec/src/builtin/builtin.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="196">
-          <caret line="31" column="5" selection-start-line="31" selection-start-column="5" selection-end-line="31" selection-end-column="5" />
+        <state relative-caret-position="57">
+          <caret line="3" column="5" selection-start-line="3" selection-start-column="5" selection-end-line="3" selection-end-column="5" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/go/src/github.com/soniakeys/graph/fromlist.go">
+    <entry file="file://C:/Go/src/builtin/builtin.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="30" column="38" selection-start-line="30" selection-start-column="38" selection-end-line="30" selection-end-column="38" />
+        <state relative-caret-position="474">
+          <caret line="182" column="43" lean-forward="true" selection-start-line="182" selection-start-column="43" selection-end-line="182" selection-end-column="43" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/files.go">
+    <entry file="file://$PROJECT_DIR$/../gonum.org/v1/plot/vg/vgimg/vgimg.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="18" column="17" selection-start-line="18" selection-start-column="17" selection-end-line="18" selection-end-column="17" />
+        <state relative-caret-position="456">
+          <caret line="197" column="43" selection-start-line="197" selection-start-column="43" selection-end-line="197" selection-end-column="43" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/generate_sol.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="114">
+          <caret line="9" column="41" selection-start-line="9" selection-start-column="41" selection-end-line="9" selection-end-column="41" />
         </state>
       </provider>
     </entry>
@@ -360,66 +258,55 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/display.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="43" selection-start-line="43" selection-end-line="43" />
+        <state relative-caret-position="152">
+          <caret line="16" column="5" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/img.jpg">
+    <entry file="file://$PROJECT_DIR$/points.png">
       <provider selected="true" editor-type-id="images" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/nsga.go">
+    <entry file="file://$PROJECT_DIR$/objectives.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="463">
-          <caret line="107" column="13" selection-start-line="107" selection-start-column="13" selection-end-line="107" selection-end-column="13" />
+        <state relative-caret-position="418">
+          <caret line="22" column="20" selection-start-line="22" selection-start-column="20" selection-end-line="22" selection-end-column="20" />
+          <folding>
+            <element signature="e#14#78#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/populations.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="38" lean-forward="true" selection-start-line="5" selection-start-column="38" selection-end-line="5" selection-end-column="38" />
+        <state relative-caret-position="361">
+          <caret line="19" column="43" selection-start-line="19" selection-start-column="43" selection-end-line="19" selection-end-column="43" />
+          <folding>
+            <element signature="e#14#45#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/structs.go">
+    <entry file="file://$PROJECT_DIR$/genetics.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="143">
-          <caret line="22" column="1" selection-start-line="22" selection-start-column="1" selection-end-line="22" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/helpers.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" selection-start-line="3" selection-end-line="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/generate_sol.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="54" column="43" lean-forward="true" selection-start-line="54" selection-start-column="43" selection-end-line="54" selection-end-column="43" />
+        <state relative-caret-position="677">
+          <caret line="104" selection-start-line="104" selection-end-line="104" />
+          <folding>
+            <element signature="e#14#91#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="312">
-          <caret line="39" lean-forward="true" selection-start-line="39" selection-end-line="39" />
-          <folding>
-            <element signature="e#14#39#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="152">
+          <caret line="8" selection-start-line="8" selection-end-line="8" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/objectives.go">
+    <entry file="file://$PROJECT_DIR$/nsga.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="22" column="23" lean-forward="true" selection-start-line="22" selection-start-column="23" selection-end-line="22" selection-end-column="23" />
-          <folding>
-            <element signature="e#14#78#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="416">
+          <caret line="91" column="61" lean-forward="true" selection-start-line="91" selection-start-column="61" selection-end-line="91" selection-end-column="61" />
         </state>
       </provider>
     </entry>

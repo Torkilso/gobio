@@ -7,8 +7,6 @@ import (
 	"math/rand"
 )
 
-
-
 func GraphToGeno(gr *graphs.Graph) []uint64 {
 	l := len((*gr).RawEdges)
 	geno := make([]uint64, l + 1)
@@ -100,7 +98,7 @@ func SolutionFromGenotype(img *Image, g *graphs.Graph) Solution {
 	deviation := deviation(img, groups)
 	connectivity := connectiviy(img, groups)
 	crowdingDistance := 0.0
-	return Solution{GraphToGeno(g), deviation, connectivity, crowdingDistance }
+	return Solution{GraphToGeno(g), deviation, connectivity, crowdingDistance}
 
 }
 func Crossover(img *Image, parent1, parent2 *Solution) (Solution, Solution) {
@@ -114,7 +112,7 @@ func Crossover(img *Image, parent1, parent2 *Solution) (Solution, Solution) {
 		// Update with 50% change
 		if rand.Float32() < .5 {
 			offspring1[i], offspring2[i] = (*parent2).genotype[i], (*parent1).genotype[i]
-		}else {
+		} else {
 			offspring1[i], offspring2[i] = (*parent1).genotype[i], (*parent2).genotype[i]
 		}
 	}
@@ -125,7 +123,7 @@ func Crossover(img *Image, parent1, parent2 *Solution) (Solution, Solution) {
 
 }
 
-
 func createPopulationFromParents(parents []*Solution) []*Solution {
+
 	return parents
 }
