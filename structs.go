@@ -45,10 +45,10 @@ type Pixel struct {
 func (px *Pixel) toRGBA() color.RGBA {
 	return color.RGBA{uint8(px.r), uint8(px.g), uint8(px.b), 0xFF}
 }
+
 type Image [][]Pixel
 
-
-func (img *Image) toRGBA() *image.RGBA{
+func (img *Image) toRGBA() *image.RGBA {
 	width := len(*img)
 	height := len((*img)[0])
 	rgba := image.NewRGBA(image.Rect(0, 0, width, height))

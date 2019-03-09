@@ -9,7 +9,7 @@ import (
 
 func GraphToGeno(gr *graphs.Graph) []uint64 {
 	l := len((*gr).RawEdges)
-	geno := make([]uint64, l + 1)
+	geno := make([]uint64, l+1)
 	for _, edge := range (*gr).RawEdges {
 		geno[edge.From] = edge.To
 	}
@@ -18,12 +18,13 @@ func GraphToGeno(gr *graphs.Graph) []uint64 {
 }
 
 func GenoToGraph(img *Image, geno []uint64) *graphs.Graph {
-	edges := make([]graphs.Edge, len(geno) - 1)
+	edges := make([]graphs.Edge, len(geno)-1)
 	for i := range edges {
 		edges[i] = graphs.Edge{uint64(i), geno[i], Dist(img, i, int(geno[i]))}
 	}
 	return graphs.GetGraph(edges, true)
 }
+
 func GeneratePopulation(img *Image, n int) *Population {
 	solutions := make([]Solution, n)
 
@@ -33,7 +34,7 @@ func GeneratePopulation(img *Image, n int) *Population {
 	primGraph, labels := PreparePrim(imgAsGraph)
 	log.Println("Prim graph end")
 
-	for i := 0 ; i < n ; i++ {
+	for i := 0; i < n; i++ {
 		start := rand.Intn(n)
 		mstGraph := graphs.GetGraph(Prim(uint64(start), primGraph, labels, imgAsGraph), true)
 		solutions[i] = SolutionFromGenotype(img, mstGraph)
@@ -54,13 +55,12 @@ func Tournament(p *Population, k int) int {
 		}
 	}
 	return bestIdx
-
 }
 
 func RunGeneration(img *Image, pop *Population) *Population {
 	result := make([]Solution, len((*pop).solutions))
 
-	for i := 0 ; i < len((*pop).solutions); i += 2 {
+	for i := 0; i < len((*pop).solutions); i += 2 {
 		p1Idx := Tournament(pop, 2)
 		p2Idx := Tournament(pop, 2)
 
@@ -92,15 +92,15 @@ func Mutate(genotype []uint64, img *Image) Solution {
 	return SolutionFromGenotype(img, graph)
 }
 
-
 func SolutionFromGenotype(img *Image, g *graphs.Graph) Solution {
 	groups := g.ConnectedComponents()
 	deviation := deviation(img, groups)
 	connectivity := connectiviy(img, groups)
 	crowdingDistance := 0.0
-	return Solution{GraphToGeno(g), deviation, connectivity, crowdingDistance}
 
+	return Solution{GraphToGeno(g), deviation, connectivity, crowdingDistance}
 }
+
 func Crossover(img *Image, parent1, parent2 *Solution) (Solution, Solution) {
 
 	n := len((*parent1).genotype)
@@ -121,9 +121,4 @@ func Crossover(img *Image, parent1, parent2 *Solution) (Solution, Solution) {
 
 	return SolutionFromGenotype(img, graph1), SolutionFromGenotype(img, graph2)
 
-}
-
-func createPopulationFromParents(parents []*Solution) []*Solution {
-
-	return parents
 }

@@ -4,7 +4,6 @@ import (
 	"github.com/alonsovidales/go_graph"
 )
 
-
 func GetTargets(img *Image, idx int) []int {
 	width := len(*img) - 1
 	height := len((*img)[0]) - 1
@@ -52,8 +51,8 @@ func GetTargets(img *Image, idx int) []int {
 
 func GenerateGraph(img *Image) *graphs.Graph {
 	numPixels := len(*img) * len((*img)[0])
-	edges := make([]graphs.Edge, 0, numPixels * 8)
-	for i := 0 ; i < numPixels ; i++ {
+	edges := make([]graphs.Edge, 0, numPixels*8)
+	for i := 0; i < numPixels; i++ {
 		targets := GetTargets(img, i)
 		for _, target := range targets {
 			edges = append(edges, graphs.Edge{uint64(i), uint64(target), Dist(img, i, target)})

@@ -13,7 +13,6 @@ func (a byWeight) Len() int           { return len(a) }
 func (a byWeight) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a byWeight) Less(i, j int) bool { return a[i].Weight < a[j].Weight }
 
-
 func PreparePrim(gr *graphs.Graph) (*graph.LabeledUndirected, []graph.LI) {
 	labels := make([]graph.LI, len((*gr).RawEdges))
 	var g graph.LabeledUndirected
@@ -28,7 +27,6 @@ func PreparePrim(gr *graphs.Graph) (*graph.LabeledUndirected, []graph.LI) {
 
 func Prim(start uint64, g *graph.LabeledUndirected, labels []graph.LI, gr *graphs.Graph) (mst []graphs.Edge) {
 
-
 	actualStart := graph.NI(start)
 
 	// weight function
@@ -41,7 +39,6 @@ func Prim(start uint64, g *graph.LabeledUndirected, labels []graph.LI, gr *graph
 
 	var leaves bits.Bits
 	_, _ = g.Prim(actualStart, w, &f, labels, &leaves)
-
 
 	res, _ := f.LabeledUndirected(labels, nil)
 	edges := make([]graphs.Edge, 0)

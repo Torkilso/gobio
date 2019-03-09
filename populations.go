@@ -8,9 +8,6 @@ import (
 func createInitialPopulation(image *Image, populationSize int) []*Solution {
 	population := make([]*Solution, 0)
 
-	// Generate solutions based on mst
-	// Use 1 goroutine for each to speed up this stuff
-
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
 
@@ -26,8 +23,5 @@ func createInitialPopulation(image *Image, populationSize int) []*Solution {
 }
 
 func (solution *Solution) dominate(opponent *Solution) bool {
-	//fmt.Println(solution)
-	//fmt.Println(opponent)
-	//fmt.Println(solution.connectivity > opponent.connectivity && solution.deviation > opponent.deviation)
 	return solution.connectivity < opponent.connectivity && solution.deviation < opponent.deviation
 }

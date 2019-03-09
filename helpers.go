@@ -11,7 +11,7 @@ func Flatten(width int, idx int) (x, y int) {
 }
 
 func Expand(width int, x, y int) int {
-	return y * width + x
+	return y*width + x
 }
 func Dist(img *Image, idx1, idx2 int) float64 {
 
@@ -27,8 +27,6 @@ func Dist(img *Image, idx1, idx2 int) float64 {
 func ColorDist(p1 *Pixel, p2 *Pixel) float64 {
 	return math.Sqrt(math.Pow(float64(p1.r-p2.r), 2) + math.Pow(float64(p1.g-p2.g), 2) + math.Pow(float64(p1.b-p2.b), 2))
 }
-
-
 
 func Centroid(img *Image, group map[uint64]bool) *Pixel {
 

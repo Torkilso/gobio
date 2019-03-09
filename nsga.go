@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math"
 	"sort"
 )
@@ -89,7 +90,7 @@ func crowdingDistanceAssignment(ids []int, population []*Solution) {
 
 func nsgaII(image *Image, generations, populationSize int) []*Solution {
 
-	parents := createInitialPopulation(image, populationSize)
+	parents := GeneratePopulationNSGA(image, populationSize)
 	children := make([]*Solution, 0)
 
 	for t := 0; t < generations; t++ {
@@ -98,6 +99,10 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 		fronts := fastNonDominatedSort(population)
 		newParents := make([]*Solution, 0)
 		i := 0
+
+		visualizeFronts(population, fronts)
+
+		fmt.Println(fronts)
 
 		for len(newParents)+len(fronts[i]) <= populationSize {
 			if len(fronts[i]) == 0 {
@@ -130,12 +135,11 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 		}
 
 		parents = append(newParents, lastFrontier...)
-		//children = createPopulationFromParents(parents)
-		children = createInitialPopulation(image, populationSize)
+		children = createPopulationFromParents(image, parents)
 		newParents = make([]*Solution, 0)
 		i = 0
 
-		//fmt.Printf("\rGeneration: %d", t)
+		fmt.Printf("\rGeneration: %d", t)
 	}
 
 	return children

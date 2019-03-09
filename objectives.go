@@ -7,7 +7,6 @@ var (
 	minConnectivity float64 = 0
 )
 
-
 func deviation(img *Image, connectedGroups []map[uint64]bool) float64 {
 
 	var dist float64
@@ -26,15 +25,15 @@ func deviation(img *Image, connectedGroups []map[uint64]bool) float64 {
 func connectiviy(img *Image, connectedGroups []map[uint64]bool) float64 {
 
 	var dist float64
+
 	for _, group := range connectedGroups {
 		for k := range group {
 			intK := int(k)
 			for j, neighbour := range GetTargets(img, intK) {
 				if _, ok := group[uint64(neighbour)]; ok { // To nothing
 				} else {
-					dist += float64(1 / (j + 1))
+					dist += 1.0 / (float64(j) + 1.0)
 				}
-
 			}
 		}
 	}
