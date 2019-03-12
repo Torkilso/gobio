@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"sort"
+	"time"
 )
 
 type SearchHelper struct {
@@ -68,7 +69,7 @@ func crowdingDistanceAssignment(ids []int, population []*Solution) {
 
 	// for deviation
 	sort.Slice(ids, func(i, j int) bool {
-		return population[ids[i]].deviation > population[ids[j]].deviation
+		return population[ids[i]].deviation < population[ids[j]].deviation
 	})
 
 	population[ids[0]].crowdingDistance = math.Inf(1)
@@ -80,7 +81,7 @@ func crowdingDistanceAssignment(ids []int, population []*Solution) {
 
 	// for connectivity
 	sort.Slice(ids, func(i, j int) bool {
-		return population[ids[i]].connectivity > population[ids[j]].connectivity
+		return population[ids[i]].connectivity < population[ids[j]].connectivity
 	})
 
 	for i := 1; i < size-1; i++ {
@@ -90,19 +91,31 @@ func crowdingDistanceAssignment(ids []int, population []*Solution) {
 
 func nsgaII(image *Image, generations, populationSize int) []*Solution {
 
+	fmt.Println("Initiating NSGAII")
+	fmt.Println("Generating", populationSize, "solutions")
+
+	start := time.Now()
+
 	parents := GeneratePopulationNSGA(image, populationSize)
+
 	children := make([]*Solution, 0)
 
+	fmt.Println("Used", time.Since(start).Seconds(), "seconds to generate solutions")
+	fmt.Println()
+	fmt.Println("Evolving solutions")
+
+	return parents
+
+	start = time.Now()
+
 	for t := 0; t < generations; t++ {
+		fmt.Println("Generation:", t)
+		startGeneration := time.Now()
 
 		population := append(parents, children...)
 		fronts := fastNonDominatedSort(population)
 		newParents := make([]*Solution, 0)
 		i := 0
-
-		visualizeFronts(population, fronts)
-
-		fmt.Println(fronts)
 
 		for len(newParents)+len(fronts[i]) <= populationSize {
 			if len(fronts[i]) == 0 {
@@ -135,11 +148,23 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 		}
 
 		parents = append(newParents, lastFrontier...)
+
 		children = createPopulationFromParents(image, parents)
+
 		newParents = make([]*Solution, 0)
 		i = 0
 
-		fmt.Printf("\rGeneration: %d", t)
+		fmt.Println("Used", time.Since(startGeneration).Seconds(), "seconds")
+		fmt.Println()
+	}
+
+	fmt.Println("Used", time.Since(start).Seconds(), "seconds to evolve solutions")
+
+	for _, sol := range children {
+
+		if sol.deviation == 0 {
+			fmt.Println(sol)
+		}
 	}
 
 	return children

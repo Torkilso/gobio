@@ -39,7 +39,6 @@ func SaveJPEG(img *Image) {
 	}
 	defer f.Close()
 	jpeg.Encode(f, (*img).toRGBA(), nil)
-
 }
 
 func SaveJPEGRaw(img *image.RGBA, name string) {
@@ -51,8 +50,7 @@ func SaveJPEGRaw(img *image.RGBA, name string) {
 	jpeg.Encode(f, img, nil)
 }
 
-
-func DrawImageBoundries(img *Image, gr *graphs.Graph, color color.Color ) *image.RGBA {
+func DrawImageBoundries(img *Image, gr *graphs.Graph, color color.Color) *image.RGBA {
 	res := img.toRGBA()
 	groups := gr.ConnectedComponents()
 	width := len(*img)
