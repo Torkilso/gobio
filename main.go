@@ -25,25 +25,24 @@ func runNSGA(img *Image) {
 
 	start := time.Now()
 
-	solutions := nsgaII(img, 1, 2)
+	solutions := nsgaII(img, 100, 80)
 
 	fmt.Println("Used", time.Since(start).Seconds(), "seconds in total")
 
 	fronts := fastNonDominatedSort(solutions)
 	visualizeFronts(solutions, fronts)
 
-	/*graph := GenoToGraph(img, solutions[0].genotype)
+	graph := GenoToGraph(img, solutions[0].genotype)
 	segments := graph.ConnectedComponents()
 	fmt.Println("Amount of segments:", len(segments))
-
-	thisImg := img.toRGBA()
-
 	visualizeImageGraph("mstgraph.png", img, graph)
 
-	imgCopy := GoImageToImage(thisImg)
+	//thisImg := img.toRGBA()
 
-	edgedImg := DrawImageBoundries(&imgCopy, graph, color.Black)
-	SaveJPEGRaw(edgedImg, "edges.jpg")*/
+	//imgCopy := GoImageToImage(thisImg)
+
+	//edgedImg := DrawImageBoundries(&imgCopy, graph, color.Black)
+	//SaveJPEGRaw(edgedImg, "edges.jpg")
 }
 
 func runGenerations(img *Image) {

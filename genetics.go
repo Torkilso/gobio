@@ -47,8 +47,7 @@ func RunGeneration(img *Image, solutions []*Solution) []*Solution {
 }
 
 func GraphToGeno(gr *graphs.Graph, size int) []uint64 {
-	l := len(gr.RawEdges)
-	geno := make([]uint64, l+1)
+	geno := make([]uint64, size)
 
 	edgesForNode := make(map[uint64]map[uint64]bool)
 
@@ -65,11 +64,13 @@ func GraphToGeno(gr *graphs.Graph, size int) []uint64 {
 
 	assigned := 0
 
-	for assigned < len(gr.Vertices)-1 {
+	for assigned < size-1 {
+		noneFound := true
 		for id, val := range edgesForNode {
 			if len(val) == 1 {
 				for key := range edgesForNode[id] {
 					geno[id] = key
+					noneFound = false
 					assigned++
 
 					delete(edgesForNode[key], id)
@@ -78,6 +79,24 @@ func GraphToGeno(gr *graphs.Graph, size int) []uint64 {
 			}
 		}
 
+		if noneFound {
+			for id := range edgesForNode {
+				if len(edgesForNode[id]) == 0 {
+					geno[id] = id
+					assigned++
+
+					delete(edgesForNode, id)
+				} else {
+					for key := range edgesForNode[id] {
+						geno[id] = key
+						assigned++
+
+						delete(edgesForNode[key], id)
+						delete(edgesForNode, id)
+					}
+				}
+			}
+		}
 	}
 
 	for lastKey := range edgesForNode {
