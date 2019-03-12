@@ -19,7 +19,6 @@ func (s *Solution) weightedSum() float64 {
 	return s.deviation + s.connectivity*10000000
 }
 
-
 func BestSolution(solutions []*Solution) *Solution {
 	bestFitness := math.MaxFloat64
 	bestIdx := -1

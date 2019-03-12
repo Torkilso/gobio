@@ -171,9 +171,9 @@ func (q *primQueue) update(u, v uint64, key float64) {
 		fmt.Println("Could not update", v, q.indexOf)
 		return
 	}
-	fmt.Println( "FROM", q.nodes[i].From,"TO", v, "Weight", key, q.nodes[i] )
+	fmt.Println("FROM", q.nodes[i].From, "TO", v, "Weight", key, q.nodes[i])
 	q.nodes[i].To = v
 	q.nodes[i].Weight = key
-	fmt.Println("After",q.nodes[i] )
+	fmt.Println("After", q.nodes[i])
 	heap.Fix(q, i)
 }

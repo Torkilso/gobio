@@ -9,11 +9,7 @@ import (
 
 func main() {
 
-<<<<<<< HEAD
 	imagePath := "./testimages/Untitled.jpg"
-=======
-	imagePath := "./data/216066/Test_image (1).jpg"
->>>>>>> f0bef1c8e532f8d639127a9b92faca1f241e0e87
 	//imagePath := "./data/216066/Test_image.jpg"
 	image := readJPEGFile(imagePath)
 
@@ -68,7 +64,7 @@ func runGenerations(img *Image) {
 
 		thisImg := img.toRGBA()
 		imgCopy := GoImageToImage(thisImg)
-		fmt.Println("Number of groups", len(groups), "Pixels", len(*img) * len((*img)[0]), groups, graph.RawEdges)
+		fmt.Println("Number of groups", len(groups), "Pixels", len(*img)*len((*img)[0]), groups, graph.RawEdges)
 		for _, g := range groups {
 			c := Centroid(img, g)
 			fmt.Println("Centroid", c)

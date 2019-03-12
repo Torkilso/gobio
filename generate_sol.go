@@ -19,32 +19,32 @@ func GetTargets(img *Image, idx int) []int {
 		nodes = append(nodes, Expand(width, x, y-1))
 	}
 	// TOP-RIGHT
-	if y > 0 && x < width - 1 {
+	if y > 0 && x < width-1 {
 		//fmt.Println("TOP-RIGHT")
 
 		nodes = append(nodes, Expand(width, x+1, y-1))
 	}
 	// RIGHT
-	if x < width - 1 {
+	if x < width-1 {
 		//fmt.Println("RIGHT")
 
 		nodes = append(nodes, Expand(width, x+1, y))
 	}
 	//BOTTOM-RIGHT
-	if x < width - 1 && y < height - 1 {
+	if x < width-1 && y < height-1 {
 		//	fmt.Println("BOTTOM-RIGHT")
 
 		nodes = append(nodes, Expand(width, x+1, y+1))
 	}
 	// BOTTOM
-	if y < height - 1 {
+	if y < height-1 {
 		//fmt.Println("BOTTOM")
 
 		nodes = append(nodes, Expand(width, x, y+1))
 
 	}
 	// BOTTOM-LEFT
-	if y < height - 1 && x > 0 {
+	if y < height-1 && x > 0 {
 		//fmt.Println("BOTTOM-LEFT")
 
 		nodes = append(nodes, Expand(width, x-1, y+1))
@@ -66,7 +66,7 @@ func GetTargets(img *Image, idx int) []int {
 }
 
 func GenerateGraph(img *Image) *graphs.Graph {
-	numPixels := len(*img) * len((*img)[0]) - 1
+	numPixels := len(*img)*len((*img)[0]) - 1
 	edges := make([]graphs.Edge, 0, numPixels*8)
 	for i := 0; i < numPixels; i++ {
 		targets := GetTargets(img, i)
