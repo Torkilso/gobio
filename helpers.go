@@ -10,6 +10,10 @@ func Flatten(width int, idx int) (x, y int) {
 	return x, y
 }
 
+func ImageSize(img *Image) int {
+	return len(*img) * len((*img)[0])
+}
+
 func Expand(width int, x, y int) int {
 	return y*width + x
 }

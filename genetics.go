@@ -34,6 +34,7 @@ func RunGeneration(img *Image, solutions []*Solution) []*Solution {
 
 		result[i], result[i+1] = Crossover(img, p1, p2)
 
+
 		/* DONT MUTATE YET
 		if rand.Float32() < .1 {
 			result[i] = Mutate(result[i].genotype, img)
@@ -47,37 +48,38 @@ func RunGeneration(img *Image, solutions []*Solution) []*Solution {
 }
 
 
-func GraphToGeno(gr *graphs.Graph) []uint64 {
-	l := len((*gr).RawEdges)
-	geno := make([]uint64, l+1)
+func GraphToGeno(gr *graphs.Graph, size int) []uint64 {
+	geno := make([]uint64, size)
 
-	for i, edges := range (*gr).VertexEdges {
-		for key := range edges {
-			geno[int(i)] = key
-			break
+
+	possibleEdges := make(map[uint64][]uint64)
+
+	for _, edge := range gr.RawEdges {
+
+		if _, ok := possibleEdges[edge.From]; ok {
+			possibleEdges[edge.From] = append(possibleEdges[edge.From], edge.To)
+		}else {
+			possibleEdges[edge.From] = []uint64{edge.To}
+		}
+		if _, ok := possibleEdges[edge.To]; ok {
+			possibleEdges[edge.To] = append(possibleEdges[edge.To], edge.From)
+		}else {
+			possibleEdges[edge.To] = []uint64{edge.From}
 		}
 	}
-	/*
-	for i := range geno {
-		geno[i] = math.MaxUint64
+	for edge, edges := range possibleEdges{
+		geno[edge] = edges[0]
 	}
-	for _, edge := range (*gr).RawEdges {
-		if geno[edge.From] == math.MaxUint64 {
-			geno[edge.From] = edge.To
-		} else {
-			geno[edge.To] = edge.From
-		}
-	}*/
 
-	geno[l] = uint64(l) // Points to itself
 	return geno
 }
 
 func GenoToGraph(img *Image, geno []uint64) *graphs.Graph {
-	edges := make([]graphs.Edge, len(geno)-1)
-	for i := range edges {
+	edges := make([]graphs.Edge, len(geno))
+	for i := range geno {
 		edges[i] = graphs.Edge{uint64(i), geno[i], Dist(img, i, int(geno[i]))}
 	}
+
 	return graphs.GetGraph(edges, true)
 }
 
@@ -92,7 +94,6 @@ func GeneratePopulation(img *Image, n int) []*Solution {
 
 	primGraph, labels := PreparePrim(imgAsGraph)
 
-	visualizeImageGraph("graph.png", img, imgAsGraph)
 
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
@@ -164,7 +165,7 @@ func Crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 			offspring1[i], offspring2[i] = (*parent1).genotype[i], (*parent2).genotype[i]
 		}
 	}
-	graph1 := GenoToGraph(img, offspring1)
+	graph1 := GenoToGraph(img, offspring1,)
 	graph2 := GenoToGraph(img, offspring2)
 
 	return SolutionFromGenotypeNSGA(img, graph1), SolutionFromGenotypeNSGA(img, graph2)
@@ -176,6 +177,7 @@ func SolutionFromGenotypeNSGA(img *Image, g *graphs.Graph) *Solution {
 	deviation := deviation(img, groups)
 	connectivity := connectiviy(img, groups)
 	crowdingDistance := 0.0
+	//visualizeImageGraph("graph.png", img, g)
 
-	return &Solution{GraphToGeno(g), deviation, connectivity, crowdingDistance}
+	return &Solution{GraphToGeno(g, ImageSize(img)), deviation, connectivity, crowdingDistance}
 }
