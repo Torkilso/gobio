@@ -11,6 +11,10 @@ func GeneratePopulationNSGA(img *Image, n int) []*Solution {
 	solutions := make([]*Solution, n)
 
 	imgAsGraph := GenerateGraph(img)
+
+	width := len(*img)
+	height := len((*img)[0])
+
 	primGraph, labels := PreparePrim(imgAsGraph)
 
 	visualizeImageGraph("graph.png", img, imgAsGraph)
@@ -19,9 +23,11 @@ func GeneratePopulationNSGA(img *Image, n int) []*Solution {
 	r1 := rand.New(s1)
 
 	for i := 0; i < n; i++ {
-		start := r1.Intn(n)
-		mstGraph := graphs.GetGraph(Prim(uint64(start), primGraph, labels, imgAsGraph), true)
-		visualizeImageGraph("mstgraph.png", img, mstGraph)
+		start := r1.Intn(width * height)
+		mst2 := Prim(uint64(start), primGraph, labels, imgAsGraph)
+
+		mstGraph := graphs.GetGraph(mst2, false)
+		//visualizeImageGraph("mstgraph.png", img, mstGraph)
 
 		solutions[i] = SolutionFromGenotypeNSGA(img, mstGraph)
 	}
