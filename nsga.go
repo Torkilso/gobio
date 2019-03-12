@@ -104,8 +104,6 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 
 	children := make([]*Solution, 0)
 
-	return parents
-
 	start = time.Now()
 
 	for t := 0; t < generations; t++ {
@@ -159,13 +157,6 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 	}
 
 	fmt.Println("Used", time.Since(start).Seconds(), "seconds to evolve solutions")
-
-	for _, sol := range children {
-
-		if sol.deviation == 0 {
-			fmt.Println(sol)
-		}
-	}
 
 	return children
 }
