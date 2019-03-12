@@ -3,14 +3,13 @@ package main
 import (
 	"fmt"
 	"image/color"
-	"log"
 	"math/rand"
 	"time"
 )
 
 func main() {
 
-	imagePath := "./testimages/Untitled.jpg"
+	imagePath := "./data/216066/Test_image.jpg"
 	//imagePath := "./data/216066/Test_image.jpg"
 	image := readJPEGFile(imagePath)
 
@@ -18,8 +17,8 @@ func main() {
 	//_ = solutions
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	//runGenerations(&image)
-	runNSGA(&image)
+	runGenerations(&image)
+	//runNSGA(&image)
 }
 
 func runNSGA(img *Image) {
@@ -40,11 +39,11 @@ func runNSGA(img *Image) {
 
 func runGenerations(img *Image) {
 
-	pop := GeneratePopulation(img, 100)
+	pop := GeneratePopulation(img, 4)
 
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 4; i++ {
 		pop = RunGeneration(img, pop)
-		sol := pop.BestSolution()
+		sol := BestSolution(pop)
 		graph := GenoToGraph(img, sol.genotype)
 		groups := graph.ConnectedComponents()
 		width := len(*img)
@@ -53,7 +52,6 @@ func runGenerations(img *Image) {
 		imgCopy := GoImageToImage(thisImg)
 		for _, g := range groups {
 			c := Centroid(img, g)
-			log.Println("Centroid", c)
 			for k := range g {
 				x, y := Flatten(width, int(k))
 				thisImg.Set(x, y, c.toRGBA())

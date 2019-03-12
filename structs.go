@@ -19,21 +19,18 @@ func (s *Solution) weightedSum() float64 {
 	return s.deviation + s.connectivity*1000000
 }
 
-type Population struct {
-	solutions []Solution
-}
 
-func (p *Population) BestSolution() Solution {
+func BestSolution(solutions []*Solution) *Solution {
 	bestFitness := math.MaxFloat64
 	bestIdx := -1
-	for i, s := range p.solutions {
+	for i, s := range solutions {
 		f := s.weightedSum()
 		if f < bestFitness {
 			bestIdx = i
 			bestFitness = f
 		}
 	}
-	return p.solutions[bestIdx]
+	return solutions[bestIdx]
 }
 
 type Pixel struct {

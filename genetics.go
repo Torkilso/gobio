@@ -1,12 +1,51 @@
 package main
 
 import (
-	"fmt"
 	"github.com/alonsovidales/go_graph"
 	"math"
 	"math/rand"
 	"time"
 )
+func Tournament(solutions []*Solution, k int) int {
+
+	bestIdx := -1
+	bestCost := math.MaxFloat64
+	for i := 0; i < k; i++ {
+		idx := rand.Intn(len(solutions))
+		c := solutions[i].weightedSum()
+		if c < bestCost {
+			bestIdx = idx
+			bestCost = c
+		}
+	}
+	return bestIdx
+}
+
+
+func RunGeneration(img *Image, solutions []*Solution) []*Solution {
+	result := make([]*Solution, len(solutions))
+
+	for i := 0; i < len(solutions); i += 2 {
+		p1Idx := Tournament(solutions, 2)
+		p2Idx := Tournament(solutions, 2)
+
+		p1 := solutions[p1Idx]
+		p2 := solutions[p2Idx]
+
+		result[i], result[i+1] = Crossover(img, p1, p2)
+
+		/* DONT MUTATE YET
+		if rand.Float32() < .1 {
+			result[i] = Mutate(result[i].genotype, img)
+		}
+		if rand.Float32() < .1 {
+			result[i+1] = Mutate(result[i+1].genotype, img)
+		}*/
+	}
+
+	return result
+}
+
 
 func GraphToGeno(gr *graphs.Graph) []uint64 {
 	l := len((*gr).RawEdges)
@@ -28,8 +67,8 @@ func GraphToGeno(gr *graphs.Graph) []uint64 {
 		} else {
 			geno[edge.To] = edge.From
 		}
-	}
-	*/
+	}*/
+
 	geno[l] = uint64(l) // Points to itself
 	return geno
 }
@@ -42,15 +81,9 @@ func GenoToGraph(img *Image, geno []uint64) *graphs.Graph {
 	return graphs.GetGraph(edges, true)
 }
 
-func TotalDist(edges []graphs.Edge) {
-	var tot float64
 
-	for _, edge := range edges {
-		tot += edge.Weight
-	}
-}
-func GeneratePopulation(img *Image, n int) *Population {
-	solutions := make([]Solution, n)
+func GeneratePopulation(img *Image, n int) []*Solution {
+	solutions := make([]*Solution, n)
 
 	imgAsGraph := GenerateGraph(img)
 
@@ -58,93 +91,65 @@ func GeneratePopulation(img *Image, n int) *Population {
 	height := len((*img)[0])
 
 	primGraph, labels := PreparePrim(imgAsGraph)
+
+	visualizeImageGraph("graph.png", img, imgAsGraph)
+
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
-	//primGraph := PreparePrim2(imgAsGraph)
-	for i := 0 ; i < n ; i++ {
+
+	for i := 0; i < n; i++ {
 		start := r1.Intn(width * height)
-		//s2 := rand.Intn(width * height)
-		//s3 := rand.Intn(width * height)
-
-		//mst := Prim3(uint64(start), imgAsGraph)
-		//fmt.Println("Len mst", len(mst))
 		mst2 := Prim(uint64(start), primGraph, labels, imgAsGraph)
-		//mst3 := Prim(uint64(s3), primGraph, labels, imgAsGraph)
+
 		mstGraph := graphs.GetGraph(mst2, false)
+		//visualizeImageGraph("mstgraph.png", img, mstGraph)
 
-		solutions[i] = SolutionFromGenotype(img, mstGraph)
-		//fmt.Println("EDGES", mstGraph.RawEdges)
-		//fmt.Println("GENO", solutions[i].genotype)
-		/*for j := range mst {
-			fmt.Println("Edges", start, mst[j], s2, mst2[j], s3, mst3[j])
-		}*/
-
+		solutions[i] = SolutionFromGenotypeNSGA(img, mstGraph)
 	}
-	return &Population{solutions}
+	return solutions
 }
 
-func Tournament(p *Population, k int) int {
+// runGeneration for NSGA
+func createPopulationFromParents(img *Image, pop []*Solution) []*Solution {
+	result := make([]*Solution, len(pop))
 
-	bestIdx := -1
-	bestCost := math.MaxFloat64
-	for i := 0; i < k; i++ {
-		idx := rand.Intn(len((*p).solutions))
-		c := (*p).solutions[i].weightedSum()
-		if c < bestCost {
-			bestIdx = idx
-			bestCost = c
-		}
-	}
-	return bestIdx
-}
+	s1 := rand.NewSource(time.Now().UnixNano())
+	r1 := rand.New(s1)
 
-func RunGeneration(img *Image, pop *Population) *Population {
-	result := make([]Solution, len((*pop).solutions))
+	for i := 0; i < len(pop); i += 2 {
+		p1Idx := r1.Intn(len(pop))
+		p2Idx := r1.Intn(len(pop))
 
-	for i := 0; i < len((*pop).solutions); i += 2 {
-		p1Idx := Tournament(pop, 2)
-		p2Idx := Tournament(pop, 2)
+		p1 := pop[p1Idx]
+		p2 := pop[p2Idx]
 
-		p1 := (*pop).solutions[p1Idx]
-		p2 := (*pop).solutions[p2Idx]
+		result[i], result[i+1] = Crossover(img, p1, p2)
 
-		result[i], result[i+1] = Crossover(img, &p1, &p2)
-
-		/*
-		if rand.Float32() < .1 {
+		if r1.Float32() < .1 {
 			result[i] = Mutate(result[i].genotype, img)
 		}
-		if rand.Float32() < .1 {
+
+		if r1.Float32() < .1 {
 			result[i+1] = Mutate(result[i+1].genotype, img)
 		}
-		*/
 	}
 
-	return &Population{result}
+	return result
 }
 
-func Mutate(genotype []uint64, img *Image) Solution {
+func Mutate(genotype []uint64, img *Image) *Solution {
 	for i := range genotype {
-		if rand.Float32() < .1 {
+		if rand.Float32() < .2 {
 			possibleValues := GetTargets(img, i)
 			chosen := rand.Intn(len(possibleValues))
 			genotype[i] = uint64(possibleValues[chosen])
 		}
 	}
 	graph := GenoToGraph(img, genotype)
-	return SolutionFromGenotype(img, graph)
+	return SolutionFromGenotypeNSGA(img, graph)
 }
 
-func SolutionFromGenotype(img *Image, g *graphs.Graph) Solution {
-	groups := g.ConnectedComponents()
-	deviation := deviation(img, groups)
-	connectivity := connectiviy(img, groups)
-	crowdingDistance := 0.0
-
-	return Solution{GraphToGeno(g), deviation, connectivity, crowdingDistance}
-}
-
-func Crossover(img *Image, parent1, parent2 *Solution) (Solution, Solution) {
+func Crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 
 	n := len((*parent1).genotype)
 
@@ -159,21 +164,18 @@ func Crossover(img *Image, parent1, parent2 *Solution) (Solution, Solution) {
 			offspring1[i], offspring2[i] = (*parent1).genotype[i], (*parent2).genotype[i]
 		}
 	}
-	eq := true
-	for i := range (*parent1).genotype {
-		if (*parent1).genotype[i] != (*parent2).genotype[i]{
-			eq = false
-		}
-	}
-	if !eq {
-		fmt.Println(parent1)
-		fmt.Println(parent2)
-
-	}
-
 	graph1 := GenoToGraph(img, offspring1)
 	graph2 := GenoToGraph(img, offspring2)
 
-	return SolutionFromGenotype(img, graph1), SolutionFromGenotype(img, graph2)
+	return SolutionFromGenotypeNSGA(img, graph1), SolutionFromGenotypeNSGA(img, graph2)
+}
 
+func SolutionFromGenotypeNSGA(img *Image, g *graphs.Graph) *Solution {
+	groups := g.ConnectedComponents()
+
+	deviation := deviation(img, groups)
+	connectivity := connectiviy(img, groups)
+	crowdingDistance := 0.0
+
+	return &Solution{GraphToGeno(g), deviation, connectivity, crowdingDistance}
 }

@@ -96,7 +96,7 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 
 	start := time.Now()
 
-	parents := GeneratePopulationNSGA(image, populationSize)
+	parents := GeneratePopulation(image, populationSize)
 
 	children := make([]*Solution, 0)
 
