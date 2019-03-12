@@ -18,9 +18,9 @@ func main() {
 	//_ = solutions
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	//runGenerations(&image)
+	runGenerations(&image)
 	//runNSGA(&image)
-	runSoniaMST(&image)
+	//runSoniaMST(&image)
 }
 
 func runNSGA(img *Image) {
@@ -51,10 +51,10 @@ func runNSGA(img *Image) {
 func runGenerations(img *Image) {
 
 	pop := GeneratePopulation(img, 2)
-	sol := BestSolution(pop)
-	graph := GenoToGraph(img, sol.genotype)
+	//sol := BestSolution(pop)
+	//graph := GenoToGraph(img, sol.genotype)
 
-	visualizeImageGraph("graph.png", img, graph)
+	//visualizeImageGraph("graph.png", img, graph)
 
 	for i := 0; i < 1; i++ {
 		pop = RunGeneration(img, pop)
@@ -69,7 +69,6 @@ func runGenerations(img *Image) {
 		fmt.Println("Number of groups", len(groups), "Pixels", len(*img)*len((*img)[0]), groups, graph.RawEdges)
 		for _, g := range groups {
 			c := Centroid(img, g)
-			fmt.Println("Centroid", c)
 			for k := range g {
 				x, y := Flatten(width, int(k))
 				thisImg.Set(x, y, c.toRGBA())
@@ -78,30 +77,11 @@ func runGenerations(img *Image) {
 
 		edgedImg := DrawImageBoundries(&imgCopy, graph, color.Black)
 		SaveJPEGRaw(edgedImg, "edges.jpg")
-		visualizeImageGraph("graph.png", img, graph)
+		//visualizeImageGraph("graph.png", img, graph)
 		SaveJPEGRaw(thisImg, "img.jpg")
 
 		fmt.Println("Gen", i, "Best", sol.weightedSum(), "Segments", len(groups))
 	}
-}
-
-
-func runMst(img *Image) {
-
-	imgAsGraph := GenerateGraph(img)
-
-	width := len(*img)
-	height := len((*img)[0])
-
-	s1 := rand.NewSource(time.Now().UnixNano())
-	r1 := rand.New(s1)
-
-	start := r1.Intn(width * height)
-	mst2 := Prim4(uint64(start), imgAsGraph)
-
-	mstGraph := graphs.GetGraph(mst2, false)
-	visualizeImageGraph("mst.png", img, mstGraph)
-
 }
 
 func runSoniaMST(img *Image) {
@@ -118,8 +98,10 @@ func runSoniaMST(img *Image) {
 
 	primGraph, labels := PreparePrim(imgAsGraph)
 	fmt.Println("Time to prepare", time.Now().Sub(startT))
+	startT = time.Now()
 
 	mst2 := Prim(uint64(start), primGraph, labels,imgAsGraph)
+	fmt.Println("Time to prim", time.Now().Sub(startT))
 
 	mstGraph := graphs.GetGraph(mst2, false)
 	visualizeImageGraph("mst.png", img, mstGraph)

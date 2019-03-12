@@ -98,13 +98,10 @@ func GeneratePopulation(img *Image, n int) []*Solution {
 		mst2 := Prim(uint64(start), primGraph, labels, imgAsGraph)
 
 		mstGraph := graphs.GetGraph(mst2, false)
-		visualizeImageGraph("mst.png", img, mstGraph)
 
 		solutions[i] = SolutionFromGenotypeNSGA(img, mstGraph)
 	}
 
-	graphSol := GenoToGraph(img, solutions[1].genotype)
-	visualizeImageGraph("solution2.png", img, graphSol)
 
 	return solutions
 }
