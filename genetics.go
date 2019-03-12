@@ -6,6 +6,7 @@ import (
 	"math"
 	"math/rand"
 	"sort"
+	"sync"
 	"time"
 )
 
@@ -118,7 +119,7 @@ func GenoToGraph(img *Image, geno []uint64) *graphs.Graph {
 }
 
 func GeneratePopulation(img *Image, n int) []*Solution {
-	solutions := make([]*Solution, n)
+	solutions := make([]*Solution, 0, n)
 
 	startT := time.Now()
 	imgAsGraph := GenerateGraph(img)
@@ -131,18 +132,31 @@ func GeneratePopulation(img *Image, n int) []*Solution {
 	fmt.Println("Done generation setup", time.Now().Sub(startT))
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
+	startT = time.Now()
+
+	channel := make(chan *Solution)
+	var wg sync.WaitGroup
+	wg.Add(n*2)
 
 	for i := 0; i < n; i++ {
-		start := r1.Intn(width * height)
-		mst2 := Prim(uint64(start), primGraph, labels, imgAsGraph)
+		go func(index int) {
+			start := r1.Intn(width * height)
+			mst := Prim(uint64(start), primGraph, labels, imgAsGraph)
 
-		mstGraph := graphs.GetGraph(mst2, true)
+			mstGraph := graphs.GetGraph(mst, true)
 
-		solutions[i] = SolutionFromGenotypeNSGA(img, mstGraph)
-
-		//visualizeImageGraph("sol.png", img, mstGraph)
+			channel <- SolutionFromGenotypeNSGA(img, mstGraph)
+			defer wg.Done()
+		}(i)
 	}
-	//visualizeImageGraph("sol_act.png", img, GenoToGraph(img, solutions[1].genotype))
+	go func() {
+		for t := range channel {
+			solutions = append(solutions, t)
+			wg.Done()
+		}
+	}()
+	wg.Wait()
+	fmt.Println("Done generation creation", time.Now().Sub(startT))
 
 	return solutions
 }
@@ -163,13 +177,13 @@ func createPopulationFromParents(img *Image, pop []*Solution) []*Solution {
 
 		result[i], result[i+1] = Crossover(img, p1, p2)
 
-		/*if r1.Float32() < .1 {
+		if r1.Float32() < .1 {
 			result[i] = Mutate(result[i].genotype, img)
 		}
 
 		if r1.Float32() < .1 {
 			result[i+1] = Mutate(result[i+1].genotype, img)
-		}*/
+		}
 	}
 
 	return result
