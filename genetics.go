@@ -1,17 +1,35 @@
 package main
 
 import (
+	"fmt"
 	"github.com/alonsovidales/go_graph"
 	"math"
 	"math/rand"
+	"time"
 )
 
 func GraphToGeno(gr *graphs.Graph) []uint64 {
 	l := len((*gr).RawEdges)
 	geno := make([]uint64, l+1)
-	for _, edge := range (*gr).RawEdges {
-		geno[edge.From] = edge.To
+
+	for i, edges := range (*gr).VertexEdges {
+		for key := range edges {
+			geno[int(i)] = key
+			break
+		}
 	}
+	/*
+	for i := range geno {
+		geno[i] = math.MaxUint64
+	}
+	for _, edge := range (*gr).RawEdges {
+		if geno[edge.From] == math.MaxUint64 {
+			geno[edge.From] = edge.To
+		} else {
+			geno[edge.To] = edge.From
+		}
+	}
+	*/
 	geno[l] = uint64(l) // Points to itself
 	return geno
 }
@@ -40,13 +58,26 @@ func GeneratePopulation(img *Image, n int) *Population {
 	height := len((*img)[0])
 
 	primGraph, labels := PreparePrim(imgAsGraph)
-
+	s1 := rand.NewSource(time.Now().UnixNano())
+	r1 := rand.New(s1)
+	//primGraph := PreparePrim2(imgAsGraph)
 	for i := 0 ; i < n ; i++ {
-		start := rand.Intn(width * height)
-		mst := Prim(uint64(start), primGraph, labels, imgAsGraph)
-		mstGraph := graphs.GetGraph(mst, true)
-		solutions[i] = SolutionFromGenotype(img, mstGraph)
+		start := r1.Intn(width * height)
+		//s2 := rand.Intn(width * height)
+		//s3 := rand.Intn(width * height)
 
+		//mst := Prim3(uint64(start), imgAsGraph)
+		//fmt.Println("Len mst", len(mst))
+		mst2 := Prim(uint64(start), primGraph, labels, imgAsGraph)
+		//mst3 := Prim(uint64(s3), primGraph, labels, imgAsGraph)
+		mstGraph := graphs.GetGraph(mst2, false)
+
+		solutions[i] = SolutionFromGenotype(img, mstGraph)
+		//fmt.Println("EDGES", mstGraph.RawEdges)
+		//fmt.Println("GENO", solutions[i].genotype)
+		/*for j := range mst {
+			fmt.Println("Edges", start, mst[j], s2, mst2[j], s3, mst3[j])
+		}*/
 
 	}
 	return &Population{solutions}
@@ -88,6 +119,7 @@ func RunGeneration(img *Image, pop *Population) *Population {
 		}
 		*/
 	}
+
 	return &Population{result}
 }
 
@@ -127,6 +159,18 @@ func Crossover(img *Image, parent1, parent2 *Solution) (Solution, Solution) {
 			offspring1[i], offspring2[i] = (*parent1).genotype[i], (*parent2).genotype[i]
 		}
 	}
+	eq := true
+	for i := range (*parent1).genotype {
+		if (*parent1).genotype[i] != (*parent2).genotype[i]{
+			eq = false
+		}
+	}
+	if !eq {
+		fmt.Println(parent1)
+		fmt.Println(parent2)
+
+	}
+
 	graph1 := GenoToGraph(img, offspring1)
 	graph2 := GenoToGraph(img, offspring2)
 

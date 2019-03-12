@@ -46,6 +46,5 @@ func Prim(start uint64, g *graph.LabeledUndirected, labels []graph.LI, gr *graph
 		edges = append(edges, graphs.Edge{uint64(e.Edge.N1), uint64(e.Edge.N2), w(e.LI)})
 	})
 
-
 	return edges
 }

@@ -21,7 +21,7 @@ func Dist(img *Image, idx1, idx2 int) float64 {
 
 	fromPx := (*img)[x1][y1]
 	toPx := (*img)[x2][y2]
-	return ColorDist(&fromPx, &toPx)
+	return math.Round(ColorDist(&fromPx, &toPx))
 }
 
 func ColorDist(p1 *Pixel, p2 *Pixel) float64 {
