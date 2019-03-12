@@ -4,6 +4,7 @@ import (
 	"github.com/alonsovidales/go_graph"
 	"math"
 	"math/rand"
+	"sort"
 	"time"
 )
 
@@ -116,7 +117,10 @@ func GeneratePopulation(img *Image, n int) []*Solution {
 		mstGraph := graphs.GetGraph(mst2, true)
 
 		solutions[i] = SolutionFromGenotypeNSGA(img, mstGraph)
+
+		visualizeImageGraph("sol.png", img, mstGraph)
 	}
+	visualizeImageGraph("sol_act.png", img, GenoToGraph(img, solutions[1].genotype))
 
 	return solutions
 }
@@ -190,7 +194,48 @@ func SolutionFromGenotypeNSGA(img *Image, g *graphs.Graph) *Solution {
 	connectivity := connectiviy(img, groups)
 	crowdingDistance := 0.0
 	//visualizeImageGraph("graph.png", img, g)
-	sol := &Solution{GraphToGeno(g, ImageSize(img)), deviation, connectivity, crowdingDistance}
+	sol := &Solution{GraphToGeno2(g, ImageSize(img)), deviation, connectivity, crowdingDistance}
 
 	return sol
+}
+
+
+
+type GenoVertices struct {
+	edges int
+	value uint64
+}
+
+
+func GraphToGeno2(gr *graphs.Graph, size int) []uint64 {
+	geno := make([]uint64, size)
+
+	edgesForNode := make([]int, len(gr.Vertices))
+
+	vertices := make([]GenoVertices, len(gr.Vertices))
+
+	for _, edge := range gr.RawEdges {
+		edgesForNode[edge.From]++
+		edgesForNode[edge.To]++
+	}
+	for i := range gr.Vertices {
+		vertices[i] = GenoVertices{edgesForNode[i], i}
+	}
+
+	sort.Slice(vertices, func(i, j int) bool {
+		return vertices[i].edges < vertices[j].edges
+	})
+
+	for _, v := range vertices {
+		for to := range gr.VertexEdges[v.value] {
+			geno[v.value] = to
+			if len(gr.VertexEdges[to]) > 1 {
+				delete(gr.VertexEdges[to], v.value)
+			}
+			break
+		}
+	}
+
+
+	return geno
 }

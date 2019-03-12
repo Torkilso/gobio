@@ -10,16 +10,16 @@ import (
 
 func main() {
 
-	imagePath := "./data/216066/Test image.jpg"
-	//imagePath := "./testimages/Untitled.jpg"
+	//imagePath := "./data/216066/Test image.jpg"
+	imagePath := "./testimages/Untitled.jpg"
 	image := readJPEGFile(imagePath)
 
 	//solutions := nsgaII(&image, 100, 100)
 	//_ = solutions
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	runGenerations(&image)
-	//runNSGA(&image)
+	//runGenerations(&image)
+	runNSGA(&image)
 	//runSoniaMST(&image)
 }
 
@@ -51,6 +51,7 @@ func runNSGA(img *Image) {
 func runGenerations(img *Image) {
 
 	pop := GeneratePopulation(img, 2)
+	return
 	//sol := BestSolution(pop)
 	//graph := GenoToGraph(img, sol.genotype)
 
@@ -77,7 +78,7 @@ func runGenerations(img *Image) {
 
 		edgedImg := DrawImageBoundries(&imgCopy, graph, color.Black)
 		SaveJPEGRaw(edgedImg, "edges.jpg")
-		//visualizeImageGraph("graph.png", img, graph)
+		visualizeImageGraph("graph.png", img, graph)
 		SaveJPEGRaw(thisImg, "img.jpg")
 
 		fmt.Println("Gen", i, "Best", sol.weightedSum(), "Segments", len(groups))
