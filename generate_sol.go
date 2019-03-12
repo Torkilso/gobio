@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/alonsovidales/go_graph"
 )
 
@@ -76,6 +75,5 @@ func GenerateGraph(img *Image) *graphs.Graph {
 			edges = append(edges, graphs.Edge{uint64(i), uint64(target), Dist(img, i, target)})
 		}
 	}
-	fmt.Println(edges)
 	return graphs.GetGraph(edges, true)
 }

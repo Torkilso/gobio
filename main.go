@@ -9,7 +9,11 @@ import (
 
 func main() {
 
+<<<<<<< HEAD
 	imagePath := "./testimages/Untitled.jpg"
+=======
+	imagePath := "./data/216066/Test_image (1).jpg"
+>>>>>>> f0bef1c8e532f8d639127a9b92faca1f241e0e87
 	//imagePath := "./data/216066/Test_image.jpg"
 	image := readJPEGFile(imagePath)
 
@@ -48,28 +52,36 @@ func runNSGA(img *Image) {
 
 func runGenerations(img *Image) {
 
-	pop := GeneratePopulation(img, 4)
+	pop := GeneratePopulation(img, 2)
+	sol := BestSolution(pop)
+	graph := GenoToGraph(img, sol.genotype)
 
-	for i := 0; i < 4; i++ {
+	visualizeImageGraph("graph.png", img, graph)
+
+	for i := 0; i < 1; i++ {
 		pop = RunGeneration(img, pop)
 		sol := BestSolution(pop)
+
 		graph := GenoToGraph(img, sol.genotype)
 		groups := graph.ConnectedComponents()
 		width := len(*img)
 
 		thisImg := img.toRGBA()
 		imgCopy := GoImageToImage(thisImg)
+		fmt.Println("Number of groups", len(groups), "Pixels", len(*img) * len((*img)[0]), groups, graph.RawEdges)
 		for _, g := range groups {
 			c := Centroid(img, g)
+			fmt.Println("Centroid", c)
 			for k := range g {
 				x, y := Flatten(width, int(k))
 				thisImg.Set(x, y, c.toRGBA())
 			}
-			SaveJPEGRaw(thisImg, "img.jpg")
 		}
 
 		edgedImg := DrawImageBoundries(&imgCopy, graph, color.Black)
 		SaveJPEGRaw(edgedImg, "edges.jpg")
+		visualizeImageGraph("graph.png", img, graph)
+		SaveJPEGRaw(thisImg, "img.jpg")
 
 		fmt.Println("Gen", i, "Best", sol.weightedSum(), "Segments", len(groups))
 	}

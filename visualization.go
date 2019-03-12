@@ -12,6 +12,10 @@ import (
 
 func visualizeImageGraph(filename string, img *Image, graph *graphs.Graph) {
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f0bef1c8e532f8d639127a9b92faca1f241e0e87
 	width := len(*img)
 	imageWidth := 20 * width
 	height := len((*img)[0])
