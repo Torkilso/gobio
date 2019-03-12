@@ -10,8 +10,8 @@ import (
 
 func main() {
 
-	//imagePath := "./data/216066/Test image.jpg"
-	imagePath := "./testimages/Untitled.jpg"
+	imagePath := "./data/216066/Test image.jpg"
+	//imagePath := "./testimages/Untitled.jpg"
 	image := readJPEGFile(imagePath)
 
 	//solutions := nsgaII(&image, 100, 100)
@@ -27,7 +27,7 @@ func runNSGA(img *Image) {
 
 	start := time.Now()
 
-	solutions := nsgaII(img, 100, 80)
+	solutions := nsgaII(img, 10, 10)
 
 	fmt.Println("Used", time.Since(start).Seconds(), "seconds in total")
 

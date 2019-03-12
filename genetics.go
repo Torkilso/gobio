@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/alonsovidales/go_graph"
 	"math"
 	"math/rand"
@@ -119,6 +120,7 @@ func GenoToGraph(img *Image, geno []uint64) *graphs.Graph {
 func GeneratePopulation(img *Image, n int) []*Solution {
 	solutions := make([]*Solution, n)
 
+	startT := time.Now()
 	imgAsGraph := GenerateGraph(img)
 
 	width := len(*img)
@@ -126,6 +128,7 @@ func GeneratePopulation(img *Image, n int) []*Solution {
 
 	primGraph, labels := PreparePrim(imgAsGraph)
 
+	fmt.Println("Done generation setup", time.Now().Sub(startT))
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
 
@@ -137,9 +140,9 @@ func GeneratePopulation(img *Image, n int) []*Solution {
 
 		solutions[i] = SolutionFromGenotypeNSGA(img, mstGraph)
 
-		visualizeImageGraph("sol.png", img, mstGraph)
+		//visualizeImageGraph("sol.png", img, mstGraph)
 	}
-	visualizeImageGraph("sol_act.png", img, GenoToGraph(img, solutions[1].genotype))
+	//visualizeImageGraph("sol_act.png", img, GenoToGraph(img, solutions[1].genotype))
 
 	return solutions
 }
@@ -213,7 +216,7 @@ func SolutionFromGenotypeNSGA(img *Image, g *graphs.Graph) *Solution {
 	connectivity := connectiviy(img, groups)
 	crowdingDistance := 0.0
 	//visualizeImageGraph("graph.png", img, g)
-	sol := &Solution{GraphToGeno2(g, ImageSize(img)), deviation, connectivity, crowdingDistance}
+	sol := &Solution{GraphToGeno(g, ImageSize(img)), deviation, connectivity, crowdingDistance}
 
 	return sol
 }
