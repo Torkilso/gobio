@@ -2,3 +2,6 @@ points.png
 Evaluator for Segmentation
 Test Images Project 2
 .idea
+
+*.jpg
+*.png
