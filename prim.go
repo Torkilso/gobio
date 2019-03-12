@@ -13,19 +13,45 @@ func (a byWeight) Len() int           { return len(a) }
 func (a byWeight) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a byWeight) Less(i, j int) bool { return a[i].Weight < a[j].Weight }
 
-func PreparePrim(gr *graphs.Graph) (*graph.LabeledUndirected, []graph.LI) {
-	labels := make([]graph.LI, len((*gr).RawEdges))
-	var g graph.LabeledUndirected
 
-	for i, edge := range (*gr).RawEdges {
+func LabeledUndirected(gr *graphs.Graph) (graph.LabeledUndirected, []graph.LI) {
+
+	g := make(graph.LabeledAdjacencyList, len(gr.RawEdges))
+	labels := make([]graph.LI, len(gr.RawEdges))
+
+	for i := len(gr.RawEdges) ; i >= 0 ; i-- {
+		edge := gr.RawEdges[i]
 		l := graph.LI(i)
 		labels[i] = l
-		g.AddEdge(graph.Edge{graph.NI(edge.From), graph.NI(edge.To)}, l)
+		g[i] = append(g[i], graph.Half{graph.NI(edge.To), l})
+		g[edge.From] = append(g[edge.From], graph.Half{graph.NI(i), l})
 	}
-	return &g, labels
+
+	return graph.LabeledUndirected{g}, labels
+}
+
+
+func PreparePrim(gr *graphs.Graph) (*graph.LabeledUndirected, []graph.LI) {
+	/*
+		g, labels := LabeledUndirected(gr)
+		return &g, labels
+	*/
+		labels := make([]graph.LI, len((*gr).RawEdges))
+		var g graph.LabeledUndirected
+
+		for i := len(gr.RawEdges)-1 ; i >= 0 ; i-- {
+			edge := gr.RawEdges[i]
+			l := graph.LI(i)
+			labels[i] = l
+			g.AddEdge(graph.Edge{graph.NI(edge.From), graph.NI(edge.To)}, l)
+		}
+
+		return &g, labels
+
 }
 
 func Prim(start uint64, g *graph.LabeledUndirected, labels []graph.LI, gr *graphs.Graph) (mst []graphs.Edge) {
+
 
 	actualStart := graph.NI(start)
 

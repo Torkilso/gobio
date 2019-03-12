@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/alonsovidales/go_graph"
 	"image/color"
 	"math/rand"
 	"time"
@@ -9,8 +10,8 @@ import (
 
 func main() {
 
-	imagePath := "./testimages/Untitled.jpg"
-	//imagePath := "./data/216066/Test_image.jpg"
+	imagePath := "./data/216066/Test image.jpg"
+	//imagePath := "./testimages/Untitled.jpg"
 	image := readJPEGFile(imagePath)
 
 	//solutions := nsgaII(&image, 100, 100)
@@ -18,7 +19,8 @@ func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	//runGenerations(&image)
-	runNSGA(&image)
+	//runNSGA(&image)
+	runSoniaMST(&image)
 }
 
 func runNSGA(img *Image) {
@@ -81,4 +83,45 @@ func runGenerations(img *Image) {
 
 		fmt.Println("Gen", i, "Best", sol.weightedSum(), "Segments", len(groups))
 	}
+}
+
+
+func runMst(img *Image) {
+
+	imgAsGraph := GenerateGraph(img)
+
+	width := len(*img)
+	height := len((*img)[0])
+
+	s1 := rand.NewSource(time.Now().UnixNano())
+	r1 := rand.New(s1)
+
+	start := r1.Intn(width * height)
+	mst2 := Prim4(uint64(start), imgAsGraph)
+
+	mstGraph := graphs.GetGraph(mst2, false)
+	visualizeImageGraph("mst.png", img, mstGraph)
+
+}
+
+func runSoniaMST(img *Image) {
+	imgAsGraph := GenerateGraph(img)
+
+	width := len(*img)
+	height := len((*img)[0])
+
+	s1 := rand.NewSource(time.Now().UnixNano())
+	r1 := rand.New(s1)
+
+	start := r1.Intn(width * height)
+	startT := time.Now()
+
+	primGraph, labels := PreparePrim(imgAsGraph)
+	fmt.Println("Time to prepare", time.Now().Sub(startT))
+
+	mst2 := Prim(uint64(start), primGraph, labels,imgAsGraph)
+
+	mstGraph := graphs.GetGraph(mst2, false)
+	visualizeImageGraph("mst.png", img, mstGraph)
+
 }
