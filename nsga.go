@@ -98,11 +98,11 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 
 	parents := GeneratePopulation(image, populationSize)
 
-	children := make([]*Solution, 0)
-
 	fmt.Println("Used", time.Since(start).Seconds(), "seconds to generate solutions")
 	fmt.Println()
 	fmt.Println("Evolving solutions")
+
+	children := make([]*Solution, 0)
 
 	return parents
 

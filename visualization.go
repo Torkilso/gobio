@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/alonsovidales/go_graph"
 	"github.com/fogleman/gg"
 	"gonum.org/v1/plot"
@@ -12,8 +11,6 @@ import (
 )
 
 func visualizeImageGraph(filename string, img *Image, graph *graphs.Graph) {
-
-	fmt.Println("Visualizing graph")
 
 	width := len(*img)
 	imageWidth := 20 * width
@@ -32,7 +29,6 @@ func visualizeImageGraph(filename string, img *Image, graph *graphs.Graph) {
 	dc.Stroke()
 
 	for _, edge := range graph.RawEdges {
-		fmt.Println(edge)
 
 		fromX := edge.From % uint64(width)
 		fromY := edge.From / uint64(width)

@@ -9,7 +9,7 @@ import (
 
 func main() {
 
-	imagePath := "./data/216066/Test_image.jpg"
+	imagePath := "./testimages/Untitled.jpg"
 	//imagePath := "./data/216066/Test_image.jpg"
 	image := readJPEGFile(imagePath)
 
@@ -17,24 +17,33 @@ func main() {
 	//_ = solutions
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	runGenerations(&image)
-	//runNSGA(&image)
+	//runGenerations(&image)
+	runNSGA(&image)
 }
 
 func runNSGA(img *Image) {
-	solutions := nsgaII(img, 3, 10)
+
+	start := time.Now()
+
+	solutions := nsgaII(img, 1, 2)
+
+	fmt.Println("Used", time.Since(start).Seconds(), "seconds in total")
 
 	fronts := fastNonDominatedSort(solutions)
 	visualizeFronts(solutions, fronts)
 
 	graph := GenoToGraph(img, solutions[0].genotype)
+	segments := graph.ConnectedComponents()
+	fmt.Println("Amount of segments:", len(segments))
+
 	thisImg := img.toRGBA()
+
+	visualizeImageGraph("mstgraph.png", img, graph)
 
 	imgCopy := GoImageToImage(thisImg)
 
 	edgedImg := DrawImageBoundries(&imgCopy, graph, color.Black)
 	SaveJPEGRaw(edgedImg, "edges.jpg")
-
 }
 
 func runGenerations(img *Image) {
@@ -63,6 +72,5 @@ func runGenerations(img *Image) {
 		SaveJPEGRaw(edgedImg, "edges.jpg")
 
 		fmt.Println("Gen", i, "Best", sol.weightedSum(), "Segments", len(groups))
-
 	}
 }
