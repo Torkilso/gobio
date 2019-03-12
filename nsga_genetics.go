@@ -2,23 +2,27 @@ package main
 
 import (
 	"github.com/alonsovidales/go_graph"
-	"log"
 	"math"
 	"math/rand"
+	"time"
 )
 
 func GeneratePopulationNSGA(img *Image, n int) []*Solution {
 	solutions := make([]*Solution, n)
 
 	imgAsGraph := GenerateGraph(img)
-
-	log.Println("Prim graph start")
 	primGraph, labels := PreparePrim(imgAsGraph)
-	log.Println("Prim graph end")
+
+	visualizeImageGraph("graph.png", img, imgAsGraph)
+
+	s1 := rand.NewSource(time.Now().UnixNano())
+	r1 := rand.New(s1)
 
 	for i := 0; i < n; i++ {
-		start := rand.Intn(n)
+		start := r1.Intn(n)
 		mstGraph := graphs.GetGraph(Prim(uint64(start), primGraph, labels, imgAsGraph), true)
+		visualizeImageGraph("mstgraph.png", img, mstGraph)
+
 		solutions[i] = SolutionFromGenotypeNSGA(img, mstGraph)
 	}
 	return solutions
@@ -28,20 +32,23 @@ func GeneratePopulationNSGA(img *Image, n int) []*Solution {
 func createPopulationFromParents(img *Image, pop []*Solution) []*Solution {
 	result := make([]*Solution, len(pop))
 
+	s1 := rand.NewSource(time.Now().UnixNano())
+	r1 := rand.New(s1)
+
 	for i := 0; i < len(pop); i += 2 {
-		p1Idx := TournamentNSGA(pop, 2)
-		p2Idx := TournamentNSGA(pop, 2)
+		p1Idx := r1.Intn(len(pop))
+		p2Idx := r1.Intn(len(pop))
 
 		p1 := pop[p1Idx]
 		p2 := pop[p2Idx]
 
 		result[i], result[i+1] = CrossoverNSGA(img, p1, p2)
 
-		if rand.Float32() < .1 {
+		if r1.Float32() < .1 {
 			result[i] = MutateNSGA(result[i].genotype, img)
 		}
 
-		if rand.Float32() < .1 {
+		if r1.Float32() < .1 {
 			result[i+1] = MutateNSGA(result[i+1].genotype, img)
 		}
 	}
@@ -102,6 +109,7 @@ func CrossoverNSGA(img *Image, parent1, parent2 *Solution) (*Solution, *Solution
 
 func SolutionFromGenotypeNSGA(img *Image, g *graphs.Graph) *Solution {
 	groups := g.ConnectedComponents()
+
 	deviation := deviation(img, groups)
 	connectivity := connectiviy(img, groups)
 	crowdingDistance := 0.0

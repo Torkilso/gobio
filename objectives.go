@@ -11,6 +11,7 @@ func deviation(img *Image, connectedGroups []map[uint64]bool) float64 {
 
 	var dist float64
 	width := len(*img)
+
 	for _, group := range connectedGroups {
 		centroid := Centroid(img, group)
 
