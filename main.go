@@ -34,7 +34,7 @@ func runNSGA(img *Image) {
 	fronts := fastNonDominatedSort(solutions)
 	visualizeFronts(solutions, fronts)
 
-	graph := GenoToGraph(img, solutions[0].genotype)
+	/*graph := GenoToGraph(img, solutions[0].genotype)
 	segments := graph.ConnectedComponents()
 	fmt.Println("Amount of segments:", len(segments))
 
@@ -45,7 +45,7 @@ func runNSGA(img *Image) {
 	imgCopy := GoImageToImage(thisImg)
 
 	edgedImg := DrawImageBoundries(&imgCopy, graph, color.Black)
-	SaveJPEGRaw(edgedImg, "edges.jpg")
+	SaveJPEGRaw(edgedImg, "edges.jpg")*/
 }
 
 func runGenerations(img *Image) {
