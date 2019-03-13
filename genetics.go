@@ -163,28 +163,47 @@ func GeneratePopulation(img *Image, n int) []*Solution {
 
 // runGeneration for NSGA
 func createPopulationFromParents(img *Image, pop []*Solution) []*Solution {
-	result := make([]*Solution, len(pop))
+	result := make([]*Solution, 0, len(pop))
 
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
 
+
+	channel := make(chan *Solution)
+	var wg sync.WaitGroup
+	wg.Add(len(pop) + len(pop) / 2)
+
+
 	for i := 0; i < len(pop); i += 2 {
-		p1Idx := r1.Intn(len(pop))
-		p2Idx := r1.Intn(len(pop))
+		go func (index int) {
+			p1Idx := r1.Intn(len(pop))
+			p2Idx := r1.Intn(len(pop))
 
-		p1 := pop[p1Idx]
-		p2 := pop[p2Idx]
+			p1 := pop[p1Idx]
+			p2 := pop[p2Idx]
 
-		result[i], result[i+1] = Crossover(img, p1, p2)
+			leftChild, rightChild := Crossover(img, p1, p2)
 
-		if r1.Float32() < .1 {
-			result[i] = Mutate(result[i].genotype, img)
-		}
+			if r1.Float32() < .1 {
+				leftChild = Mutate(leftChild.genotype, img)
+			}
 
-		if r1.Float32() < .1 {
-			result[i+1] = Mutate(result[i+1].genotype, img)
-		}
+			if r1.Float32() < .1 {
+				rightChild = Mutate(rightChild.genotype, img)
+			}
+			channel <- leftChild
+			channel <- rightChild
+			wg.Done()
+		}(i)
 	}
+	go func() {
+		for t := range channel {
+			result = append(result, t)
+			wg.Done()
+		}
+	}()
+	wg.Wait()
+	close(channel)
 
 	return result
 }

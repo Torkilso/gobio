@@ -2,49 +2,72 @@ package main
 
 import (
 	"fmt"
-	"github.com/alonsovidales/go_graph"
 	"image/color"
+	_image "image"
 	"math/rand"
 	"time"
+	graphs "github.com/alonsovidales/go_graph"
 )
 
 func main() {
 
-	imagePath := "./data/216066/Test image.jpg"
-	//imagePath := "./testimages/Untitled.jpg"
-	image := readJPEGFile(imagePath)
+	//imagePath := "./data/216066/Test_image.jpg"
+	//imagePath := "./testimages/Untitled2.jpg"
+	//image := readJPEGFile(imagePath)
 
 	//solutions := nsgaII(&image, 100, 100)
 	//_ = solutions
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	//runGenerations(&image)
-	runNSGA(&image)
+	//runNSGA(&image)
 	//runSoniaMST(&image)
+	runNSGAOnTestFolder("216066")
 }
 
 func runNSGA(img *Image) {
 
 	start := time.Now()
 
-	solutions := nsgaII(img, 10, 10)
+	solutions := nsgaII(img, 10, 4)
 
 	fmt.Println("Used", time.Since(start).Seconds(), "seconds in total")
 
 	fronts := fastNonDominatedSort(solutions)
 	visualizeFronts(solutions, fronts)
 
-	graph := GenoToGraph(img, solutions[0].genotype)
+	best := BestSolution(solutions)
+
+	graph := GenoToGraph(img, best.genotype)
 	segments := graph.ConnectedComponents()
 	fmt.Println("Amount of segments:", len(segments))
-	visualizeImageGraph("mstgraph.png", img, graph)
+
+	//visualizeImageGraph("mstgraph.png", img, graph)
 
 	//thisImg := img.toRGBA()
 
 	//imgCopy := GoImageToImage(thisImg)
 
-	//edgedImg := DrawImageBoundries(&imgCopy, graph, color.Black)
-	//SaveJPEGRaw(edgedImg, "edges.jpg")
+	edgedImg := DrawImageBoundries(img, graph, color.Black)
+	SaveJPEGRaw(edgedImg, "edges.jpg")
+}
+
+func runNSGAOnTestFolder(folderId string) {
+	imagePath := "./data/" + folderId + "/Test image.jpg"
+	image := readJPEGFile(imagePath)
+	rand.Seed(time.Now().UTC().UnixNano())
+
+	solutions := nsgaII(&image, 4, 6)
+
+	for _, s := range solutions {
+		white := _image.NewRGBA(_image.Rect(0, 0, len(image), len(image[0])))
+		gr := GenoToGraph(&image, s.genotype)
+		goImage := GoImageToImageRGBA(white)
+		edgedImg := DrawImageBoundries(&goImage, gr, color.Black)
+		SaveJPEGRaw(edgedImg, "sol.jpg")
+
+
+	}
 }
 
 func runGenerations(img *Image) {
@@ -100,7 +123,7 @@ func runSoniaMST(img *Image) {
 	fmt.Println("Time to prepare", time.Now().Sub(startT))
 	startT = time.Now()
 
-	mst2 := Prim(uint64(start), primGraph, labels,imgAsGraph)
+	mst2 := Prim(uint64(start), primGraph, labels, imgAsGraph)
 	fmt.Println("Time to prim", time.Now().Sub(startT))
 
 	mstGraph := graphs.GetGraph(mst2, false)
