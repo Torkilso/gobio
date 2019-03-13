@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/alonsovidales/go_graph"
 	"github.com/google/gxui"
 	"github.com/google/gxui/themes/dark"
@@ -67,9 +68,29 @@ func DrawImageBoundries(img *Image, gr *graphs.Graph, color color.Color) *image.
 
 					res.Set(x1, y1, color)
 					res.Set(x2, y2, color)
-
 				}
 			}
+		}
+	}
+	return res
+}
+
+func drawImageSegmentsWithCentroidColor(img *Image, gr *graphs.Graph) *image.RGBA {
+	res := img.toRGBA()
+	groups := gr.ConnectedComponents()
+	width := len(*img)
+	for id, group := range groups {
+		fmt.Println(id)
+		centroid := Centroid(img, group)
+		for k := range group {
+			intK := int(k)
+
+			x1, y1 := Flatten(width, intK)
+
+			color := color.RGBA{R: uint8(centroid.r), G: uint8(centroid.g), B: uint8(centroid.b)}
+
+			res.Set(x1, y1, color)
+
 		}
 	}
 	return res
