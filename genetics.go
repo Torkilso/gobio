@@ -1,9 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"github.com/alonsovidales/go_graph"
 	"math"
 	"math/rand"
+	"sort"
+	"sync"
 	"time"
 )
 
@@ -116,8 +119,9 @@ func GenoToGraph(img *Image, geno []uint64) *graphs.Graph {
 }
 
 func GeneratePopulation(img *Image, n int) []*Solution {
-	solutions := make([]*Solution, n)
+	solutions := make([]*Solution, 0, n)
 
+	startT := time.Now()
 	imgAsGraph := GenerateGraph(img)
 
 	width := len(*img)
@@ -125,45 +129,81 @@ func GeneratePopulation(img *Image, n int) []*Solution {
 
 	primGraph, labels := PreparePrim(imgAsGraph)
 
+	fmt.Println("Done generation setup", time.Now().Sub(startT))
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
+	startT = time.Now()
+
+	channel := make(chan *Solution)
+	var wg sync.WaitGroup
+	wg.Add(n*2)
 
 	for i := 0; i < n; i++ {
-		start := r1.Intn(width * height)
-		mst2 := Prim(uint64(start), primGraph, labels, imgAsGraph)
+		go func(index int) {
+			start := r1.Intn(width * height)
+			mst := Prim(uint64(start), primGraph, labels, imgAsGraph)
 
-		mstGraph := graphs.GetGraph(mst2, true)
+			mstGraph := graphs.GetGraph(mst, true)
 
-		solutions[i] = SolutionFromGenotypeNSGA(img, mstGraph)
+			channel <- SolutionFromGenotypeNSGA(img, mstGraph)
+			defer wg.Done()
+		}(i)
 	}
+	go func() {
+		for t := range channel {
+			solutions = append(solutions, t)
+			wg.Done()
+		}
+	}()
+	wg.Wait()
+	fmt.Println("Done generation creation", time.Now().Sub(startT))
 
 	return solutions
 }
 
 // runGeneration for NSGA
 func createPopulationFromParents(img *Image, pop []*Solution) []*Solution {
-	result := make([]*Solution, len(pop))
+	result := make([]*Solution, 0, len(pop))
 
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
 
+
+	channel := make(chan *Solution)
+	var wg sync.WaitGroup
+	wg.Add(len(pop) + len(pop) / 2)
+
+
 	for i := 0; i < len(pop); i += 2 {
-		p1Idx := r1.Intn(len(pop))
-		p2Idx := r1.Intn(len(pop))
+		go func (index int) {
+			p1Idx := r1.Intn(len(pop))
+			p2Idx := r1.Intn(len(pop))
 
-		p1 := pop[p1Idx]
-		p2 := pop[p2Idx]
+			p1 := pop[p1Idx]
+			p2 := pop[p2Idx]
 
-		result[i], result[i+1] = Crossover(img, p1, p2)
+			leftChild, rightChild := Crossover(img, p1, p2)
 
-		/*if r1.Float32() < .1 {
-			result[i] = Mutate(result[i].genotype, img)
-		}
+			if r1.Float32() < .1 {
+				leftChild = Mutate(leftChild.genotype, img)
+			}
 
-		if r1.Float32() < .1 {
-			result[i+1] = Mutate(result[i+1].genotype, img)
-		}*/
+			if r1.Float32() < .1 {
+				rightChild = Mutate(rightChild.genotype, img)
+			}
+			channel <- leftChild
+			channel <- rightChild
+			wg.Done()
+		}(i)
 	}
+	go func() {
+		for t := range channel {
+			result = append(result, t)
+			wg.Done()
+		}
+	}()
+	wg.Wait()
+	close(channel)
 
 	return result
 }
@@ -212,4 +252,45 @@ func SolutionFromGenotypeNSGA(img *Image, g *graphs.Graph) *Solution {
 	sol := &Solution{GraphToGeno(g, ImageSize(img)), deviation, connectivity, crowdingDistance}
 
 	return sol
+}
+
+
+
+type GenoVertices struct {
+	edges int
+	value uint64
+}
+
+
+func GraphToGeno2(gr *graphs.Graph, size int) []uint64 {
+	geno := make([]uint64, size)
+
+	edgesForNode := make([]int, len(gr.Vertices))
+
+	vertices := make([]GenoVertices, len(gr.Vertices))
+
+	for _, edge := range gr.RawEdges {
+		edgesForNode[edge.From]++
+		edgesForNode[edge.To]++
+	}
+	for i := range gr.Vertices {
+		vertices[i] = GenoVertices{edgesForNode[i], i}
+	}
+
+	sort.Slice(vertices, func(i, j int) bool {
+		return vertices[i].edges < vertices[j].edges
+	})
+
+	for _, v := range vertices {
+		for to := range gr.VertexEdges[v.value] {
+			geno[v.value] = to
+			if len(gr.VertexEdges[to]) > 1 {
+				delete(gr.VertexEdges[to], v.value)
+			}
+			break
+		}
+	}
+
+
+	return geno
 }
