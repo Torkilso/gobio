@@ -35,7 +35,7 @@ func RunGeneration(img *Image, solutions []*Solution) []*Solution {
 		p1 := solutions[p1Idx]
 		p2 := solutions[p2Idx]
 
-		result[i], result[i+1] = Crossover(img, p1, p2)
+		result[i], result[i+1] = crossover(img, p1, p2)
 
 		/* DONT MUTATE YET
 		if rand.Float32() < .1 {
@@ -118,7 +118,7 @@ func GenoToGraph(img *Image, geno []uint64) *graphs.Graph {
 	return graphs.GetGraph(edges, true)
 }
 
-func GeneratePopulation(img *Image, n int) []*Solution {
+func generatePopulation(img *Image, n int) Population {
 	solutions := make([]*Solution, 0, n)
 
 	startT := time.Now()
@@ -161,26 +161,26 @@ func GeneratePopulation(img *Image, n int) []*Solution {
 	return solutions
 }
 
-// runGeneration for NSGA
-func createPopulationFromParents(img *Image, pop []*Solution) []*Solution {
-	result := make([]*Solution, 0, len(pop))
+func (p *Population) evolve(img *Image) {
+	size := len(*p)
+	result := make([]*Solution, 0, size)
 
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
 
 	channel := make(chan *Solution)
 	var wg sync.WaitGroup
-	wg.Add(len(pop) + len(pop)/2)
+	wg.Add(size + size/2)
 
-	for i := 0; i < len(pop); i += 2 {
+	for i := 0; i < size; i += 2 {
 		go func(index int) {
-			p1Idx := r1.Intn(len(pop))
-			p2Idx := r1.Intn(len(pop))
+			p1Idx := r1.Intn(size)
+			p2Idx := r1.Intn(size)
 
-			p1 := pop[p1Idx]
-			p2 := pop[p2Idx]
+			p1 := (*p)[p1Idx]
+			p2 := (*p)[p2Idx]
 
-			leftChild, rightChild := Crossover(img, p1, p2)
+			leftChild, rightChild := crossover(img, p1, p2)
 
 			if r1.Float32() < .1 {
 				leftChild.mutate(img)
@@ -206,7 +206,7 @@ func createPopulationFromParents(img *Image, pop []*Solution) []*Solution {
 	wg.Wait()
 	close(channel)
 
-	return result
+	*p = append(*p, result...)
 }
 
 func (s *Solution) mutate(img *Image) {
@@ -225,7 +225,7 @@ func (s *Solution) mutate(img *Image) {
 	s.crowdingDistance = 0.0
 }
 
-func Crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
+func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 
 	n := len((*parent1).genotype)
 

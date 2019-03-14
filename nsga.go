@@ -90,19 +90,15 @@ func crowdingDistanceAssignment(ids []int, population []*Solution) {
 }
 
 func nsgaII(image *Image, generations, populationSize int) []*Solution {
+	start := time.Now()
 
 	fmt.Println("Initiating NSGAII")
 	fmt.Println("Generating", populationSize, "solutions")
 
-	start := time.Now()
-
-	parents := GeneratePopulation(image, populationSize)
+	population := generatePopulation(image, populationSize)
 
 	fmt.Println("Used", time.Since(start).Seconds(), "seconds to generate solutions")
-	fmt.Println()
-	fmt.Println("Evolving solutions")
-
-	children := make([]*Solution, 0)
+	fmt.Println("\nEvolving solutions")
 
 	start = time.Now()
 
@@ -110,9 +106,7 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 		fmt.Println("Generation:", t)
 		startGeneration := time.Now()
 
-		children = createPopulationFromParents(image, parents)
-
-		population := append(parents, children...)
+		population.evolve(image)
 
 		/*fmt.Println("Solutions in generation population")
 		for id, sol := range population {
@@ -121,9 +115,11 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 			fmt.Println("Solution", id, ": segments:", len(segments), ", c:", sol.connectivity, ", d:", sol.deviation)
 		}*/
 
+		fmt.Println("Used", time.Since(startGeneration).Seconds(), "seconds to create offsprings")
+
 		fronts := fastNonDominatedSort(population)
 
-		visualizeFronts(population, fronts)
+		//visualizeFronts(population, fronts)
 
 		newParents := make([]*Solution, 0)
 		i := 0
@@ -158,10 +154,7 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 			}
 		}
 
-		parents = append(newParents, lastFrontier...)
-
-		//children = createPopulationFromParents(image, parents)
-
+		population = append(newParents, lastFrontier...)
 		i = 0
 
 		fmt.Println("Used", time.Since(startGeneration).Seconds(), "seconds")
@@ -170,5 +163,5 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 
 	fmt.Println("Used", time.Since(start).Seconds(), "seconds to evolve solutions")
 
-	return children
+	return population
 }
