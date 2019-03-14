@@ -89,8 +89,8 @@ func drawSolutionSegmentsBorders(img *Image, solution *Solution, col color.Color
 	imgRect := image.Rect(0, 0, len(*img), len((*img)[0]))
 	blank := image.NewRGBA(imgRect)
 
-	for x := imgRect.Min.X ; x < imgRect.Max.X ; x++ {
-		for y := imgRect.Min.Y ; y < imgRect.Max.Y ; y++ {
+	for x := imgRect.Min.X; x < imgRect.Max.X; x++ {
+		for y := imgRect.Min.Y; y < imgRect.Max.Y; y++ {
 			blank.Set(x, y, color.White)
 		}
 	}

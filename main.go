@@ -10,6 +10,11 @@ import (
 	"time"
 )
 
+var (
+	generationsToRun = 80
+	folderId         = "86016"
+)
+
 func main() {
 
 	//imagePath := "./data/216066/Test_image.jpg"
@@ -21,7 +26,7 @@ func main() {
 	//runGenerations(&image)
 	//runNSGA(&image)
 	//runSoniaMST(&image)
-	runAndStoreImagesForTesting("216066", 120, 1000)
+	runAndStoreImagesForTesting(folderId, generationsToRun, 20)
 	//runNSGAOnTestFolder("216066")
 	//img := readJPEGFile("./testimages/Untitled2.jpg")
 	//testMaxObjectives(&img)
@@ -57,7 +62,7 @@ func runNSGA(img *Image) {
 }
 
 func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
-	imagePath := "./data/" + folderId + "/Test_image.jpg"
+	imagePath := "./data/" + folderId + "/image.jpg"
 	image := readJPEGFile(imagePath)
 
 	rand.Seed(time.Now().UTC().UnixNano())
@@ -70,10 +75,7 @@ func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
 	for id, solution := range solutions {
 		graph := GenoToGraph(&image, solutions[id].genotype)
 		segments := graph.ConnectedComponents()
-		fmt.Println("Solution", id, ": segments:", len(segments), ", c:", solution.connectivity, ", d:", solution.deviation)
-
-		//drawSolutionSegmentsBorders(&image, solution, color.Black, string(string(id)+"border.png"))
-		//drawSolutionSegmentsWithCentroidColor(&image, solution, string(string(id)+"segments.png"))
+		fmt.Println("Solution", id, ": weightedSum:", solution.weightedSum(), ", segments:", len(segments), ", c:", solution.connectivity, ", d:", solution.deviation)
 	}
 
 	dir, err := ioutil.ReadDir("./solutions/Student_Segmentation_Files")
@@ -81,16 +83,15 @@ func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
 	if err != nil {
 		panic(err)
 	}
+
 	for _, d := range dir {
 		_ = os.RemoveAll(path.Join([]string{"./solutions/Student_Segmentation_Files", d.Name()}...))
 	}
 
 	for i, s := range solutions {
 		filename := fmt.Sprintf("./solutions/Student_Segmentation_Files/sol%d.jpg", i)
-		fmt.Println("Storing solution", s.weightedSum(), filename)
+		//fmt.Println("Storing solution", s.weightedSum(), filename)
 		drawSolutionSegmentsBorders(&image, s, color.Black, filename)
-		//drawSolutionSegmentsWithCentroidColor(&image, s, filenameCentroids)
-
 	}
 }
 

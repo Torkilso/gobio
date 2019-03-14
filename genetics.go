@@ -209,6 +209,82 @@ func (p *Population) evolve(img *Image) {
 	*p = append(*p, result...)
 }
 
+func (p *Population) evolveWithTournament(img *Image) {
+	size := len(*p)
+
+	s1 := rand.NewSource(time.Now().UnixNano())
+	r1 := rand.New(s1)
+
+	parentsA := make([]*Solution, 0, size)
+	parentsB := make([]*Solution, 0, size)
+
+	for i := 0; i < size; i += 2 {
+		p1Idx := r1.Intn(size)
+		p2Idx := r1.Intn(size)
+		p3Idx := r1.Intn(size)
+		p4Idx := r1.Intn(size)
+
+		p1 := tournamentNSGA(p1Idx, p2Idx, p)
+		p2 := tournamentNSGA(p3Idx, p4Idx, p)
+
+		parentsA = append(parentsA, p1)
+		parentsB = append(parentsB, p2)
+	}
+
+	resultSize := len(parentsA)
+	result := make([]*Solution, 0, resultSize*2)
+
+	channel := make(chan *Solution)
+	var wg sync.WaitGroup
+	wg.Add(resultSize + resultSize*2)
+
+	for i := 0; i < resultSize; i++ {
+		go func(index int) {
+			p1 := parentsA[index]
+			p2 := parentsB[index]
+
+			leftChild, rightChild := crossover(img, p1, p2)
+
+			if r1.Float32() < .1 {
+				leftChild.mutate(img)
+			}
+
+			if r1.Float32() < .1 {
+				rightChild.mutate(img)
+			}
+
+			channel <- leftChild
+			channel <- rightChild
+			wg.Done()
+		}(i)
+	}
+
+	go func() {
+		for t := range channel {
+			result = append(result, t)
+			wg.Done()
+		}
+	}()
+
+	wg.Wait()
+	close(channel)
+
+	*p = append(*p, result...)
+}
+
+func tournamentNSGA(id1, id2 int, p *Population) *Solution {
+
+	if (*p)[id1].frontNumber < (*p)[id2].frontNumber {
+		return (*p)[id1]
+	} else if (*p)[id1].frontNumber == (*p)[id2].frontNumber {
+		if (*p)[id1].crowdingDistance < (*p)[id2].crowdingDistance {
+			return (*p)[id1]
+		}
+	}
+
+	return (*p)[id2]
+}
+
 func (s *Solution) mutate(img *Image) {
 
 	index := rand.Intn(len(s.genotype))
@@ -248,11 +324,11 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 	groups2 := graph2.ConnectedComponents()
 
 	s1 := &Solution{
-		offspring1, deviation(img, groups1), connectivity(img, groups1), 0.0,
+		offspring1, deviation(img, groups1), connectivity(img, groups1), 0.0, 0,
 	}
 
 	s2 := &Solution{
-		offspring2, deviation(img, groups2), connectivity(img, groups2), 0.0,
+		offspring2, deviation(img, groups2), connectivity(img, groups2), 0.0, 0,
 	}
 
 	return s1, s2
@@ -264,7 +340,7 @@ func SolutionFromGenotypeNSGA(img *Image, g *graphs.Graph) *Solution {
 	deviation := deviation(img, groups)
 	connectivity := connectivity(img, groups)
 	crowdingDistance := 0.0
-	sol := &Solution{GraphToGeno(g, ImageSize(img)), deviation, connectivity, crowdingDistance}
+	sol := &Solution{GraphToGeno(g, ImageSize(img)), deviation, connectivity, crowdingDistance, 0}
 
 	return sol
 }
