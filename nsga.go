@@ -107,12 +107,14 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 	start = time.Now()
 
 	for t := 0; t < generations; t++ {
-		fmt.Println("Generation:", t)
+
+
 		startGeneration := time.Now()
 
 		children = createPopulationFromParents(image, parents)
 
 		population := append(parents, children...)
+		fmt.Println("Generation:", t, "Best parent:", BestSolution(parents).weightedSum(), "Best children:", BestSolution(children).weightedSum(), "Best all:", BestSolution(population).weightedSum())
 
 		/*fmt.Println("Solutions in generation population")
 		for id, sol := range population {
@@ -159,6 +161,8 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 		}
 
 		parents = append(newParents, lastFrontier...)
+
+		fmt.Println("Best from new:", BestSolution(parents).weightedSum())
 
 		//children = createPopulationFromParents(image, parents)
 

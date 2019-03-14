@@ -21,7 +21,7 @@ func main() {
 	//runGenerations(&image)
 	//runNSGA(&image)
 	//runSoniaMST(&image)
-	runAndStoreImagesForTesting("216066", 10, 20)
+	runAndStoreImagesForTesting("216066", 50, 1000)
 	//runNSGAOnTestFolder("216066")
 	//img := readJPEGFile("./testimages/Untitled2.jpg")
 	//testMaxObjectives(&img)
@@ -55,7 +55,7 @@ func runNSGA(img *Image) {
 }
 
 func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
-	imagePath := "./data/" + folderId + "/Test image.jpg"
+	imagePath := "./data/" + folderId + "/Test_image.jpg"
 	image := readJPEGFile(imagePath)
 	rand.Seed(time.Now().UTC().UnixNano())
 	setObjectivesMaxMinValues(&image)
