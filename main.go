@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/alonsovidales/go_graph"
 	"image/color"
+	"io/ioutil"
 	"math/rand"
+	"os"
+	"path"
 	"time"
 )
 
@@ -19,9 +21,15 @@ func main() {
 	//runGenerations(&image)
 	//runNSGA(&image)
 	//runSoniaMST(&image)
-	runNSGAOnTestFolder("216066")
+	runAndStoreImagesForTesting("216066", 10, 20)
+	//runNSGAOnTestFolder("216066")
+	//img := readJPEGFile("./testimages/Untitled2.jpg")
+	//testMaxObjectives(&img)
 }
-
+func testMaxObjectives(img *Image) {
+	setObjectivesMaxMinValues(img)
+	fmt.Println("Max conn =",maxConnectivity, "Max dev =", maxDeviation )
+}
 func runNSGA(img *Image) {
 
 	start := time.Now()
@@ -46,6 +54,31 @@ func runNSGA(img *Image) {
 	SaveJPEGRaw(edgedImg, "edges.jpg")
 }
 
+func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
+	imagePath := "./data/" + folderId + "/Test image.jpg"
+	image := readJPEGFile(imagePath)
+	rand.Seed(time.Now().UTC().UnixNano())
+	setObjectivesMaxMinValues(&image)
+	fmt.Println("Max conn =",maxConnectivity, "Max dev =", maxDeviation )
+
+	solutions := nsgaII(&image, generations, popSize)
+
+	dir, err := ioutil.ReadDir("./solutions/Student_Segmentation_Files")
+
+	if err != nil {
+		panic(err)
+	}
+	for _, d := range dir {
+		_ = os.RemoveAll(path.Join([]string{"./solutions/Student_Segmentation_Files", d.Name()}...))
+	}
+
+	for i, s := range solutions {
+		filename := fmt.Sprintf("./solutions/Student_Segmentation_Files/sol%d.jpg", i)
+		drawSolutionSegmentsBorders(&image, s, color.Black, filename)
+
+	}
+}
+
 func runNSGAOnTestFolder(folderId string) {
 	imagePath := "./data/" + folderId + "/colors.jpg"
 	image := readJPEGFile(imagePath)
@@ -56,7 +89,7 @@ func runNSGAOnTestFolder(folderId string) {
 	// Set max and min connectivity and deviation
 	setObjectivesMaxMinValues(&image)
 
-	solutions := nsgaII(&image, 100, 80)
+	solutions := nsgaII(&image, 10, 30)
 
 	fmt.Println("Used", time.Since(start).Seconds(), "seconds in total")
 	fmt.Println("\nSolutions:")
@@ -111,26 +144,3 @@ func runGenerations(img *Image) {
 	}
 }
 
-func runSoniaMST(img *Image) {
-	imgAsGraph := GenerateGraph(img)
-
-	width := len(*img)
-	height := len((*img)[0])
-
-	s1 := rand.NewSource(time.Now().UnixNano())
-	r1 := rand.New(s1)
-
-	start := r1.Intn(width * height)
-	startT := time.Now()
-
-	primGraph, labels := PreparePrim(imgAsGraph)
-	fmt.Println("Time to prepare", time.Now().Sub(startT))
-	startT = time.Now()
-
-	mst2 := Prim(uint64(start), primGraph, labels, imgAsGraph)
-	fmt.Println("Time to prim", time.Now().Sub(startT))
-
-	mstGraph := graphs.GetGraph(mst2, false)
-	visualizeImageGraph("mst.png", img, mstGraph)
-
-}

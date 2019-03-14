@@ -220,7 +220,7 @@ func (s *Solution) mutate(img *Image) {
 	graph := GenoToGraph(img, s.genotype)
 	groups := graph.ConnectedComponents()
 
-	s.connectivity = connectiviy(img, groups)
+	s.connectivity = connectivity(img, groups)
 	s.deviation = deviation(img, groups)
 	s.crowdingDistance = 0.0
 }
@@ -248,11 +248,11 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 	groups2 := graph2.ConnectedComponents()
 
 	s1 := &Solution{
-		offspring1, deviation(img, groups1), connectiviy(img, groups1), 0.0,
+		offspring1, deviation(img, groups1), connectivity(img, groups1), 0.0,
 	}
 
 	s2 := &Solution{
-		offspring2, deviation(img, groups2), connectiviy(img, groups2), 0.0,
+		offspring2, deviation(img, groups2), connectivity(img, groups2), 0.0,
 	}
 
 	return s1, s2
@@ -262,7 +262,7 @@ func SolutionFromGenotypeNSGA(img *Image, g *graphs.Graph) *Solution {
 	groups := g.ConnectedComponents()
 
 	deviation := deviation(img, groups)
-	connectivity := connectiviy(img, groups)
+	connectivity := connectivity(img, groups)
 	crowdingDistance := 0.0
 	sol := &Solution{GraphToGeno(g, ImageSize(img)), deviation, connectivity, crowdingDistance}
 

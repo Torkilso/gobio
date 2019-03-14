@@ -11,7 +11,7 @@ func GetTargets(img *Image, idx int) []int {
 
 	nodes := make([]int, 0, 8)
 
-	//nodes = append(nodes, idx)
+	nodes = append(nodes, idx)
 	// TOP
 	if y > 0 {
 		//fmt.Println("TOP")
