@@ -110,8 +110,21 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 		fmt.Println("Generation:", t)
 		startGeneration := time.Now()
 
+		children = createPopulationFromParents(image, parents)
+
 		population := append(parents, children...)
+
+		/*fmt.Println("Solutions in generation population")
+		for id, sol := range population {
+			graph := GenoToGraph(image, sol.genotype)
+			segments := graph.ConnectedComponents()
+			fmt.Println("Solution", id, ": segments:", len(segments), ", c:", sol.connectivity, ", d:", sol.deviation)
+		}*/
+
 		fronts := fastNonDominatedSort(population)
+
+		visualizeFronts(population, fronts)
+
 		newParents := make([]*Solution, 0)
 		i := 0
 
@@ -147,9 +160,8 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 
 		parents = append(newParents, lastFrontier...)
 
-		children = createPopulationFromParents(image, parents)
+		//children = createPopulationFromParents(image, parents)
 
-		newParents = make([]*Solution, 0)
 		i = 0
 
 		fmt.Println("Used", time.Since(startGeneration).Seconds(), "seconds")

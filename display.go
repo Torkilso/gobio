@@ -7,6 +7,7 @@ import (
 	"image"
 	"image/color"
 	"image/jpeg"
+	"image/png"
 	"os"
 )
 
@@ -50,6 +51,15 @@ func SaveJPEGRaw(img *image.RGBA, name string) {
 	jpeg.Encode(f, img, nil)
 }
 
+func SavePNGRaw(img *image.RGBA, name string) {
+	f, err := os.Create(name)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	png.Encode(f, img)
+}
+
 func DrawImageBoundries(img *Image, gr *graphs.Graph, color color.Color) *image.RGBA {
 	res := img.toRGBA()
 	groups := gr.ConnectedComponents()
@@ -67,10 +77,66 @@ func DrawImageBoundries(img *Image, gr *graphs.Graph, color color.Color) *image.
 
 					res.Set(x1, y1, color)
 					res.Set(x2, y2, color)
-
 				}
 			}
 		}
 	}
 	return res
+}
+
+func drawSolutionSegmentsBorders(img *Image, solution *Solution, color color.Color, name string) {
+
+	imgRect := image.Rect(0, 0, len(*img), len((*img)[0]))
+	blank := image.NewRGBA(imgRect)
+
+	gr := GenoToGraph(img, solution.genotype)
+	groups := gr.ConnectedComponents()
+
+	width := len(*img)
+	for _, group := range groups {
+		for k := range group {
+			intK := int(k)
+			for _, neighbour := range GetTargets(img, intK) {
+				if _, ok := group[uint64(neighbour)]; ok { // Same segments
+				} else {
+					// Two neighbours are not in same segment.
+					// Draw edge in this and neighbour
+					x1, y1 := Flatten(width, intK)
+					x2, y2 := Flatten(width, neighbour)
+
+					blank.Set(x1, y1, color)
+					blank.Set(x2, y2, color)
+				}
+			}
+		}
+	}
+	SavePNGRaw(blank, name)
+}
+
+func drawSolutionSegmentsWithCentroidColor(img *Image, solution *Solution, name string) {
+
+	imgRect := image.Rect(0, 0, len(*img), len((*img)[0]))
+	blank := image.NewRGBA(imgRect)
+
+	gr := GenoToGraph(img, solution.genotype)
+	groups := gr.ConnectedComponents()
+
+	width := len(*img)
+	for _, group := range groups {
+		//fmt.Println("segment id: ", id, " group length:", len(group))
+		centroid := Centroid(img, group)
+		//fmt.Println("centroid", centroid)
+		for k := range group {
+			intK := int(k)
+
+			x1, y1 := Flatten(width, intK)
+
+			//fmt.Println(x1, y1)
+			centroidColor := color.RGBA{R: uint8(centroid.r), G: uint8(centroid.g), B: uint8(centroid.b), A: 0xFF}
+
+			blank.Set(x1, y1, centroidColor)
+
+		}
+	}
+	SavePNGRaw(blank, name)
 }
