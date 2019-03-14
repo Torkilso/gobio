@@ -45,6 +45,48 @@ func visualizeImageGraph(filename string, img *Image, graph *graphs.Graph) {
 	dc.SavePNG(filename)
 }
 
+func createParetoPlotter() *plot.Plot {
+	p, err := plot.New()
+	if err != nil {
+		panic(err)
+	}
+
+	p.Title.Text = "Fronts"
+	p.X.Label.Text = "Deviation"
+	p.Y.Label.Text = "Connectivity"
+
+	return p
+}
+
+func addParetoFrontToPlotter(p *plot.Plot, population []*Solution, fronts map[int][]int, generation int) {
+
+	pts := make(plotter.XYs, len(fronts[0]))
+
+	for i := range fronts[0] {
+		pts[i].X = population[fronts[0][i]].deviation
+		pts[i].Y = population[fronts[0][i]].connectivity
+	}
+
+	lpLine, lpPoints, err := plotter.NewLinePoints(pts)
+
+	if err != nil {
+		panic(err)
+	}
+
+	lpPoints.Shape = draw.CircleGlyph{}
+	lpLine.Color = color.RGBA{A: 0}
+
+	lpPoints.Color = color.RGBA{B: uint8(generation * 2), R: 255 - uint8(generation*2), A: 255}
+
+	p.Add(lpLine, lpPoints)
+}
+
+func saveParetoPlotter(p *plot.Plot, name string) {
+	if err := p.Save(10*vg.Inch, 10*vg.Inch, name); err != nil {
+		panic(err)
+	}
+}
+
 func visualizeFronts(population []*Solution, fronts map[int][]int) {
 	p, err := plot.New()
 	if err != nil {

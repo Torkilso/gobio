@@ -13,12 +13,12 @@ func setObjectivesMaxMinValues(img *Image) {
 	height := len((*img)[0])
 	// Make image where all groups are in different segments
 
-	connectedGroupsInDifferent := make([]map[uint64]bool, width * height)
+	connectedGroupsInDifferent := make([]map[uint64]bool, width*height)
 
 	for x := range *img {
 		for y := range (*img)[x] {
 			idx := Expand(width, x, y)
-			connectedGroupsInDifferent[idx] = map[uint64]bool{uint64(idx):true}
+			connectedGroupsInDifferent[idx] = map[uint64]bool{uint64(idx): true}
 		}
 	}
 	maxConnectivity = connectivity(img, connectedGroupsInDifferent)
@@ -34,7 +34,6 @@ func setObjectivesMaxMinValues(img *Image) {
 	}
 
 	maxDeviation = deviation(img, connectedGroupsInSame)
-
 
 	// max deviation -> all pixels in one segment
 

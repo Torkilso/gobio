@@ -21,15 +21,17 @@ func main() {
 	//runGenerations(&image)
 	//runNSGA(&image)
 	//runSoniaMST(&image)
-	runAndStoreImagesForTesting("216066", 10, 20)
+	runAndStoreImagesForTesting("216066", 100, 40)
 	//runNSGAOnTestFolder("216066")
 	//img := readJPEGFile("./testimages/Untitled2.jpg")
 	//testMaxObjectives(&img)
 }
+
 func testMaxObjectives(img *Image) {
 	setObjectivesMaxMinValues(img)
-	fmt.Println("Max conn =",maxConnectivity, "Max dev =", maxDeviation )
+	fmt.Println("Max conn =", maxConnectivity, "Max dev =", maxDeviation)
 }
+
 func runNSGA(img *Image) {
 
 	start := time.Now()
@@ -57,11 +59,22 @@ func runNSGA(img *Image) {
 func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
 	imagePath := "./data/" + folderId + "/Test image.jpg"
 	image := readJPEGFile(imagePath)
+
 	rand.Seed(time.Now().UTC().UnixNano())
 	setObjectivesMaxMinValues(&image)
-	fmt.Println("Max conn =",maxConnectivity, "Max dev =", maxDeviation )
+
+	fmt.Println("Max conn =", maxConnectivity, "Max dev =", maxDeviation)
 
 	solutions := nsgaII(&image, generations, popSize)
+
+	for id, solution := range solutions {
+		graph := GenoToGraph(&image, solutions[id].genotype)
+		segments := graph.ConnectedComponents()
+		fmt.Println("Solution", id, ": segments:", len(segments), ", c:", solution.connectivity, ", d:", solution.deviation)
+
+		//drawSolutionSegmentsBorders(&image, solution, color.Black, string(string(id)+"border.png"))
+		//drawSolutionSegmentsWithCentroidColor(&image, solution, string(string(id)+"segments.png"))
+	}
 
 	dir, err := ioutil.ReadDir("./solutions/Student_Segmentation_Files")
 
@@ -74,7 +87,9 @@ func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
 
 	for i, s := range solutions {
 		filename := fmt.Sprintf("./solutions/Student_Segmentation_Files/sol%d.jpg", i)
+		//filenameCentroids := fmt.Sprintf("./solutions/Student_Segmentation_Files/solcentroids%d.jpg", i)
 		drawSolutionSegmentsBorders(&image, s, color.Black, filename)
+		//drawSolutionSegmentsWithCentroidColor(&image, s, filenameCentroids)
 
 	}
 }
@@ -143,4 +158,3 @@ func runGenerations(img *Image) {
 		fmt.Println("Gen", i, "Best", sol.weightedSum(), "Segments", len(groups))
 	}
 }
-
