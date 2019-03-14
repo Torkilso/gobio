@@ -1,11 +1,21 @@
 package main
 
 var (
-	maxDeviation    float64 = 100
+	maxDeviation    float64 = 10000
 	minDeviation    float64 = 0
-	maxConnectivity float64 = 100
+	maxConnectivity float64 = 10000
 	minConnectivity float64 = 0
 )
+
+func setObjectivesMaxMinValues(img *Image) {
+	// max deviation -> all pixels in one segment
+
+	// min deviation -> all pixels in their own segment = 0
+
+	// max connectivity -> all pixels in their own segment
+
+	// min connectivity -> all pixels in one segment
+}
 
 func deviation(img *Image, connectedGroups []map[uint64]bool) float64 {
 

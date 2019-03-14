@@ -136,7 +136,7 @@ func GeneratePopulation(img *Image, n int) []*Solution {
 
 	channel := make(chan *Solution)
 	var wg sync.WaitGroup
-	wg.Add(n*2)
+	wg.Add(n * 2)
 
 	for i := 0; i < n; i++ {
 		go func(index int) {
@@ -168,14 +168,12 @@ func createPopulationFromParents(img *Image, pop []*Solution) []*Solution {
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
 
-
 	channel := make(chan *Solution)
 	var wg sync.WaitGroup
-	wg.Add(len(pop) + len(pop) / 2)
-
+	wg.Add(len(pop) + len(pop)/2)
 
 	for i := 0; i < len(pop); i += 2 {
-		go func (index int) {
+		go func(index int) {
 			p1Idx := r1.Intn(len(pop))
 			p2Idx := r1.Intn(len(pop))
 
@@ -185,11 +183,13 @@ func createPopulationFromParents(img *Image, pop []*Solution) []*Solution {
 			leftChild, rightChild := Crossover(img, p1, p2)
 
 			if r1.Float32() < .1 {
-				leftChild = Mutate(leftChild.genotype, img)
+				index := r1.Intn(len(leftChild.genotype))
+				leftChild = Mutate(leftChild.genotype, index, img)
 			}
 
 			if r1.Float32() < .1 {
-				rightChild = Mutate(rightChild.genotype, img)
+				index := r1.Intn(len(rightChild.genotype))
+				rightChild = Mutate(rightChild.genotype, index, img)
 			}
 			channel <- leftChild
 			channel <- rightChild
@@ -208,14 +208,19 @@ func createPopulationFromParents(img *Image, pop []*Solution) []*Solution {
 	return result
 }
 
-func Mutate(genotype []uint64, img *Image) *Solution {
-	for i := range genotype {
+func Mutate(genotype []uint64, index int, img *Image) *Solution {
+
+	possibleValues := GetTargets(img, index)
+	chosen := rand.Intn(len(possibleValues))
+	genotype[uint64(index)] = uint64(possibleValues[chosen])
+
+	/*for i := range genotype {
 		if rand.Float32() < .2 {
 			possibleValues := GetTargets(img, i)
 			chosen := rand.Intn(len(possibleValues))
 			genotype[i] = uint64(possibleValues[chosen])
 		}
-	}
+	}*/
 	graph := GenoToGraph(img, genotype)
 	return SolutionFromGenotypeNSGA(img, graph)
 }
@@ -254,13 +259,10 @@ func SolutionFromGenotypeNSGA(img *Image, g *graphs.Graph) *Solution {
 	return sol
 }
 
-
-
 type GenoVertices struct {
 	edges int
 	value uint64
 }
-
 
 func GraphToGeno2(gr *graphs.Graph, size int) []uint64 {
 	geno := make([]uint64, size)
@@ -290,7 +292,6 @@ func GraphToGeno2(gr *graphs.Graph, size int) []uint64 {
 			break
 		}
 	}
-
 
 	return geno
 }

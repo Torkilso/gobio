@@ -39,7 +39,7 @@ type Pixel struct {
 }
 
 func (px *Pixel) toRGBA() color.RGBA {
-	return color.RGBA{uint8(px.r), uint8(px.g), uint8(px.b), 0xFF}
+	return color.RGBA{R: uint8(px.r), G: uint8(px.g), B: uint8(px.b), A: 0xFF}
 }
 
 type Image [][]Pixel
@@ -53,5 +53,6 @@ func (img *Image) toRGBA() *image.RGBA {
 			rgba.Set(i, j, px.toRGBA())
 		}
 	}
+
 	return rgba
 }

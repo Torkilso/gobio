@@ -2,11 +2,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/alonsovidales/go_graph"
 	"image/color"
-	_image "image"
 	"math/rand"
 	"time"
-	graphs "github.com/alonsovidales/go_graph"
 )
 
 func main() {
@@ -48,20 +47,32 @@ func runNSGA(img *Image) {
 }
 
 func runNSGAOnTestFolder(folderId string) {
-	imagePath := "./data/" + folderId + "/Test image.jpg"
+	imagePath := "./data/" + folderId + "/colors.jpg"
 	image := readJPEGFile(imagePath)
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	solutions := nsgaII(&image, 4, 6)
+	start := time.Now()
 
-	for _, s := range solutions {
-		white := _image.NewRGBA(_image.Rect(0, 0, len(image), len(image[0])))
-		gr := GenoToGraph(&image, s.genotype)
-		goImage := GoImageToImageRGBA(white)
-		edgedImg := DrawImageBoundries(&goImage, gr, color.Black)
-		SaveJPEGRaw(edgedImg, "sol.jpg")
+	// Set max and min connectivity and deviation
+	setObjectivesMaxMinValues(&image)
 
+	solutions := nsgaII(&image, 100, 80)
 
+	fmt.Println("Used", time.Since(start).Seconds(), "seconds in total")
+
+	fmt.Println()
+	fmt.Println("Solutions:")
+
+	for id, s := range solutions {
+		graph := GenoToGraph(&image, s.genotype)
+		segments := graph.ConnectedComponents()
+		fmt.Println("Solution", id, ": segments:", len(segments), ", c:", s.connectivity, ", d:", s.deviation)
+
+		if len(segments) > 1 {
+
+			drawSolutionSegmentsBorders(&image, s, color.Black, "border.png")
+			drawSolutionSegmentsWithCentroidColor(&image, s, "segments.png")
+		}
 	}
 }
 
