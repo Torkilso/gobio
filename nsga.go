@@ -108,7 +108,6 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 		startGeneration := time.Now()
 		population.evolve(image)
 
-		fmt.Println("Generation:", t, "Best before:", BestSolution(population).weightedSum())
 
 		/*fmt.Println("Solutions in generation population")
 		for id, sol := range population {
@@ -117,28 +116,35 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 			fmt.Println("Solution", id, ": segments:", len(segments), ", c:", sol.connectivity, ", d:", sol.deviation)
 		}*/
 
-		fmt.Println("Used", time.Since(startGeneration).Seconds(), "seconds to create offsprings")
+		//fmt.Println("Used", time.Since(startGeneration).Seconds(), "seconds to create offsprings")
 
 		fronts := fastNonDominatedSort(population)
+		fmt.Println("Generation:", t, "Best before:", BestSolution(population).weightedSum(), "Num fronts:", len(fronts))
 
-		//visualizeFronts(population, fronts)
+
+		visualizeFronts(population, fronts)
 
 		newParents := make([]*Solution, 0)
 		i := 0
 
+		fmt.Println("Adding fronts", len(newParents), len(fronts[i]), populationSize)
 		for len(newParents)+len(fronts[i]) <= populationSize {
+			//fmt.Println("Best now", BestSolution(newParents).weightedSum(), len(fronts[i]))
+
 			if len(fronts[i]) == 0 {
+				fmt.Println("Len(fronts[i])", fronts[i])
 				break
 			}
 
 			crowdingDistanceAssignment(fronts[i], population)
-			frontSolutions := make([]*Solution, 0)
+			frontSolutions := make([]*Solution, len(fronts[i]))
 
-			for _, id := range fronts[i] {
-				frontSolutions = append(frontSolutions, population[id])
+			for i, id := range fronts[i] {
+				frontSolutions[i] = population[id]
 			}
 
 			newParents = append(newParents, frontSolutions...)
+			//fmt.Println("Best now", BestSolution(newParents).weightedSum())
 			i++
 		}
 
@@ -158,7 +164,7 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 
 		population = append(newParents, lastFrontier...)
 
-		fmt.Println("Best from new:", BestSolution(population).weightedSum())
+		//fmt.Println("Best from new:", BestSolution(population).weightedSum())
 
 		//children = createPopulationFromParents(image, parents)
 

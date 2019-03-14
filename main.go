@@ -21,7 +21,7 @@ func main() {
 	//runGenerations(&image)
 	//runNSGA(&image)
 	//runSoniaMST(&image)
-	runAndStoreImagesForTesting("216066", 50, 1000)
+	runAndStoreImagesForTesting("216066", 20, 30)
 	//runNSGAOnTestFolder("216066")
 	//img := readJPEGFile("./testimages/Untitled2.jpg")
 	//testMaxObjectives(&img)
@@ -55,7 +55,7 @@ func runNSGA(img *Image) {
 }
 
 func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
-	imagePath := "./data/" + folderId + "/Test_image.jpg"
+	imagePath := "./data/" + folderId + "/Test image.jpg"
 	image := readJPEGFile(imagePath)
 	rand.Seed(time.Now().UTC().UnixNano())
 	setObjectivesMaxMinValues(&image)
@@ -74,6 +74,7 @@ func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
 
 	for i, s := range solutions {
 		filename := fmt.Sprintf("./solutions/Student_Segmentation_Files/sol%d.jpg", i)
+		fmt.Println("Storing solution", s.weightedSum(), filename)
 		drawSolutionSegmentsBorders(&image, s, color.Black, filename)
 
 	}

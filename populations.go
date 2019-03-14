@@ -23,5 +23,5 @@ func createInitialPopulation(image *Image, populationSize int) []*Solution {
 }
 
 func (solution *Solution) dominate(opponent *Solution) bool {
-	return solution.connectivity < opponent.connectivity && solution.deviation < opponent.deviation
+	return solution.connectivity <= opponent.connectivity && solution.deviation <= opponent.deviation
 }
