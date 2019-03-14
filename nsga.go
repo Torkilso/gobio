@@ -90,19 +90,15 @@ func crowdingDistanceAssignment(ids []int, population []*Solution) {
 }
 
 func nsgaII(image *Image, generations, populationSize int) []*Solution {
+	start := time.Now()
 
 	fmt.Println("Initiating NSGAII")
 	fmt.Println("Generating", populationSize, "solutions")
 
-	start := time.Now()
-
-	parents := GeneratePopulation(image, populationSize)
+	population := generatePopulation(image, populationSize)
 
 	fmt.Println("Used", time.Since(start).Seconds(), "seconds to generate solutions")
-	fmt.Println()
-	fmt.Println("Evolving solutions")
-
-	children := make([]*Solution, 0)
+	fmt.Println("\nEvolving solutions")
 
 	start = time.Now()
 
@@ -110,11 +106,9 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 
 
 		startGeneration := time.Now()
+		population.evolve(image)
 
-		children = createPopulationFromParents(image, parents)
-
-		population := append(parents, children...)
-		fmt.Println("Generation:", t, "Best parent:", BestSolution(parents).weightedSum(), "Best children:", BestSolution(children).weightedSum(), "Best all:", BestSolution(population).weightedSum())
+		fmt.Println("Generation:", t, "Best before:", BestSolution(population).weightedSum())
 
 		/*fmt.Println("Solutions in generation population")
 		for id, sol := range population {
@@ -123,9 +117,11 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 			fmt.Println("Solution", id, ": segments:", len(segments), ", c:", sol.connectivity, ", d:", sol.deviation)
 		}*/
 
+		fmt.Println("Used", time.Since(startGeneration).Seconds(), "seconds to create offsprings")
+
 		fronts := fastNonDominatedSort(population)
 
-		visualizeFronts(population, fronts)
+		//visualizeFronts(population, fronts)
 
 		newParents := make([]*Solution, 0)
 		i := 0
@@ -160,9 +156,9 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 			}
 		}
 
-		parents = append(newParents, lastFrontier...)
+		population = append(newParents, lastFrontier...)
 
-		fmt.Println("Best from new:", BestSolution(parents).weightedSum())
+		fmt.Println("Best from new:", BestSolution(population).weightedSum())
 
 		//children = createPopulationFromParents(image, parents)
 
@@ -174,5 +170,5 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 
 	fmt.Println("Used", time.Since(start).Seconds(), "seconds to evolve solutions")
 
-	return children
+	return population
 }

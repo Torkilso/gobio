@@ -32,6 +32,8 @@ func BestSolution(solutions []*Solution) *Solution {
 	return solutions[bestIdx]
 }
 
+type Population []*Solution
+
 type Pixel struct {
 	r int16
 	g int16

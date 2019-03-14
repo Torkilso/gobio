@@ -92,9 +92,7 @@ func runNSGAOnTestFolder(folderId string) {
 	solutions := nsgaII(&image, 10, 30)
 
 	fmt.Println("Used", time.Since(start).Seconds(), "seconds in total")
-
-	fmt.Println()
-	fmt.Println("Solutions:")
+	fmt.Println("\nSolutions:")
 
 	for id, s := range solutions {
 		graph := GenoToGraph(&image, s.genotype)
@@ -111,7 +109,7 @@ func runNSGAOnTestFolder(folderId string) {
 
 func runGenerations(img *Image) {
 
-	pop := GeneratePopulation(img, 2)
+	pop := generatePopulation(img, 2)
 	return
 	//sol := BestSolution(pop)
 	//graph := GenoToGraph(img, sol.genotype)
