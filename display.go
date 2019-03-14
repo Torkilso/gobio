@@ -84,10 +84,16 @@ func DrawImageBoundries(img *Image, gr *graphs.Graph, color color.Color) *image.
 	return res
 }
 
-func drawSolutionSegmentsBorders(img *Image, solution *Solution, color color.Color, name string) {
+func drawSolutionSegmentsBorders(img *Image, solution *Solution, col color.Color, name string) {
 
 	imgRect := image.Rect(0, 0, len(*img), len((*img)[0]))
 	blank := image.NewRGBA(imgRect)
+
+	for x := imgRect.Min.X ; x < imgRect.Max.X ; x++ {
+		for y := imgRect.Min.Y ; y < imgRect.Max.Y ; y++ {
+			blank.Set(x, y, color.White)
+		}
+	}
 
 	gr := GenoToGraph(img, solution.genotype)
 	groups := gr.ConnectedComponents()
@@ -104,8 +110,8 @@ func drawSolutionSegmentsBorders(img *Image, solution *Solution, color color.Col
 					x1, y1 := Flatten(width, intK)
 					x2, y2 := Flatten(width, neighbour)
 
-					blank.Set(x1, y1, color)
-					blank.Set(x2, y2, color)
+					blank.Set(x1, y1, col)
+					blank.Set(x2, y2, col)
 				}
 			}
 		}

@@ -21,7 +21,7 @@ func (s *Solution) weightedSum() float64 {
 
 func BestSolution(solutions []*Solution) *Solution {
 	bestFitness := math.MaxFloat64
-	bestIdx := -1
+	bestIdx := 0
 	for i, s := range solutions {
 		f := s.weightedSum()
 		if f < bestFitness {

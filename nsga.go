@@ -102,9 +102,9 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 
 	start = time.Now()
 
+	p := createParetoPlotter()
+
 	for t := 0; t < generations; t++ {
-
-
 		startGeneration := time.Now()
 		population.evolve(image)
 
@@ -116,13 +116,12 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 			fmt.Println("Solution", id, ": segments:", len(segments), ", c:", sol.connectivity, ", d:", sol.deviation)
 		}*/
 
-		//fmt.Println("Used", time.Since(startGeneration).Seconds(), "seconds to create offsprings")
-
 		fronts := fastNonDominatedSort(population)
 		fmt.Println("Generation:", t, "Best before:", BestSolution(population).weightedSum(), "Num fronts:", len(fronts))
 
 
-		visualizeFronts(population, fronts)
+		addParetoFrontToPlotter(p, population, fronts, t)
+
 
 		newParents := make([]*Solution, 0)
 		i := 0
@@ -170,9 +169,13 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 
 		i = 0
 
-		fmt.Println("Used", time.Since(startGeneration).Seconds(), "seconds")
+		fmt.Println("Used", time.Since(startGeneration).Seconds(), "seconds for generation")
 		fmt.Println()
+		saveParetoPlotter(p, "pareto.png")
+
 	}
+
+	saveParetoPlotter(p, "pareto.png")
 
 	fmt.Println("Used", time.Since(start).Seconds(), "seconds to evolve solutions")
 
