@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
-	"image/color"
 	_image "image"
+	"image/color"
+	"io/ioutil"
 	"math/rand"
+	"os"
+	"path"
 	"time"
-	graphs "github.com/alonsovidales/go_graph"
 )
 
 func main() {
@@ -22,7 +24,7 @@ func main() {
 	//runGenerations(&image)
 	//runNSGA(&image)
 	//runSoniaMST(&image)
-	runNSGAOnTestFolder("216066")
+	runNSGAOnTestFolder("216066", 30, 50)
 }
 
 func runNSGA(img *Image) {
@@ -52,21 +54,30 @@ func runNSGA(img *Image) {
 	SaveJPEGRaw(edgedImg, "edges.jpg")
 }
 
-func runNSGAOnTestFolder(folderId string) {
+func runNSGAOnTestFolder(folderId string, generations, popSize int) {
 	imagePath := "./data/" + folderId + "/Test image.jpg"
 	image := readJPEGFile(imagePath)
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	solutions := nsgaII(&image, 4, 6)
+	solutions := nsgaII(&image, generations, popSize)
 
-	for _, s := range solutions {
+
+	dir, err := ioutil.ReadDir("./solutions/Student_Segmentation_Files")
+	if err != nil {
+		panic(err)
+	}
+	for _, d := range dir {
+		os.RemoveAll(path.Join([]string{"./solutions/Student_Segmentation_Files", d.Name()}...))
+	}
+
+	for i, s := range solutions {
 		white := _image.NewRGBA(_image.Rect(0, 0, len(image), len(image[0])))
 		gr := GenoToGraph(&image, s.genotype)
 		goImage := GoImageToImageRGBA(white)
 		edgedImg := DrawImageBoundries(&goImage, gr, color.Black)
-		SaveJPEGRaw(edgedImg, "sol.jpg")
-
-
+		filename := fmt.Sprintf("./solutions/Student_Segmentation_Files/sol%d.jpg", i)
+		fmt.Println("Filename", filename)
+		SaveJPEGRaw(edgedImg, filename)
 	}
 }
 
@@ -107,26 +118,3 @@ func runGenerations(img *Image) {
 	}
 }
 
-func runSoniaMST(img *Image) {
-	imgAsGraph := GenerateGraph(img)
-
-	width := len(*img)
-	height := len((*img)[0])
-
-	s1 := rand.NewSource(time.Now().UnixNano())
-	r1 := rand.New(s1)
-
-	start := r1.Intn(width * height)
-	startT := time.Now()
-
-	primGraph, labels := PreparePrim(imgAsGraph)
-	fmt.Println("Time to prepare", time.Now().Sub(startT))
-	startT = time.Now()
-
-	mst2 := Prim(uint64(start), primGraph, labels, imgAsGraph)
-	fmt.Println("Time to prim", time.Now().Sub(startT))
-
-	mstGraph := graphs.GetGraph(mst2, false)
-	visualizeImageGraph("mst.png", img, mstGraph)
-
-}
