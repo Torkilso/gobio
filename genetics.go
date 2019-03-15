@@ -48,7 +48,7 @@ func RunGeneration(img *Image, solutions []*Solution) []*Solution {
 
 	return result
 }
-
+/*
 func (gr *Graph) ConnectedComponents() (groups []map[uint64]bool) {
 	var groupToUse uint64
 	usedVertex := make(map[uint64]uint64)
@@ -88,26 +88,47 @@ func dfs(origin int, usedVertex []bool, geno[]uint64) {
 	if !usedVertex[origin] {
 		dfs(int(geno[origin]), usedVertex, geno)
 	}
-
-
 }
+
+*/
+/**
+	1. Make a slice to hold visited, where value is segment number
+	2. Make a list of maps, which holds the segments
+	3. For each item in geno
+		1. Check if it has been visited, if so, continue.
+		2. Make a group to hold
+ */
+
 func GenoToConnectedComponents(geno []uint64) []map[uint64]bool {
 
-	reverseGeno := make([]uint64, len(geno))
-	for i, g := range geno {
-		reverseGeno[geno[i]] = g
+	edges := make([][]uint64, len(geno))
+	for i := range geno {
+		edges[i] = []uint64{geno[i]}
+	}
+	for i := range geno {
+		edges[geno[i]] = append(edges[geno[i]], uint64(i))
 	}
 	segments := make([]map[uint64]bool, 0)
 	used := make([]bool, len(geno))
-	segmentsMap := make(map[uint64]int, len(geno))
-	for from, to := range geno {
+	for from := range geno {
 		if !used[from] {
-			group := make([]bool, 0)
-			current := from
-			for used[]
-
+			used[from] = true
+			next := make([]uint64, 0)
+			group := map[uint64]bool{uint64(from): true}
+			next = append(next, edges[from]...)
+			for len(next) > 0 {
+				current := next[0]
+				if !used[current] {
+					group[current] = true
+					next = append(next, edges[current]...)
+				}
+				used[current] = true
+				next = next[1:]
+			}
+			segments = append(segments, group)
 		}
 	}
+	return segments
 }
 
 func GraphToGeno(gr *graphs.Graph, size int) []uint64 {
@@ -307,6 +328,82 @@ func (p *Population) evolve(img *Image) {
 	*p = append(*p, result...)
 }
 
+func (p *Population) evolveWithTournament(img *Image) {
+	size := len(*p)
+
+	s1 := rand.NewSource(time.Now().UnixNano())
+	r1 := rand.New(s1)
+
+	parentsA := make([]*Solution, 0, size)
+	parentsB := make([]*Solution, 0, size)
+
+	for i := 0; i < size; i += 2 {
+		p1Idx := r1.Intn(size)
+		p2Idx := r1.Intn(size)
+		p3Idx := r1.Intn(size)
+		p4Idx := r1.Intn(size)
+
+		p1 := tournamentNSGA(p1Idx, p2Idx, p)
+		p2 := tournamentNSGA(p3Idx, p4Idx, p)
+
+		parentsA = append(parentsA, p1)
+		parentsB = append(parentsB, p2)
+	}
+
+	resultSize := len(parentsA)
+	result := make([]*Solution, 0, resultSize*2)
+
+	channel := make(chan *Solution)
+	var wg sync.WaitGroup
+	wg.Add(resultSize + resultSize*2)
+
+	for i := 0; i < resultSize; i++ {
+		go func(index int) {
+			p1 := parentsA[index]
+			p2 := parentsB[index]
+
+			leftChild, rightChild := crossover(img, p1, p2)
+
+			if r1.Float32() < .1 {
+				leftChild.mutate(img)
+			}
+
+			if r1.Float32() < .1 {
+				rightChild.mutate(img)
+			}
+
+			channel <- leftChild
+			channel <- rightChild
+			wg.Done()
+		}(i)
+	}
+
+	go func() {
+		for t := range channel {
+			result = append(result, t)
+			wg.Done()
+		}
+	}()
+
+	wg.Wait()
+	close(channel)
+
+	*p = append(*p, result...)
+}
+
+func tournamentNSGA(id1, id2 int, p *Population) *Solution {
+
+	if (*p)[id1].frontNumber < (*p)[id2].frontNumber {
+		return (*p)[id1]
+	} else if (*p)[id1].frontNumber == (*p)[id2].frontNumber {
+		if (*p)[id1].crowdingDistance < (*p)[id2].crowdingDistance {
+			return (*p)[id1]
+		}
+	}
+
+	return (*p)[id2]
+}
+
 func (s *Solution) mutate(img *Image) {
 
 	index := rand.Intn(len(s.genotype))
@@ -342,22 +439,22 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 	}
 	fmt.Println("Time for creating offsprings", time.Now().Sub(st).String())
 	st = time.Now()
-	graph1 := GenoToGraph(img, offspring1, false)
-	graph2 := GenoToGraph(img, offspring2, false)
+	//graph1 := GenoToGraph(img, offspring1, false)
+	//graph2 := GenoToGraph(img, offspring2, false)
 	fmt.Println("Time for geno to graph", time.Now().Sub(st).String())
 	st = time.Now()
 
-	groups1 := graph1.ConnectedComponents()
-	groups2 := graph2.ConnectedComponents()
+	groups1 := GenoToConnectedComponents(offspring1)
+	groups2 := GenoToConnectedComponents(offspring2)
 	fmt.Println("Time for connected components", time.Now().Sub(st).String())
 	st = time.Now()
 
 	s1 := &Solution{
-		offspring1, deviation(img, groups1), connectivity(img, groups1), 0.0,
+		offspring1, deviation(img, groups1), connectivity(img, groups1), 0.0, 0,
 	}
 
 	s2 := &Solution{
-		offspring2, deviation(img, groups2), connectivity(img, groups2), 0.0,
+		offspring2, deviation(img, groups2), connectivity(img, groups2), 0.0, 0,
 	}
 	fmt.Println("Time for solutions components", time.Now().Sub(st).String())
 
@@ -371,7 +468,7 @@ func SolutionFromGenotypeNSGA(img *Image, g *graphs.Graph) *Solution {
 	deviation := deviation(img, groups)
 	connectivity := connectivity(img, groups)
 	crowdingDistance := 0.0
-	sol := &Solution{GraphToGeno(g, ImageSize(img)), deviation, connectivity, crowdingDistance}
+	sol := &Solution{GraphToGeno(g, ImageSize(img)), deviation, connectivity, crowdingDistance, 0}
 
 	return sol
 }

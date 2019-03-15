@@ -5,11 +5,12 @@ import (
 )
 
 func GetTargets(img *Image, idx int) []int {
+
 	width := len(*img)
 	height := len((*img)[0])
 	x, y := Flatten(len(*img), idx)
 
-	nodes := make([]int, 0, 8)
+	nodes := make([]int, 0, 9)
 
 	nodes = append(nodes, idx)
 	// TOP

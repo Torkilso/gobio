@@ -2,13 +2,17 @@ package main
 
 import (
 	"fmt"
-	"github.com/pkg/profile"
 	"image/color"
 	"io/ioutil"
 	"math/rand"
 	"os"
 	"path"
 	"time"
+)
+
+var (
+	generationsToRun = 80
+	folderId         = "86016"
 )
 
 func main() {
@@ -19,12 +23,12 @@ func main() {
 
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	defer profile.Start(profile.MemProfile).Stop()
+	//defer profile.Start(profile.MemProfile).Stop()
 
 	//runGenerations(&image)
 	//runNSGA(&image)
 	//runSoniaMST(&image)
-	runAndStoreImagesForTesting("216066", 100, 50)
+	runAndStoreImagesForTesting(folderId, generationsToRun, 20)
 	//runNSGAOnTestFolder("216066")
 	//img := readJPEGFile("./testimages/Untitled2.jpg")
 	//testMaxObjectives(&img)
@@ -36,10 +40,22 @@ func main() {
 func perf() {
 	imagePath := "./data/216066/Test image.jpg"
 	img := readJPEGFile(imagePath)
-	pop := generatePopulation(&img, 2)
-	defer timeTrack(time.Now(), "Crossover")
-	//GenoToGraph(&img, pop[0].genotype, false)
-	crossover(&img, pop[0], pop[1])
+	pop := generatePopulation(&img, 1)
+	s := time.Now()
+	gr := GenoToGraph(&img, pop[0].genotype, false)
+	seg1 := gr.ConnectedComponents()
+	fmt.Println("Time graph", time.Now().Sub(s).String())
+	s = time.Now()
+
+	seg2:= GenoToConnectedComponents(pop[0].genotype)
+	fmt.Println("Time homemade", time.Now().Sub(s).String())
+
+	fmt.Println("Lens", len(seg1), len(seg2))
+
+
+//	fmt.Println(segm)
+//	fmt.Println(segm2)
+	//crossover(&img, pop[0], pop[1])
 
 }
 
@@ -68,7 +84,7 @@ func runNSGA(img *Image) {
 }
 
 func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
-	imagePath := "./data/" + folderId + "/Test image.jpg"
+	imagePath := "./data/" + folderId + "/image.jpg"
 	image := readJPEGFile(imagePath)
 
 	rand.Seed(time.Now().UTC().UnixNano())
@@ -81,10 +97,7 @@ func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
 	for id, solution := range solutions {
 		graph := GenoToGraph(&image, solutions[id].genotype, false)
 		segments := graph.ConnectedComponents()
-		fmt.Println("Solution", id, ": segments:", len(segments), ", c:", solution.connectivity, ", d:", solution.deviation)
-
-		//drawSolutionSegmentsBorders(&image, solution, color.Black, string(string(id)+"border.png"))
-		//drawSolutionSegmentsWithCentroidColor(&image, solution, string(string(id)+"segments.png"))
+		fmt.Println("Solution", id, ": weightedSum:", solution.weightedSum(), ", segments:", len(segments), ", c:", solution.connectivity, ", d:", solution.deviation)
 	}
 
 	dir, err := ioutil.ReadDir("./solutions/Student_Segmentation_Files")
@@ -92,16 +105,15 @@ func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
 	if err != nil {
 		panic(err)
 	}
+
 	for _, d := range dir {
 		_ = os.RemoveAll(path.Join([]string{"./solutions/Student_Segmentation_Files", d.Name()}...))
 	}
 
 	for i, s := range solutions {
 		filename := fmt.Sprintf("./solutions/Student_Segmentation_Files/sol%d.jpg", i)
-		fmt.Println("Storing solution", s.weightedSum(), filename)
+		//fmt.Println("Storing solution", s.weightedSum(), filename)
 		drawSolutionSegmentsBorders(&image, s, color.Black, filename)
-		//drawSolutionSegmentsWithCentroidColor(&image, s, filenameCentroids)
-
 	}
 }
 

@@ -1,5 +1,10 @@
 package main
 
+import (
+	"log"
+	"time"
+)
+
 var (
 	maxDeviation    float64 = 10000
 	minDeviation    float64 = 0
@@ -44,8 +49,14 @@ func setObjectivesMaxMinValues(img *Image) {
 	// min connectivity -> all pixels in one segment
 }
 
-func deviation(img *Image, connectedGroups []map[uint64]bool) float64 {
+func timeTrack(start time.Time, name string) {
+	elapsed := time.Since(start)
+	log.Printf("%s took %s", name, elapsed)
+}
 
+
+func deviation(img *Image, connectedGroups []map[uint64]bool) float64 {
+	defer timeTrack(time.Now(), "deviation")
 	var dist float64
 	width := len(*img)
 
@@ -61,6 +72,7 @@ func deviation(img *Image, connectedGroups []map[uint64]bool) float64 {
 }
 
 func connectivity(img *Image, connectedGroups []map[uint64]bool) float64 {
+	defer timeTrack(time.Now(), "connectivity")
 
 	var dist float64
 
@@ -68,7 +80,6 @@ func connectivity(img *Image, connectedGroups []map[uint64]bool) float64 {
 		for k := range group {
 			intK := int(k)
 			for j, neighbour := range GetTargets(img, intK) {
-
 				if _, ok := group[uint64(neighbour)]; ok { // To nothing
 				} else {
 					dist += 1.0 / (float64(j) + 1.0)

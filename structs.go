@@ -13,10 +13,11 @@ type Solution struct {
 	deviation        float64
 	connectivity     float64
 	crowdingDistance float64
+	frontNumber      int
 }
 
 func (s *Solution) weightedSum() float64 {
-	return s.deviation / maxDeviation +  s.connectivity / maxConnectivity
+	return s.deviation/maxDeviation + s.connectivity/maxConnectivity
 }
 
 func BestSolution(solutions []*Solution) *Solution {

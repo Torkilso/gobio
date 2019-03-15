@@ -76,7 +76,7 @@ func addParetoFrontToPlotter(p *plot.Plot, population []*Solution, fronts map[in
 	lpPoints.Shape = draw.CircleGlyph{}
 	lpLine.Color = color.RGBA{A: 0}
 
-	lpPoints.Color = color.RGBA{B: uint8(generation * 2), R: 255 - uint8(generation*2), A: 255}
+	lpPoints.Color = color.RGBA{B: uint8(255 * generation / generationsToRun), R: 255 - uint8(255*generation/generationsToRun), A: 255}
 
 	p.Add(lpLine, lpPoints)
 }

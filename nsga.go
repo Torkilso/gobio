@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"gonum.org/v1/plot"
 	"math"
 	"sort"
 	"time"
@@ -53,6 +54,7 @@ func fastNonDominatedSort(population []*Solution) map[int][]int {
 					newFront = append(newFront, solution)
 				}
 			}
+			population[frontSolution].frontNumber = frontRank
 		}
 
 		frontRank++
@@ -72,6 +74,8 @@ func crowdingDistanceAssignment(ids []int, population []*Solution) {
 		return population[ids[i]].deviation < population[ids[j]].deviation
 	})
 
+	fmt.Println("Fronts", ids)
+
 	population[ids[0]].crowdingDistance = math.Inf(1)
 	population[ids[size-1]].crowdingDistance = math.Inf(1)
 
@@ -89,6 +93,44 @@ func crowdingDistanceAssignment(ids []int, population []*Solution) {
 	}
 }
 
+func (p *Population) sortAndSelectParetoSolutions(populationSize, generation int, plotter *plot.Plot) {
+	fronts := fastNonDominatedSort(*p)
+	fmt.Println("\nGeneration:", generation, "Best before:", BestSolution(*p).weightedSum(), "Num fronts:", len(fronts))
+
+
+	newParents := make([]*Solution, 0)
+	i := 0
+
+	fmt.Println("len(newParents)+len(fronts[i])", len(newParents), len(fronts[i]), populationSize, len(newParents)+len(fronts[i]))
+	for len(newParents)+len(fronts[i]) <= populationSize {
+		crowdingDistanceAssignment(fronts[i], *p)
+		frontSolutions := make([]*Solution, len(fronts[i]))
+
+		for i, id := range fronts[i] {
+			frontSolutions[i] = (*p)[id]
+		}
+
+		newParents = append(newParents, frontSolutions...)
+		i++
+	}
+
+	lastFrontier := make([]*Solution, 0)
+
+	if len(fronts[i]) > 0 {
+		crowdingDistanceAssignment(fronts[i], *p)
+
+		for _, id := range fronts[i] {
+			if len(lastFrontier)+len(newParents) < populationSize {
+				lastFrontier = append(lastFrontier, (*p)[id])
+			} else {
+				break
+			}
+		}
+	}
+
+	*p = append(newParents, lastFrontier...)
+}
+
 func nsgaII(image *Image, generations, populationSize int) []*Solution {
 	start := time.Now()
 
@@ -103,84 +145,23 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 	start = time.Now()
 
 	p := createParetoPlotter()
+	population.sortAndSelectParetoSolutions(populationSize, 0, p)
 
 	for t := 0; t < generations; t++ {
-
 		startGeneration := time.Now()
 
 		population.evolve(image)
-
-
-		/*fmt.Println("Solutions in generation population")
-		for id, sol := range population {
-			graph := GenoToGraph(image, sol.genotype)
-			segments := graph.ConnectedComponents()
-			fmt.Println("Solution", id, ": segments:", len(segments), ", c:", sol.connectivity, ", d:", sol.deviation)
-		}*/
-
-		fronts := fastNonDominatedSort(population)
-
-		fmt.Println("Generation:", t, "Best before:", BestSolution(population).weightedSum(), "Num fronts:", len(fronts))
-
-
-		addParetoFrontToPlotter(p, population, fronts, t)
-
-
-		newParents := make([]*Solution, 0)
-		i := 0
-
-		fmt.Println("Adding fronts", len(newParents), len(fronts[i]), populationSize)
-		for len(newParents)+len(fronts[i]) <= populationSize {
-			//fmt.Println("Best now", BestSolution(newParents).weightedSum(), len(fronts[i]))
-
-			if len(fronts[i]) == 0 {
-				fmt.Println("Len(fronts[i])", fronts[i])
-				break
-			}
-
-			crowdingDistanceAssignment(fronts[i], population)
-			frontSolutions := make([]*Solution, len(fronts[i]))
-
-			for i, id := range fronts[i] {
-				frontSolutions[i] = population[id]
-			}
-
-			newParents = append(newParents, frontSolutions...)
-			//fmt.Println("Best now", BestSolution(newParents).weightedSum())
-			i++
-		}
-
-		lastFrontier := make([]*Solution, 0)
-
-		if len(fronts[i]) > 0 {
-			crowdingDistanceAssignment(fronts[i], population)
-
-			for _, id := range fronts[i] {
-				if len(lastFrontier)+len(newParents) < populationSize {
-					lastFrontier = append(lastFrontier, population[id])
-				} else {
-					break
-				}
-			}
-		}
-
-		population = append(newParents, lastFrontier...)
+		population.sortAndSelectParetoSolutions(populationSize, t, p)
 
 		//fmt.Println("Best from new:", BestSolution(population).weightedSum())
 
-		//children = createPopulationFromParents(image, parents)
-
-		i = 0
-
 		fmt.Println("Used", time.Since(startGeneration).Seconds(), "seconds for generation")
-		fmt.Println()
 		saveParetoPlotter(p, "pareto.png")
-
 	}
 
 	saveParetoPlotter(p, "pareto.png")
 
-	fmt.Println("Used", time.Since(start).Seconds(), "seconds to evolve solutions")
+	fmt.Println("\nUsed", time.Since(start).Seconds(), "seconds to evolve solutions")
 
 	return population
 }

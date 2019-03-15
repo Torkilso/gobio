@@ -33,7 +33,6 @@ func ColorDist(p1 *Pixel, p2 *Pixel) float64 {
 }
 
 func Centroid(img *Image, group map[uint64]bool) *Pixel {
-
 	var r int
 	var g int
 	var b int
