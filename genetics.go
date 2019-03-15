@@ -49,6 +49,67 @@ func RunGeneration(img *Image, solutions []*Solution) []*Solution {
 	return result
 }
 
+func (gr *Graph) ConnectedComponents() (groups []map[uint64]bool) {
+	var groupToUse uint64
+	usedVertex := make(map[uint64]uint64)
+	currentGroup := uint64(0)
+	for v := range gr.VertexEdges {
+		if _, used := usedVertex[v]; !used {
+			group := make(map[uint64]bool)
+			gr.dfs(v, group, nil, nil)
+			found := false
+		groupSearch:
+			for k := range group {
+				if g, used := usedVertex[k]; used {
+					groupToUse = g
+					found = true
+
+					break groupSearch
+				}
+			}
+			if !found {
+				groupToUse = currentGroup
+				currentGroup++
+				groups = append(groups, make(map[uint64]bool))
+			}
+
+			for k := range group {
+				usedVertex[k] = groupToUse
+				groups[groupToUse][k] = true
+			}
+		}
+	}
+
+	return
+}
+func dfs(origin int, usedVertex []bool, geno[]uint64) {
+	usedVertex[origin] = true
+
+	if !usedVertex[origin] {
+		dfs(int(geno[origin]), usedVertex, geno)
+	}
+
+
+}
+func GenoToConnectedComponents(geno []uint64) []map[uint64]bool {
+
+	reverseGeno := make([]uint64, len(geno))
+	for i, g := range geno {
+		reverseGeno[geno[i]] = g
+	}
+	segments := make([]map[uint64]bool, 0)
+	used := make([]bool, len(geno))
+	segmentsMap := make(map[uint64]int, len(geno))
+	for from, to := range geno {
+		if !used[from] {
+			group := make([]bool, 0)
+			current := from
+			for used[]
+
+		}
+	}
+}
+
 func GraphToGeno(gr *graphs.Graph, size int) []uint64 {
 	geno := make([]uint64, size)
 
@@ -109,13 +170,50 @@ func GraphToGeno(gr *graphs.Graph, size int) []uint64 {
 	return geno
 }
 
-func GenoToGraph(img *Image, geno []uint64) *graphs.Graph {
-	edges := make([]graphs.Edge, len(geno))
-	for i := range geno {
-		edges[i] = graphs.Edge{uint64(i), geno[i], Dist(img, i, int(geno[i]))}
+func GetGraph(size int, edges []graphs.Edge, undirected bool) (ug *graphs.Graph) {
+	var weight float64
+
+	ug = &graphs.Graph{
+		RawEdges:    edges,
+		Vertices:    make(map[uint64]bool, size),
+		VertexEdges: make(map[uint64]map[uint64]float64, size),
+		Undirected:  undirected,
+		NegEdges:    false,
 	}
 
-	return graphs.GetGraph(edges, true)
+	for _, edge := range edges {
+		weight = edge.Weight
+
+		ug.Vertices[edge.From] = true
+		ug.Vertices[edge.To] = true
+		if _, ok := ug.VertexEdges[edge.From]; ok {
+			ug.VertexEdges[edge.From][edge.To] = weight
+		} else {
+			ug.VertexEdges[edge.From] = map[uint64]float64{edge.To: weight}
+		}
+		if undirected {
+			if _, ok := ug.VertexEdges[edge.To]; ok {
+				ug.VertexEdges[edge.To][edge.From] = weight
+			} else {
+				ug.VertexEdges[edge.To] = map[uint64]float64{edge.From: weight}
+			}
+		}
+	}
+
+	return
+}
+
+func GenoToGraph(img *Image, geno []uint64, weight bool) *graphs.Graph {
+	edges := make([]graphs.Edge, len(geno))
+	var w float64
+	for i := range geno {
+		if weight {
+			w = Dist(img, i, int(geno[i]))
+		}
+		edges[i] = graphs.Edge{uint64(i), geno[i], w}
+	}
+
+	return GetGraph(ImageSize(img), edges, true)
 }
 
 func generatePopulation(img *Image, n int) Population {
@@ -217,7 +315,7 @@ func (s *Solution) mutate(img *Image) {
 
 	s.genotype[uint64(index)] = uint64(possibleValues[chosen])
 
-	graph := GenoToGraph(img, s.genotype)
+	graph := GenoToGraph(img, s.genotype, false)
 	groups := graph.ConnectedComponents()
 
 	s.connectivity = connectivity(img, groups)
@@ -227,6 +325,8 @@ func (s *Solution) mutate(img *Image) {
 
 func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 
+	s := time.Now()
+	st := time.Now()
 	n := len((*parent1).genotype)
 
 	offspring1 := make([]uint64, n)
@@ -240,12 +340,17 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 			offspring1[i], offspring2[i] = (*parent1).genotype[i], (*parent2).genotype[i]
 		}
 	}
-
-	graph1 := GenoToGraph(img, offspring1)
-	graph2 := GenoToGraph(img, offspring2)
+	fmt.Println("Time for creating offsprings", time.Now().Sub(st).String())
+	st = time.Now()
+	graph1 := GenoToGraph(img, offspring1, false)
+	graph2 := GenoToGraph(img, offspring2, false)
+	fmt.Println("Time for geno to graph", time.Now().Sub(st).String())
+	st = time.Now()
 
 	groups1 := graph1.ConnectedComponents()
 	groups2 := graph2.ConnectedComponents()
+	fmt.Println("Time for connected components", time.Now().Sub(st).String())
+	st = time.Now()
 
 	s1 := &Solution{
 		offspring1, deviation(img, groups1), connectivity(img, groups1), 0.0,
@@ -254,7 +359,9 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 	s2 := &Solution{
 		offspring2, deviation(img, groups2), connectivity(img, groups2), 0.0,
 	}
+	fmt.Println("Time for solutions components", time.Now().Sub(st).String())
 
+	fmt.Println("Time for crossover", time.Now().Sub(s).String())
 	return s1, s2
 }
 

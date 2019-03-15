@@ -105,7 +105,9 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 	p := createParetoPlotter()
 
 	for t := 0; t < generations; t++ {
+
 		startGeneration := time.Now()
+
 		population.evolve(image)
 
 
@@ -117,6 +119,7 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 		}*/
 
 		fronts := fastNonDominatedSort(population)
+
 		fmt.Println("Generation:", t, "Best before:", BestSolution(population).weightedSum(), "Num fronts:", len(fronts))
 
 

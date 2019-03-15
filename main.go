@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/pkg/profile"
 	"image/color"
 	"io/ioutil"
 	"math/rand"
@@ -18,18 +19,28 @@ func main() {
 
 	rand.Seed(time.Now().UTC().UnixNano())
 
+	defer profile.Start(profile.MemProfile).Stop()
+
 	//runGenerations(&image)
 	//runNSGA(&image)
 	//runSoniaMST(&image)
-	runAndStoreImagesForTesting("216066", 120, 1000)
+	runAndStoreImagesForTesting("216066", 100, 50)
 	//runNSGAOnTestFolder("216066")
 	//img := readJPEGFile("./testimages/Untitled2.jpg")
 	//testMaxObjectives(&img)
+	//perf()
+
+
 }
 
-func testMaxObjectives(img *Image) {
-	setObjectivesMaxMinValues(img)
-	fmt.Println("Max conn =", maxConnectivity, "Max dev =", maxDeviation)
+func perf() {
+	imagePath := "./data/216066/Test image.jpg"
+	img := readJPEGFile(imagePath)
+	pop := generatePopulation(&img, 2)
+	defer timeTrack(time.Now(), "Crossover")
+	//GenoToGraph(&img, pop[0].genotype, false)
+	crossover(&img, pop[0], pop[1])
+
 }
 
 func runNSGA(img *Image) {
@@ -44,11 +55,11 @@ func runNSGA(img *Image) {
 	visualizeFronts(solutions, fronts)
 
 	for id, solution := range solutions {
-		graph := GenoToGraph(img, solutions[0].genotype)
+		graph := GenoToGraph(img, solutions[0].genotype, true)
 		segments := graph.ConnectedComponents()
 		fmt.Println("Solution", id, ": segments:", len(segments), ", c:", solution.connectivity, ", d:", solution.deviation)
 	}
-	graph := GenoToGraph(img, solutions[0].genotype)
+	graph := GenoToGraph(img, solutions[0].genotype, true)
 
 	//visualizeImageGraph("mstgraph.png", img, graph)
 
@@ -57,7 +68,7 @@ func runNSGA(img *Image) {
 }
 
 func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
-	imagePath := "./data/" + folderId + "/Test_image.jpg"
+	imagePath := "./data/" + folderId + "/Test image.jpg"
 	image := readJPEGFile(imagePath)
 
 	rand.Seed(time.Now().UTC().UnixNano())
@@ -68,7 +79,7 @@ func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
 	solutions := nsgaII(&image, generations, popSize)
 
 	for id, solution := range solutions {
-		graph := GenoToGraph(&image, solutions[id].genotype)
+		graph := GenoToGraph(&image, solutions[id].genotype, false)
 		segments := graph.ConnectedComponents()
 		fmt.Println("Solution", id, ": segments:", len(segments), ", c:", solution.connectivity, ", d:", solution.deviation)
 
@@ -110,7 +121,7 @@ func runNSGAOnTestFolder(folderId string) {
 	fmt.Println("\nSolutions:")
 
 	for id, s := range solutions {
-		graph := GenoToGraph(&image, s.genotype)
+		graph := GenoToGraph(&image, s.genotype, true)
 		segments := graph.ConnectedComponents()
 		fmt.Println("Solution", id, ": segments:", len(segments), ", c:", s.connectivity, ", d:", s.deviation)
 
@@ -135,7 +146,7 @@ func runGenerations(img *Image) {
 		pop = RunGeneration(img, pop)
 		sol := BestSolution(pop)
 
-		graph := GenoToGraph(img, sol.genotype)
+		graph := GenoToGraph(img, sol.genotype, false)
 		groups := graph.ConnectedComponents()
 		width := len(*img)
 
