@@ -124,6 +124,10 @@ func (p *Population) sortAndSelectParetoSolutions(populationSize, generation int
 	if len(fronts[i]) > 0 {
 		crowdingDistanceAssignment(fronts[i], *p)
 
+		sort.Slice(fronts[i], func(i, j int) bool {
+			return (*p)[i].crowdingDistance > (*p)[j].crowdingDistance
+		})
+
 		for _, id := range fronts[i] {
 			if len(lastFrontier)+len(newParents) < populationSize {
 				lastFrontier = append(lastFrontier, (*p)[id])
