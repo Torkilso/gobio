@@ -56,7 +56,6 @@ func timeTrack(start time.Time, name string) {
 
 
 func deviation(img *Image, connectedGroups []map[uint64]bool) float64 {
-	defer timeTrack(time.Now(), "deviation")
 	var dist float64
 	width := len(*img)
 
@@ -65,14 +64,13 @@ func deviation(img *Image, connectedGroups []map[uint64]bool) float64 {
 
 		for k := range group {
 			x, y := Flatten(width, int(k))
-			dist += ColorDist(&(*img)[x][y], centroid)
+			dist += ColorDist((*img)[x][y], centroid)
 		}
 	}
 	return dist
 }
 
 func connectivity(img *Image, connectedGroups []map[uint64]bool) float64 {
-	defer timeTrack(time.Now(), "connectivity")
 
 	var dist float64
 
@@ -80,8 +78,7 @@ func connectivity(img *Image, connectedGroups []map[uint64]bool) float64 {
 		for k := range group {
 			intK := int(k)
 			for j, neighbour := range GetTargets(img, intK) {
-				if _, ok := group[uint64(neighbour)]; ok { // To nothing
-				} else {
+				if _, ok := group[uint64(neighbour)]; !ok { // To nothing
 					dist += 1.0 / (float64(j) + 1.0)
 				}
 			}

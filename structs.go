@@ -45,7 +45,7 @@ func (px *Pixel) toRGBA() color.RGBA {
 	return color.RGBA{R: uint8(px.r), G: uint8(px.g), B: uint8(px.b), A: 0xFF}
 }
 
-type Image [][]Pixel
+type Image [][]*Pixel
 
 func (img *Image) toRGBA() *image.RGBA {
 	width := len(*img)

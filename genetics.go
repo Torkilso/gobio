@@ -48,49 +48,8 @@ func RunGeneration(img *Image, solutions []*Solution) []*Solution {
 
 	return result
 }
-/*
-func (gr *Graph) ConnectedComponents() (groups []map[uint64]bool) {
-	var groupToUse uint64
-	usedVertex := make(map[uint64]uint64)
-	currentGroup := uint64(0)
-	for v := range gr.VertexEdges {
-		if _, used := usedVertex[v]; !used {
-			group := make(map[uint64]bool)
-			gr.dfs(v, group, nil, nil)
-			found := false
-		groupSearch:
-			for k := range group {
-				if g, used := usedVertex[k]; used {
-					groupToUse = g
-					found = true
 
-					break groupSearch
-				}
-			}
-			if !found {
-				groupToUse = currentGroup
-				currentGroup++
-				groups = append(groups, make(map[uint64]bool))
-			}
 
-			for k := range group {
-				usedVertex[k] = groupToUse
-				groups[groupToUse][k] = true
-			}
-		}
-	}
-
-	return
-}
-func dfs(origin int, usedVertex []bool, geno[]uint64) {
-	usedVertex[origin] = true
-
-	if !usedVertex[origin] {
-		dfs(int(geno[origin]), usedVertex, geno)
-	}
-}
-
-*/
 /**
 	1. Make a slice to hold visited, where value is segment number
 	2. Make a list of maps, which holds the segments
@@ -300,15 +259,15 @@ func (p *Population) evolve(img *Image) {
 			p2 := (*p)[p2Idx]
 
 			leftChild, rightChild := crossover(img, p1, p2)
-
-			if r1.Float32() < .1 {
+			/*
+			if r1.Float32() < .3 {
 				leftChild.mutate(img)
 			}
 
-			if r1.Float32() < .1 {
+			if r1.Float32() < .3 {
 				rightChild.mutate(img)
 			}
-
+			*/
 			channel <- leftChild
 			channel <- rightChild
 			wg.Done()
@@ -363,7 +322,7 @@ func (p *Population) evolveWithTournament(img *Image) {
 			p2 := parentsB[index]
 
 			leftChild, rightChild := crossover(img, p1, p2)
-
+			/*
 			if r1.Float32() < .1 {
 				leftChild.mutate(img)
 			}
@@ -371,6 +330,7 @@ func (p *Population) evolveWithTournament(img *Image) {
 			if r1.Float32() < .1 {
 				rightChild.mutate(img)
 			}
+			*/
 
 			channel <- leftChild
 			channel <- rightChild
@@ -392,11 +352,10 @@ func (p *Population) evolveWithTournament(img *Image) {
 }
 
 func tournamentNSGA(id1, id2 int, p *Population) *Solution {
-
 	if (*p)[id1].frontNumber < (*p)[id2].frontNumber {
 		return (*p)[id1]
 	} else if (*p)[id1].frontNumber == (*p)[id2].frontNumber {
-		if (*p)[id1].crowdingDistance < (*p)[id2].crowdingDistance {
+		if (*p)[id1].crowdingDistance > (*p)[id2].crowdingDistance {
 			return (*p)[id1]
 		}
 	}
@@ -412,8 +371,7 @@ func (s *Solution) mutate(img *Image) {
 
 	s.genotype[uint64(index)] = uint64(possibleValues[chosen])
 
-	graph := GenoToGraph(img, s.genotype, false)
-	groups := graph.ConnectedComponents()
+	groups := GenoToConnectedComponents(s.genotype)
 
 	s.connectivity = connectivity(img, groups)
 	s.deviation = deviation(img, groups)
@@ -422,8 +380,6 @@ func (s *Solution) mutate(img *Image) {
 
 func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 
-	s := time.Now()
-	st := time.Now()
 	n := len((*parent1).genotype)
 
 	offspring1 := make([]uint64, n)
@@ -437,17 +393,12 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 			offspring1[i], offspring2[i] = (*parent1).genotype[i], (*parent2).genotype[i]
 		}
 	}
-	fmt.Println("Time for creating offsprings", time.Now().Sub(st).String())
-	st = time.Now()
 	//graph1 := GenoToGraph(img, offspring1, false)
 	//graph2 := GenoToGraph(img, offspring2, false)
-	fmt.Println("Time for geno to graph", time.Now().Sub(st).String())
-	st = time.Now()
 
 	groups1 := GenoToConnectedComponents(offspring1)
 	groups2 := GenoToConnectedComponents(offspring2)
-	fmt.Println("Time for connected components", time.Now().Sub(st).String())
-	st = time.Now()
+
 
 	s1 := &Solution{
 		offspring1, deviation(img, groups1), connectivity(img, groups1), 0.0, 0,
@@ -456,9 +407,6 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 	s2 := &Solution{
 		offspring2, deviation(img, groups2), connectivity(img, groups2), 0.0, 0,
 	}
-	fmt.Println("Time for solutions components", time.Now().Sub(st).String())
-
-	fmt.Println("Time for crossover", time.Now().Sub(s).String())
 	return s1, s2
 }
 

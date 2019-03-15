@@ -10,10 +10,10 @@ func GoImageToImageRGBA(src *image.RGBA) Image {
 	width := src.Bounds().Dx()
 	height := src.Bounds().Dy()
 
-	pixels := make([][]Pixel, width)
+	pixels := make([][]*Pixel, width)
 
 	for i := range pixels {
-		pixels[i] = make([]Pixel, height)
+		pixels[i] = make([]*Pixel, height)
 	}
 
 	for i := 0; i < width; i++ {
@@ -24,7 +24,7 @@ func GoImageToImageRGBA(src *image.RGBA) Image {
 			green := int16(g >> 8)
 			blue := int16(b >> 8)
 
-			pixels[i][j] = Pixel{
+			pixels[i][j] = &Pixel{
 				r: red,
 				g: green,
 				b: blue,
@@ -38,10 +38,10 @@ func GoImageToImage(src image.Image) Image {
 	width := src.Bounds().Dx()
 	height := src.Bounds().Dy()
 
-	pixels := make([][]Pixel, width)
+	pixels := make([][]*Pixel, width)
 
 	for i := range pixels {
-		pixels[i] = make([]Pixel, height)
+		pixels[i] = make([]*Pixel, height)
 	}
 
 	for i := 0; i < width; i++ {
@@ -52,7 +52,7 @@ func GoImageToImage(src image.Image) Image {
 			green := int16(g >> 8)
 			blue := int16(b >> 8)
 
-			pixels[i][j] = Pixel{
+			pixels[i][j] = &Pixel{
 				r: red,
 				g: green,
 				b: blue,

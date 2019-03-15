@@ -11,7 +11,8 @@ import (
 )
 
 var (
-	generationsToRun = 200
+	generationsToRun = 100
+	popSize = 50
 	folderId         = "216066"
 )
 
@@ -28,7 +29,7 @@ func main() {
 	//runGenerations(&image)
 	//runNSGA(&image)
 	//runSoniaMST(&image)
-	runAndStoreImagesForTesting(folderId, generationsToRun, 80)
+	runAndStoreImagesForTesting(folderId, generationsToRun, popSize)
 	//runNSGAOnTestFolder("216066")
 	//img := readJPEGFile("./testimages/Untitled2.jpg")
 	//testMaxObjectives(&img)
@@ -37,27 +38,6 @@ func main() {
 
 }
 
-func perf() {
-	imagePath := "./data/216066/Test image.jpg"
-	img := readJPEGFile(imagePath)
-	pop := generatePopulation(&img, 1)
-	s := time.Now()
-	gr := GenoToGraph(&img, pop[0].genotype, false)
-	seg1 := gr.ConnectedComponents()
-	fmt.Println("Time graph", time.Now().Sub(s).String())
-	s = time.Now()
-
-	seg2:= GenoToConnectedComponents(pop[0].genotype)
-	fmt.Println("Time homemade", time.Now().Sub(s).String())
-
-	fmt.Println("Lens", len(seg1), len(seg2))
-
-
-//	fmt.Println(segm)
-//	fmt.Println(segm2)
-	//crossover(&img, pop[0], pop[1])
-
-}
 
 func runNSGA(img *Image) {
 
@@ -84,7 +64,7 @@ func runNSGA(img *Image) {
 }
 
 func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
-	imagePath := "./data/" + folderId + "/Test_image.jpg"
+	imagePath := "./data/" + folderId + "/Test image.jpg"
 	image := readJPEGFile(imagePath)
 
 	rand.Seed(time.Now().UTC().UnixNano())
@@ -95,8 +75,7 @@ func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
 	solutions := nsgaII(&image, generations, popSize)
 
 	for id, solution := range solutions {
-		graph := GenoToGraph(&image, solutions[id].genotype, false)
-		segments := graph.ConnectedComponents()
+		segments := GenoToConnectedComponents(solutions[id].genotype)
 		fmt.Println("Solution", id, ": weightedSum:", solution.weightedSum(), ", segments:", len(segments), ", c:", solution.connectivity, ", d:", solution.deviation)
 	}
 
