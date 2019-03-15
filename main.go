@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	generationsToRun = 80
-	folderId         = "86016"
+	generationsToRun = 200
+	folderId         = "216066"
 )
 
 func main() {
@@ -28,7 +28,7 @@ func main() {
 	//runGenerations(&image)
 	//runNSGA(&image)
 	//runSoniaMST(&image)
-	runAndStoreImagesForTesting(folderId, generationsToRun, 20)
+	runAndStoreImagesForTesting(folderId, generationsToRun, 80)
 	//runNSGAOnTestFolder("216066")
 	//img := readJPEGFile("./testimages/Untitled2.jpg")
 	//testMaxObjectives(&img)
@@ -84,7 +84,7 @@ func runNSGA(img *Image) {
 }
 
 func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
-	imagePath := "./data/" + folderId + "/image.jpg"
+	imagePath := "./data/" + folderId + "/Test_image.jpg"
 	image := readJPEGFile(imagePath)
 
 	rand.Seed(time.Now().UTC().UnixNano())
