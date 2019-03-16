@@ -3,25 +3,20 @@ package main
 import (
 	"fmt"
 	"github.com/alonsovidales/go_graph"
-	"math"
 	"math/rand"
 	"sync"
 	"time"
 )
 
-func tournamentWeighted(solutions []*Solution, k int) int {
+func tournamentWeighted(solutions []*Solution) int {
 
-	bestIdx := -1
-	bestCost := math.MaxFloat64
-	for i := 0; i < k; i++ {
-		idx := rand.Intn(len(solutions))
-		c := solutions[i].weightedSum()
-		if c < bestCost {
-			bestIdx = idx
-			bestCost = c
-		}
+	idx1 := rand.Intn(len(solutions))
+	idx2 := rand.Intn(len(solutions))
+
+	if solutions[idx1].weightedSum() < solutions[idx2].weightedSum() {
+		return idx1
 	}
-	return bestIdx
+	return idx2
 }
 
 /**
@@ -140,7 +135,7 @@ func generatePopulation(img *Image, n int) Population {
 	r1 := rand.New(s1)
 	startT = time.Now()
 
-	channel := make(chan *Solution)
+	channel := make(chan *Solution, n)
 	var wg sync.WaitGroup
 	wg.Add(n * 2)
 
@@ -176,17 +171,20 @@ func (p *Population) evolveSingleObjective(img *Image) {
 
 	for i := 0; i < size; i += 2 {
 		go func(index int) {
-			p1Idx := tournamentWeighted(*p, 2)
-			p2Idx := tournamentWeighted(*p, 2)
+			p1Idx := tournamentWeighted(*p)
+			p2Idx := tournamentWeighted(*p)
 
 			p1 := (*p)[p1Idx]
 			p2 := (*p)[p2Idx]
 
 			leftChild, rightChild := crossover(img, p1, p2)
 
-			leftChild.mutateMultiple(img)
-			rightChild.mutateMultiple(img)
-
+			if rand.Float32() < 0.2 {
+				leftChild.mutate(img)
+			}
+			if rand.Float32() < 0.2 {
+				rightChild.mutate(img)
+			}
 			channel <- leftChild
 			channel <- rightChild
 			wg.Done()
@@ -243,9 +241,10 @@ func (p *Population) evolveWithTournament(img *Image) {
 
 			leftChild, rightChild := crossover(img, parentsA[index], parentsB[index])
 
-			//leftChild.mutateMultiple(img)
-			//rightChild.mutateMultiple(img)
-
+			/*
+				leftChild.mutateMultiple(img)
+				rightChild.mutateMultiple(img)
+			*/
 			if r1.Float32() < .2 {
 				leftChild.mutate(img)
 			}
@@ -295,9 +294,10 @@ func (s *Solution) mutate(img *Image) {
 
 	groups := GenoToConnectedComponents(s.genotype)
 
-	s.connectivity = connectivity(img, groups)
+	c, e := connectivityAndEdge(img, groups)
+	s.connectivity = c
 	s.deviation = deviation(img, groups)
-	s.edgeValue = edgeValues(img, groups)
+	s.edgeValue = e
 	s.crowdingDistance = 0.0
 	s.amountOfSegments = len(groups)
 }
@@ -333,10 +333,11 @@ func (s *Solution) mutateMultiple(img *Image) {
 
 	if mutated {
 		groups := GenoToConnectedComponents(s.genotype)
+		c, e := connectivityAndEdge(img, groups)
 
-		s.connectivity = connectivity(img, groups)
+		s.connectivity = c
 		s.deviation = deviation(img, groups)
-		s.edgeValue = edgeValues(img, groups)
+		s.edgeValue = e
 		s.crowdingDistance = 0.0
 		s.amountOfSegments = len(groups)
 	}
@@ -360,12 +361,14 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 	groups1 := GenoToConnectedComponents(offspring1)
 	groups2 := GenoToConnectedComponents(offspring2)
 
+	c1, e1 := connectivityAndEdge(img, groups1)
+	c2, e2 := connectivityAndEdge(img, groups2)
 	s1 := &Solution{
 		offspring1,
 		deviation(img, groups1),
-		connectivity(img, groups1),
+		c1,
 		0.0,
-		edgeValues(img, groups1),
+		e1,
 		0,
 		len(groups2),
 	}
@@ -373,9 +376,9 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 	s2 := &Solution{
 		offspring2,
 		deviation(img, groups2),
-		connectivity(img, groups2),
+		c2,
 		0.0,
-		edgeValues(img, groups2),
+		e2,
 		0,
 		len(groups2),
 	}
@@ -386,8 +389,7 @@ func SolutionFromGenotypeNSGA(img *Image, g *graphs.Graph) *Solution {
 	groups := g.ConnectedComponents()
 
 	deviation := deviation(img, groups)
-	connectivity := connectivity(img, groups)
-	edgeValue := edgeValues(img, groups)
+	connectivity, edgeValue := connectivityAndEdge(img, groups)
 	crowdingDistance := 0.0
 
 	sol := &Solution{GraphToGeno(g, ImageSize(img)),
@@ -430,9 +432,11 @@ func (p *Population) joinSegments(img *Image, segmentSizeThreshold int) {
 				}
 
 				newGroups := GenoToConnectedComponents((*p)[index].genotype)
-				(*p)[index].connectivity = connectivity(img, newGroups)
+				connectivity, edgeValue := connectivityAndEdge(img, newGroups)
+
+				(*p)[index].connectivity = connectivity
 				(*p)[index].deviation = deviation(img, newGroups)
-				(*p)[index].edgeValue = edgeValues(img, newGroups)
+				(*p)[index].edgeValue = edgeValue
 				(*p)[index].crowdingDistance = 0.0
 				(*p)[index].amountOfSegments = len(newGroups)
 			}
@@ -512,6 +516,5 @@ func (p *Population) hasTakenLeapOfFaith() bool {
 			return true
 		}
 	}
-
 	return false
 }
