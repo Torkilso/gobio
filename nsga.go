@@ -159,9 +159,7 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 	for t := 0; t < generations; t++ {
 		startGeneration := time.Now()
 
-		fmt.Println("Evolving")
 		population.evolveWithTournament(image)
-		fmt.Println("sortAndSelectParetoSolutions")
 
 		population.sortAndSelectParetoSolutions(populationSize, t, p)
 
@@ -182,4 +180,9 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 		bestFronts[i] = population[f]
 	}
 	return bestFronts
+}
+
+
+func (solution *Solution) dominate(opponent *Solution) bool {
+	return solution.connectivity <= opponent.connectivity && solution.deviation <= opponent.deviation
 }

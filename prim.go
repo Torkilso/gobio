@@ -6,13 +6,6 @@ import (
 	"github.com/soniakeys/graph"
 )
 
-// byWeight Used to sort the graph edges by weight
-type byWeight []graphs.Edge
-
-func (a byWeight) Len() int           { return len(a) }
-func (a byWeight) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a byWeight) Less(i, j int) bool { return a[i].Weight < a[j].Weight }
-
 func LabeledUndirected(gr *graphs.Graph) (graph.LabeledUndirected, []graph.LI) {
 
 	g := make(graph.LabeledAdjacencyList, len(gr.RawEdges))

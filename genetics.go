@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func Tournament(solutions []*Solution, k int) int {
+func tournamentWeighted(solutions []*Solution, k int) int {
 
 	bestIdx := -1
 	bestCost := math.MaxFloat64
@@ -24,29 +24,6 @@ func Tournament(solutions []*Solution, k int) int {
 	return bestIdx
 }
 
-func runGeneration(img *Image, solutions []*Solution) []*Solution {
-	result := make([]*Solution, len(solutions))
-
-	for i := 0; i < len(solutions); i += 2 {
-		p1Idx := Tournament(solutions, 2)
-		p2Idx := Tournament(solutions, 2)
-
-		p1 := solutions[p1Idx]
-		p2 := solutions[p2Idx]
-
-		result[i], result[i+1] = crossover(img, p1, p2)
-
-		/* DONT MUTATE YET
-		if rand.Float32() < .1 {
-			result[i] = Mutate(result[i].genotype, img)
-		}
-		if rand.Float32() < .1 {
-			result[i+1] = Mutate(result[i+1].genotype, img)
-		}*/
-	}
-
-	return result
-}
 
 /**
 1. Make a slice to hold visited, where value is segment number
@@ -195,17 +172,14 @@ func (p *Population) evolveSingleObjective(img *Image) {
 	size := len(*p)
 	result := make([]*Solution, 0, size)
 
-	s1 := rand.NewSource(time.Now().UnixNano())
-	r1 := rand.New(s1)
-
 	channel := make(chan *Solution)
 	var wg sync.WaitGroup
 	wg.Add(size + size/2)
 
 	for i := 0; i < size; i += 2 {
 		go func(index int) {
-			p1Idx := r1.Intn(size)
-			p2Idx := r1.Intn(size)
+			p1Idx := tournamentWeighted(*p, 2)
+			p2Idx := tournamentWeighted(*p, 2)
 
 			p1 := (*p)[p1Idx]
 			p2 := (*p)[p2Idx]
@@ -233,54 +207,6 @@ func (p *Population) evolveSingleObjective(img *Image) {
 	close(channel)
 
 	*p = result
-}
-
-func (p *Population) evolve(img *Image) {
-	size := len(*p)
-	result := make([]*Solution, 0, size)
-
-	s1 := rand.NewSource(time.Now().UnixNano())
-	r1 := rand.New(s1)
-
-	channel := make(chan *Solution)
-	var wg sync.WaitGroup
-	wg.Add(size + size/2)
-
-	for i := 0; i < size; i += 2 {
-		go func(index int) {
-			p1Idx := r1.Intn(size)
-			p2Idx := r1.Intn(size)
-
-			p1 := (*p)[p1Idx]
-			p2 := (*p)[p2Idx]
-
-			leftChild, rightChild := crossover(img, p1, p2)
-			/*
-				if r1.Float32() < .3 {
-					leftChild.mutate(img)
-				}
-
-				if r1.Float32() < .3 {
-					rightChild.mutate(img)
-				}
-			*/
-			channel <- leftChild
-			channel <- rightChild
-			wg.Done()
-		}(i)
-	}
-
-	go func() {
-		for t := range channel {
-			result = append(result, t)
-			wg.Done()
-		}
-	}()
-
-	wg.Wait()
-	close(channel)
-
-	*p = append(*p, result...)
 }
 
 func (p *Population) evolveWithTournament(img *Image) {
