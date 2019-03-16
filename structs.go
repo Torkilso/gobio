@@ -13,7 +13,7 @@ type Solution struct {
 	deviation        float64
 	connectivity     float64
 	crowdingDistance float64
-	edgeValue		 float64
+	edgeValue        float64
 	frontNumber      int
 }
 

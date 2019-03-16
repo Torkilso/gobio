@@ -11,7 +11,7 @@ var (
 	maxConnectivity float64 = 10000
 	minConnectivity float64 = 0
 	maxEdgeValues   float64 = 0
-	minEdgeValues 	float64 = 0
+	minEdgeValues   float64 = 0
 )
 
 func setObjectivesMaxMinValues(img *Image) {
@@ -104,6 +104,5 @@ func edgeValues(img *Image, connectedGroups []map[uint64]bool) float64 {
 		}
 	}
 	return dist
-
 
 }

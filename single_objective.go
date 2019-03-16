@@ -1,6 +1,5 @@
 package main
 
-
-func singleObjective(){
+func singleObjective() {
 
 }

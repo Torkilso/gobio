@@ -13,8 +13,8 @@ import (
 
 var (
 	generationsToRun = 120
-	popSize = 80
-	folderId         = "176035"
+	popSize          = 80
+	folderId         = "178054"
 )
 
 func main() {
@@ -54,10 +54,6 @@ func cleanTestingDirs(folderId string) {
 		panic(err)
 	}
 
-	if err2 != nil {
-		panic(err2)
-	}
-
 	for _, d := range dir {
 		_ = os.RemoveAll(path.Join([]string{"./solutions/Student_Segmentation_Files", d.Name()}...))
 	}
@@ -66,10 +62,11 @@ func cleanTestingDirs(folderId string) {
 	}
 	for _, file := range dataDir {
 		if strings.Contains(file.Name(), "GT") {
-			copyTo("./data/" + folderId + "/" + file.Name(), "./solutions/Optimal_Segmentation_Files/" + file.Name())
+			copyTo("./data/"+folderId+"/"+file.Name(), "./solutions/Optimal_Segmentation_Files/"+file.Name())
 		}
 	}
 }
+
 func runMultiObjective(folderId string, generations, popSize int) {
 	cleanTestingDirs(folderId)
 	image := initialize(folderId)
@@ -87,8 +84,7 @@ func runMultiObjective(folderId string, generations, popSize int) {
 	}
 }
 
-
-
+/*
 func runSingleObjective(folderId string, generations, popSize int) {
 	cleanTestingDirs(folderId)
 	image := initialize(folderId)
@@ -133,3 +129,4 @@ func runSingleObjective(folderId string, generations, popSize int) {
 		fmt.Println("Gen", i, "Best", sol.weightedSum(), "Segments", len(groups))
 	}
 }
+*/

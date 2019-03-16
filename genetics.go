@@ -148,7 +148,6 @@ func GraphToGeno(gr *graphs.Graph, size int) []uint64 {
 	return geno
 }
 
-
 func generatePopulation(img *Image, n int) Population {
 	solutions := make([]*Solution, 0, n)
 
@@ -392,6 +391,3 @@ func SolutionFromGenotypeNSGA(img *Image, g *graphs.Graph) *Solution {
 
 	return sol
 }
-
-
-

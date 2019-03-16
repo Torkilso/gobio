@@ -134,8 +134,7 @@ func drawSolutionSegmentsBordersWithImage(img *Image, solution *Solution, col co
 		}
 	}
 
-	gr := GenoToGraph(img, solution.genotype, false)
-	groups := gr.ConnectedComponents()
+	groups := GenoToConnectedComponents(solution.genotype)
 
 	width := len(*img)
 	for _, group := range groups {
@@ -163,8 +162,7 @@ func drawSolutionSegmentsWithCentroidColor(img *Image, solution *Solution, name 
 	imgRect := image.Rect(0, 0, len(*img), len((*img)[0]))
 	blank := image.NewRGBA(imgRect)
 
-	gr := GenoToGraph(img, solution.genotype, false)
-	groups := gr.ConnectedComponents()
+	groups := GenoToConnectedComponents(solution.genotype)
 
 	width := len(*img)
 	for _, group := range groups {
