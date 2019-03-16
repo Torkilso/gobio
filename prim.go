@@ -50,14 +50,15 @@ func Prim(start uint64, g *graph.LabeledUndirected, labels []graph.LI, gr *graph
 
 	// get connected components
 
-	a := g.LabeledAdjacencyList
-	f := graph.NewFromList(len(a))
+	//a := g.LabeledAdjacencyList
+	f := graph.NewFromList(len(g.LabeledAdjacencyList))
 
 	var leaves bits.Bits
 	_, _ = g.Prim(actualStart, w, &f, labels, &leaves)
 
+
 	res, _ := f.LabeledUndirected(labels, nil)
-	edges := make([]graphs.Edge, 0)
+	edges := make([]graphs.Edge, 0, len(labels))
 	res.Edges(func(e graph.LabeledEdge) {
 		edges = append(edges, graphs.Edge{uint64(e.Edge.N1), uint64(e.Edge.N2), w(e.LI)})
 	})

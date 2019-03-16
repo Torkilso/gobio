@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/pkg/profile"
 	"image/color"
 	"io/ioutil"
 	"math/rand"
@@ -12,8 +13,8 @@ import (
 )
 
 var (
-	generationsToRun = 120
-	popSize = 80
+	generationsToRun = 80
+	popSize 	     = 50
 	folderId         = "176035"
 )
 
@@ -21,9 +22,9 @@ func main() {
 
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	//defer profile.Start(profile.MemProfile).Stop()
-	//runMultiObjective(folderId, generationsToRun, popSize)
-	runSingleObjective(folderId, generationsToRun, popSize)
+	defer profile.Start().Stop()
+	runMultiObjective(folderId, generationsToRun, popSize)
+	//runSingleObjective(folderId, generationsToRun, popSize)
 
 }
 
