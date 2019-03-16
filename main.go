@@ -29,8 +29,9 @@ func main() {
 
 	//runGenerations(&image)
 	//runNSGA(&image)
-	runMultiObjective(folderId, generationsToRun, popSize)
+	//runMultiObjective(folderId, generationsToRun, popSize)
 	//runNSGAOnTestFolder("216066")
+	runSingleObjective(folderId, generationsToRun, popSize)
 
 }
 
@@ -89,43 +90,9 @@ func runSingleObjective(folderId string, generations, popSize int) {
 	cleanTestingDirs(folderId)
 	image := initialize(folderId)
 
-	solutions := singleObjective(image, generations, popSize)
+	bestSolution := singleObjective(image, generations, popSize)
 
-	for i, s := range solutions {
-		segments := GenoToConnectedComponents(s.genotype)
-		if len(segments) > 500 || len(segments) < 2 {
-			continue
-		}
-		filename := fmt.Sprintf("./solutions/Student_Segmentation_Files/sol%d.jpg", i)
+	filename := "./solutions/Student_Segmentation_Files/sol.jpg"
 
-		drawSolutionSegmentsBorders(image, s, color.Black, filename)
-	}
-	pop := generatePopulation(img, 2)
-
-	for i := 0; i < 1; i++ {
-		pop = RunGeneration(img, pop)
-		sol := BestSolution(pop)
-
-		graph := GenoToGraph(img, sol.genotype, false)
-		groups := graph.ConnectedComponents()
-		width := len(*img)
-
-		thisImg := img.toRGBA()
-		imgCopy := GoImageToImage(thisImg)
-		fmt.Println("Number of groups", len(groups), "Pixels", len(*img)*len((*img)[0]), groups, graph.RawEdges)
-		for _, g := range groups {
-			c := Centroid(img, g)
-			for k := range g {
-				x, y := Flatten(width, int(k))
-				thisImg.Set(x, y, c.toRGBA())
-			}
-		}
-
-		edgedImg := DrawImageBoundries(&imgCopy, graph, color.Black)
-		SaveJPEGRaw(edgedImg, "edges.jpg")
-		visualizeImageGraph("graph.png", img, graph)
-		SaveJPEGRaw(thisImg, "img.jpg")
-
-		fmt.Println("Gen", i, "Best", sol.weightedSum(), "Segments", len(groups))
-	}
+	drawSolutionSegmentsBorders(image, bestSolution, color.Black, filename)
 }

@@ -103,7 +103,7 @@ func crowdingDistanceAssignment(ids []int, population []*Solution) {
 
 func (p *Population) sortAndSelectParetoSolutions(populationSize, generation int, plotter *plot.Plot) {
 	fronts := fastNonDominatedSort(*p)
-	fmt.Println("\nGeneration:", generation, "Best before:", BestSolution(*p).weightedSum(), "Num fronts:", len(fronts))
+	fmt.Println("\nGeneration:", generation, "Best before:", bestSolution(*p).weightedSum(), "Num fronts:", len(fronts))
 	addParetoFrontToPlotter(plotter, *p,  fronts, generation)
 
 
@@ -166,7 +166,7 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 
 		population.sortAndSelectParetoSolutions(populationSize, t, p)
 
-		//fmt.Println("Best from new:", BestSolution(population).weightedSum())
+		//fmt.Println("Best from new:", bestSolution(population).weightedSum())
 
 		fmt.Println("Used", time.Since(startGeneration).Seconds(), "seconds for generation")
 		saveParetoPlotter(p, "pareto.png")

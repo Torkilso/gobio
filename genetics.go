@@ -24,7 +24,7 @@ func Tournament(solutions []*Solution, k int) int {
 	return bestIdx
 }
 
-func RunGeneration(img *Image, solutions []*Solution) []*Solution {
+func runGeneration(img *Image, solutions []*Solution) []*Solution {
 	result := make([]*Solution, len(solutions))
 
 	for i := 0; i < len(solutions); i += 2 {
@@ -191,6 +191,49 @@ func generatePopulation(img *Image, n int) Population {
 	fmt.Println("Done generation creation", time.Now().Sub(startT))
 
 	return solutions
+}
+func (p *Population) evolveSingleObjective(img *Image) {
+	size := len(*p)
+	result := make([]*Solution, 0, size)
+
+	s1 := rand.NewSource(time.Now().UnixNano())
+	r1 := rand.New(s1)
+
+	channel := make(chan *Solution)
+	var wg sync.WaitGroup
+	wg.Add(size + size/2)
+
+	for i := 0; i < size; i += 2 {
+		go func(index int) {
+			p1Idx := r1.Intn(size)
+			p2Idx := r1.Intn(size)
+
+			p1 := (*p)[p1Idx]
+			p2 := (*p)[p2Idx]
+
+			leftChild, rightChild := crossover(img, p1, p2)
+
+			leftChild.mutateMultiple(img)
+			rightChild.mutateMultiple(img)
+
+
+			channel <- leftChild
+			channel <- rightChild
+			wg.Done()
+		}(i)
+	}
+
+	go func() {
+		for t := range channel {
+			result = append(result, t)
+			wg.Done()
+		}
+	}()
+
+	wg.Wait()
+	close(channel)
+
+	*p = result
 }
 
 func (p *Population) evolve(img *Image) {
