@@ -74,7 +74,6 @@ func crowdingDistanceAssignment(ids []int, population []*Solution) {
 		return population[ids[i]].deviation < population[ids[j]].deviation
 	})
 
-
 	population[ids[0]].crowdingDistance = math.Inf(1)
 	population[ids[size-1]].crowdingDistance = math.Inf(1)
 
@@ -103,9 +102,9 @@ func crowdingDistanceAssignment(ids []int, population []*Solution) {
 
 func (p *Population) sortAndSelectParetoSolutions(populationSize, generation int, plotter *plot.Plot) {
 	fronts := fastNonDominatedSort(*p)
+
 	fmt.Println("\nGeneration:", generation, "Best before:", bestSolution(*p).weightedSum(), "Num fronts:", len(fronts))
 	addParetoFrontToPlotter(plotter, *p,  fronts, generation)
-
 
 	newParents := make([]*Solution, 0)
 	i := 0

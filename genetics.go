@@ -48,14 +48,13 @@ func runGeneration(img *Image, solutions []*Solution) []*Solution {
 	return result
 }
 
-
 /**
-	1. Make a slice to hold visited, where value is segment number
-	2. Make a list of maps, which holds the segments
-	3. For each item in geno
-		1. Check if it has been visited, if so, continue.
-		2. Make a group to hold
- */
+1. Make a slice to hold visited, where value is segment number
+2. Make a list of maps, which holds the segments
+3. For each item in geno
+	1. Check if it has been visited, if so, continue.
+	2. Make a group to hold
+*/
 
 func GenoToConnectedComponents(geno []uint64) []map[uint64]bool {
 
@@ -257,13 +256,13 @@ func (p *Population) evolve(img *Image) {
 
 			leftChild, rightChild := crossover(img, p1, p2)
 			/*
-			if r1.Float32() < .3 {
-				leftChild.mutate(img)
-			}
+				if r1.Float32() < .3 {
+					leftChild.mutate(img)
+				}
 
-			if r1.Float32() < .3 {
-				rightChild.mutate(img)
-			}
+				if r1.Float32() < .3 {
+					rightChild.mutate(img)
+				}
 			*/
 			channel <- leftChild
 			channel <- rightChild
@@ -318,13 +317,12 @@ func (p *Population) evolveWithTournament(img *Image) {
 
 	for i := 0; i < resultSize; i++ {
 		go func(index int) {
-			p1 := parentsA[index]
-			p2 := parentsB[index]
 
-			leftChild, rightChild := crossover(img, p1, p2)
+			leftChild, rightChild := crossover(img, parentsA[index], parentsB[index])
 
 			leftChild.mutateMultiple(img)
 			rightChild.mutateMultiple(img)
+
 			/*if r1.Float32() < .1 {
 				leftChild.mutate(img)
 			}
@@ -415,7 +413,6 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 
 	groups1 := GenoToConnectedComponents(offspring1)
 	groups2 := GenoToConnectedComponents(offspring2)
-
 
 	s1 := &Solution{
 		offspring1, deviation(img, groups1), connectivity(img, groups1), 0.0, edgeValues(img, groups1), 0,

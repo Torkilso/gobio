@@ -55,6 +55,10 @@ func cleanTestingDirs(folderId string) {
 		panic(err)
 	}
 
+	if err2 != nil {
+		panic(err2)
+	}
+
 	for _, d := range dir {
 		_ = os.RemoveAll(path.Join([]string{"./solutions/Student_Segmentation_Files", d.Name()}...))
 	}
