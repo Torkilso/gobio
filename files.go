@@ -8,7 +8,6 @@ import (
 	"os"
 )
 
-
 func GoImageToImage(src image.Image) Image {
 	width := src.Bounds().Dx()
 	height := src.Bounds().Dy()
@@ -54,7 +53,6 @@ func readJPEGFile(path string) Image {
 	return GoImageToImage(src)
 }
 
-
 func copyTo(sourceFile, destinationFile string) {
 	input, err := ioutil.ReadFile(sourceFile)
 	if err != nil {
@@ -68,6 +66,5 @@ func copyTo(sourceFile, destinationFile string) {
 		fmt.Println(err)
 		return
 	}
-
 
 }

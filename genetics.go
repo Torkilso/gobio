@@ -19,7 +19,6 @@ func tournamentWeighted(solutions []*Solution) int {
 	return idx2
 }
 
-
 /**
 1. Make a slice to hold visited, where value is segment number
 2. Make a list of maps, which holds the segments
@@ -120,7 +119,6 @@ func GraphToGeno(gr *graphs.Graph, size int) []uint64 {
 	return geno
 }
 
-
 func generatePopulation(img *Image, n int) Population {
 	solutions := make([]*Solution, 0, n)
 
@@ -187,7 +185,6 @@ func (p *Population) evolveSingleObjective(img *Image) {
 			if rand.Float32() < 0.2 {
 				rightChild.mutate(img)
 			}
-
 			channel <- leftChild
 			channel <- rightChild
 			wg.Done()
@@ -303,8 +300,26 @@ func (s *Solution) mutate(img *Image) {
 	s.edgeValue = e
 	s.crowdingDistance = 0.0
 }
+
 func (s *Solution) mutateMultiple(img *Image) {
 	mutated := false
+
+	/*groups := GenoToConnectedComponents(s.genotype)
+
+	for _, group := range groups {
+		if len(group) > 5 {
+			continue
+		}
+
+		for i := range group {
+			possibleValues := GetTargets(img, int(i))
+			chosen := rand.Intn(len(possibleValues))
+			s.genotype[uint64(i)] = uint64(possibleValues[chosen])
+
+			mutated = true
+		}
+	}*/
+
 	for i := range s.genotype {
 		if rand.Float32() < 0.00001 {
 			possibleValues := GetTargets(img, i)
@@ -314,6 +329,7 @@ func (s *Solution) mutateMultiple(img *Image) {
 			mutated = true
 		}
 	}
+
 	if mutated {
 		groups := GenoToConnectedComponents(s.genotype)
 		c, e := connectivityAndEdge(img, groups)
@@ -366,5 +382,31 @@ func SolutionFromGenotypeNSGA(img *Image, g *graphs.Graph) *Solution {
 	return sol
 }
 
+func (s *Solution) joinSmallSegments(img *Image) bool {
+	groups := GenoToConnectedComponents(s.genotype)
 
+	noSmallSegments := true
 
+	for _, group := range groups {
+		if len(group) > 100 {
+			continue
+		}
+
+		for i := range group {
+			possibleValues := GetTargets(img, int(i))
+			chosen := rand.Intn(len(possibleValues))
+			s.genotype[uint64(i)] = uint64(possibleValues[chosen])
+		}
+
+		noSmallSegments = false
+	}
+
+	newGroups := GenoToConnectedComponents(s.genotype)
+	c, e := connectivityAndEdge(img, newGroups)
+	s.connectivity = c
+	s.edgeValue = e
+	s.deviation = deviation(img, newGroups)
+	s.crowdingDistance = 0.0
+
+	return noSmallSegments
+}

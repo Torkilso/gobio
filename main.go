@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/pkg/profile"
 	"image/color"
 	"io/ioutil"
 	"math/rand"
@@ -14,15 +13,15 @@ import (
 
 var (
 	generationsToRun = 80
-	popSize 	     = 50
-	folderId         = "176035"
+	popSize          = 40
+	folderId         = "216066"
 )
 
 func main() {
 
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	defer profile.Start().Stop()
+	//defer profile.Start(profile.MemProfile).Stop()
 	runMultiObjective(folderId, generationsToRun, popSize)
 	//runSingleObjective(folderId, generationsToRun, popSize)
 
@@ -48,7 +47,6 @@ func cleanTestingDirs(folderId string) {
 		panic(err)
 	}
 
-
 	for _, d := range dir {
 		_ = os.RemoveAll(path.Join([]string{"./solutions/Student_Segmentation_Files", d.Name()}...))
 	}
@@ -57,28 +55,40 @@ func cleanTestingDirs(folderId string) {
 	}
 	for _, file := range dataDir {
 		if strings.Contains(file.Name(), "GT") {
-			copyTo("./data/" + folderId + "/" + file.Name(), "./solutions/Optimal_Segmentation_Files/" + file.Name())
+			copyTo("./data/"+folderId+"/"+file.Name(), "./solutions/Optimal_Segmentation_Files/"+file.Name())
 		}
 	}
 }
+
 func runMultiObjective(folderId string, generations, popSize int) {
 	cleanTestingDirs(folderId)
 	image := initialize(folderId)
 
 	solutions := nsgaII(image, generations, popSize)
+	fmt.Println("\nSolutions:")
 
 	for i, s := range solutions {
+
+		segmentsB := GenoToConnectedComponents(s.genotype)
+		fmt.Println("segments before:", len(segmentsB))
+		smallSegmentsGone := false
+
+		for !smallSegmentsGone {
+			smallSegmentsGone = s.joinSmallSegments(image)
+		}
+
 		segments := GenoToConnectedComponents(s.genotype)
+		fmt.Println("segments after:", len(segments))
+
 		if len(segments) > 500 || len(segments) < 2 {
 			continue
 		}
+
 		filename := fmt.Sprintf("./solutions/Student_Segmentation_Files/sol%d.jpg", i)
 
 		drawSolutionSegmentsBorders(image, s, color.Black, filename)
 	}
 }
-
-
 
 func runSingleObjective(folderId string, generations, popSize int) {
 	cleanTestingDirs(folderId)
