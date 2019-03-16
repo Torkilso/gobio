@@ -149,51 +149,6 @@ func GraphToGeno(gr *graphs.Graph, size int) []uint64 {
 	return geno
 }
 
-func GetGraph(size int, edges []graphs.Edge, undirected bool) (ug *graphs.Graph) {
-	var weight float64
-
-	ug = &graphs.Graph{
-		RawEdges:    edges,
-		Vertices:    make(map[uint64]bool, size),
-		VertexEdges: make(map[uint64]map[uint64]float64, size),
-		Undirected:  undirected,
-		NegEdges:    false,
-	}
-
-	for _, edge := range edges {
-		weight = edge.Weight
-
-		ug.Vertices[edge.From] = true
-		ug.Vertices[edge.To] = true
-		if _, ok := ug.VertexEdges[edge.From]; ok {
-			ug.VertexEdges[edge.From][edge.To] = weight
-		} else {
-			ug.VertexEdges[edge.From] = map[uint64]float64{edge.To: weight}
-		}
-		if undirected {
-			if _, ok := ug.VertexEdges[edge.To]; ok {
-				ug.VertexEdges[edge.To][edge.From] = weight
-			} else {
-				ug.VertexEdges[edge.To] = map[uint64]float64{edge.From: weight}
-			}
-		}
-	}
-
-	return
-}
-
-func GenoToGraph(img *Image, geno []uint64, weight bool) *graphs.Graph {
-	edges := make([]graphs.Edge, len(geno))
-	var w float64
-	for i := range geno {
-		if weight {
-			w = Dist(img, i, int(geno[i]))
-		}
-		edges[i] = graphs.Edge{uint64(i), geno[i], w}
-	}
-
-	return GetGraph(ImageSize(img), edges, true)
-}
 
 func generatePopulation(img *Image, n int) Population {
 	solutions := make([]*Solution, 0, n)
