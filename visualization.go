@@ -61,10 +61,12 @@ func createParetoPlotter() *plot.Plot {
 func addParetoFrontToPlotter(p *plot.Plot, population []*Solution, fronts map[int][]int, generation int) {
 
 	pts := make(plotter.XYs, len(fronts[0]))
+	//alphaValues := make([]uint8, 0, len(fronts[0]))
 
 	for i := range fronts[0] {
 		pts[i].X = population[fronts[0][i]].deviation
 		pts[i].Y = population[fronts[0][i]].connectivity
+		//alphaValues = append(alphaValues, uint8(population[fronts[0][i]].edgeValue/minEdgeValues))
 	}
 
 	lpLine, lpPoints, err := plotter.NewLinePoints(pts)

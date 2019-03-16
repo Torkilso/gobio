@@ -68,6 +68,7 @@ func deviation(img *Image, connectedGroups []map[uint64]bool) float64 {
 			dist += ColorDist((*img)[x][y], centroid)
 		}
 	}
+
 	return dist
 }
 
@@ -85,6 +86,7 @@ func connectivity(img *Image, connectedGroups []map[uint64]bool) float64 {
 			}
 		}
 	}
+
 	return dist
 }
 
@@ -103,6 +105,6 @@ func edgeValues(img *Image, connectedGroups []map[uint64]bool) float64 {
 			}
 		}
 	}
-	return dist
 
+	return dist
 }

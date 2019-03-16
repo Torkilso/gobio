@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	generationsToRun = 120
-	popSize          = 80
-	folderId         = "178054"
+	generationsToRun = 80
+	popSize          = 40
+	folderId         = "216066"
 )
 
 func main() {
@@ -22,8 +22,8 @@ func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	//defer profile.Start(profile.MemProfile).Stop()
-	//runMultiObjective(folderId, generationsToRun, popSize)
-	runSingleObjective(folderId, generationsToRun, popSize)
+	runMultiObjective(folderId, generationsToRun, popSize)
+	//runSingleObjective(folderId, generationsToRun, popSize)
 
 }
 
@@ -65,19 +65,31 @@ func runMultiObjective(folderId string, generations, popSize int) {
 	image := initialize(folderId)
 
 	solutions := nsgaII(image, generations, popSize)
+	fmt.Println("\nSolutions:")
 
 	for i, s := range solutions {
+
+		segmentsB := GenoToConnectedComponents(s.genotype)
+		fmt.Println("segments before:", len(segmentsB))
+		smallSegmentsGone := false
+
+		for !smallSegmentsGone {
+			smallSegmentsGone = s.joinSmallSegments(image)
+		}
+
 		segments := GenoToConnectedComponents(s.genotype)
+		fmt.Println("segments after:", len(segments))
+
 		if len(segments) > 500 || len(segments) < 2 {
 			continue
 		}
+
 		filename := fmt.Sprintf("./solutions/Student_Segmentation_Files/sol%d.jpg", i)
 
 		drawSolutionSegmentsBorders(image, s, color.Black, filename)
 	}
 }
 
-/*
 func runSingleObjective(folderId string, generations, popSize int) {
 	cleanTestingDirs(folderId)
 	image := initialize(folderId)
@@ -88,4 +100,3 @@ func runSingleObjective(folderId string, generations, popSize int) {
 
 	drawSolutionSegmentsBorders(image, bestSolution, color.Black, filename)
 }
-*/

@@ -103,8 +103,8 @@ func crowdingDistanceAssignment(ids []int, population []*Solution) {
 func (p *Population) sortAndSelectParetoSolutions(populationSize, generation int, plotter *plot.Plot) {
 	fronts := fastNonDominatedSort(*p)
 
-	fmt.Println("\nGeneration:", generation, "Best before:", bestSolution(*p).weightedSum(), "Num fronts:", len(fronts))
-	addParetoFrontToPlotter(plotter, *p,  fronts, generation)
+	//fmt.Println("\nGeneration:", generation, "Best before:", bestSolution(*p).weightedSum(), "Num fronts:", len(fronts))
+	addParetoFrontToPlotter(plotter, *p, fronts, generation)
 
 	newParents := make([]*Solution, 0)
 	i := 0
@@ -144,12 +144,9 @@ func (p *Population) sortAndSelectParetoSolutions(populationSize, generation int
 func nsgaII(image *Image, generations, populationSize int) []*Solution {
 	start := time.Now()
 
-	fmt.Println("Initiating NSGAII")
 	fmt.Println("Generating", populationSize, "solutions")
-
 	population := generatePopulation(image, populationSize)
-
-	fmt.Println("Used", time.Since(start).Seconds(), "seconds to generate solutions")
+	fmt.Print("Used ", time.Since(start).Seconds(), "seconds to generate solutions\n\n")
 
 	start = time.Now()
 
@@ -157,21 +154,18 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 	population.sortAndSelectParetoSolutions(populationSize, 0, p)
 
 	for t := 0; t < generations; t++ {
+		fmt.Print("Generation ", t, ": ")
+
 		startGeneration := time.Now()
 
 		population.evolveWithTournament(image)
-
 		population.sortAndSelectParetoSolutions(populationSize, t, p)
 
-		//fmt.Println("Best from new:", bestSolution(population).weightedSum())
-
-		fmt.Println("Used", time.Since(startGeneration).Seconds(), "seconds for generation")
+		fmt.Println(time.Since(startGeneration).Seconds(), "seconds")
 		saveParetoPlotter(p, "pareto.png")
 	}
 
-	saveParetoPlotter(p, "pareto.png")
-
-	fmt.Println("\nUsed", time.Since(start).Seconds(), "seconds to evolve solutions")
+	fmt.Println("Used", time.Since(start).Seconds(), "seconds to evolve solutions")
 
 	fronts := fastNonDominatedSort(population)
 
@@ -182,7 +176,6 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 	return bestFronts
 }
 
-
-func (solution *Solution) dominate(opponent *Solution) bool {
-	return solution.connectivity <= opponent.connectivity && solution.deviation <= opponent.deviation
+func (s *Solution) dominate(opponent *Solution) bool {
+	return s.connectivity <= opponent.connectivity && s.deviation <= opponent.deviation
 }

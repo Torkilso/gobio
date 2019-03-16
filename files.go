@@ -8,7 +8,6 @@ import (
 	"os"
 )
 
-
 func GoImageToImage(src image.Image) Image {
 	width := src.Bounds().Dx()
 	height := src.Bounds().Dy()

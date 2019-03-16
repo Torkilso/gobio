@@ -7,7 +7,6 @@ import (
 	"os"
 )
 
-
 func SavePNGRaw(img *image.RGBA, name string) {
 	f, err := os.Create(name)
 	if err != nil {
@@ -16,7 +15,6 @@ func SavePNGRaw(img *image.RGBA, name string) {
 	defer f.Close()
 	png.Encode(f, img)
 }
-
 
 func drawSolutionSegmentsBorders(img *Image, solution *Solution, col color.Color, name string) {
 

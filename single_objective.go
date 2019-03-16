@@ -12,7 +12,7 @@ func singleObjective(image *Image, generations, populationSize int) *Solution {
 		sol := bestSolution(population)
 
 		groups := GenoToConnectedComponents(sol.genotype)
-		fmt.Println("Gen", i, "Best", sol.weightedSum(),  "Segments", len(groups))
+		fmt.Println("Gen", i, "Best", sol.weightedSum(), "Segments", len(groups))
 	}
 	return bestSolution(population)
 }
