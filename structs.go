@@ -15,6 +15,7 @@ type Solution struct {
 	crowdingDistance float64
 	edgeValue        float64
 	frontNumber      int
+	amountOfSegments int
 }
 
 func (s *Solution) weightedSum() float64 {

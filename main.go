@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	generationsToRun = 80
-	popSize          = 40
+	generationsToRun = 100
+	popSize          = 20
 	folderId         = "216066"
 )
 
@@ -65,20 +65,16 @@ func runMultiObjective(folderId string, generations, popSize int) {
 	image := initialize(folderId)
 
 	solutions := nsgaII(image, generations, popSize)
+
+	joinSegmentsStart := time.Now()
+	solutions.joinSegments(image, 1000)
+	fmt.Print("Used ", time.Since(joinSegmentsStart).Seconds(), " to join segments\n\n")
+
 	fmt.Println("\nSolutions:")
 
 	for i, s := range solutions {
-
-		segmentsB := GenoToConnectedComponents(s.genotype)
-		fmt.Println("segments before:", len(segmentsB))
-		smallSegmentsGone := false
-
-		for !smallSegmentsGone {
-			smallSegmentsGone = s.joinSmallSegments(image)
-		}
-
 		segments := GenoToConnectedComponents(s.genotype)
-		fmt.Println("segments after:", len(segments))
+		fmt.Println("segments:", len(segments))
 
 		if len(segments) > 500 || len(segments) < 2 {
 			continue

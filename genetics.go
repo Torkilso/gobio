@@ -243,16 +243,16 @@ func (p *Population) evolveWithTournament(img *Image) {
 
 			leftChild, rightChild := crossover(img, parentsA[index], parentsB[index])
 
-			leftChild.mutateMultiple(img)
-			rightChild.mutateMultiple(img)
+			//leftChild.mutateMultiple(img)
+			//rightChild.mutateMultiple(img)
 
-			/*if r1.Float32() < .1 {
+			if r1.Float32() < .2 {
 				leftChild.mutate(img)
 			}
 
-			if r1.Float32() < .1 {
+			if r1.Float32() < .2 {
 				rightChild.mutate(img)
-			}*/
+			}
 
 			channel <- leftChild
 			channel <- rightChild
@@ -297,7 +297,9 @@ func (s *Solution) mutate(img *Image) {
 
 	s.connectivity = connectivity(img, groups)
 	s.deviation = deviation(img, groups)
+	s.edgeValue = edgeValues(img, groups)
 	s.crowdingDistance = 0.0
+	s.amountOfSegments = len(groups)
 }
 
 func (s *Solution) mutateMultiple(img *Image) {
@@ -334,7 +336,9 @@ func (s *Solution) mutateMultiple(img *Image) {
 
 		s.connectivity = connectivity(img, groups)
 		s.deviation = deviation(img, groups)
+		s.edgeValue = edgeValues(img, groups)
 		s.crowdingDistance = 0.0
+		s.amountOfSegments = len(groups)
 	}
 }
 func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
@@ -357,11 +361,23 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 	groups2 := GenoToConnectedComponents(offspring2)
 
 	s1 := &Solution{
-		offspring1, deviation(img, groups1), connectivity(img, groups1), 0.0, edgeValues(img, groups1), 0,
+		offspring1,
+		deviation(img, groups1),
+		connectivity(img, groups1),
+		0.0,
+		edgeValues(img, groups1),
+		0,
+		len(groups2),
 	}
 
 	s2 := &Solution{
-		offspring2, deviation(img, groups2), connectivity(img, groups2), 0.0, edgeValues(img, groups2), 0,
+		offspring2,
+		deviation(img, groups2),
+		connectivity(img, groups2),
+		0.0,
+		edgeValues(img, groups2),
+		0,
+		len(groups2),
 	}
 	return s1, s2
 }
@@ -373,35 +389,129 @@ func SolutionFromGenotypeNSGA(img *Image, g *graphs.Graph) *Solution {
 	connectivity := connectivity(img, groups)
 	edgeValue := edgeValues(img, groups)
 	crowdingDistance := 0.0
-	sol := &Solution{GraphToGeno(g, ImageSize(img)), deviation, connectivity, crowdingDistance, edgeValue, 0}
+
+	sol := &Solution{GraphToGeno(g, ImageSize(img)),
+		deviation,
+		connectivity,
+		crowdingDistance,
+		edgeValue,
+		0,
+		len(groups)}
 
 	return sol
 }
 
-func (s *Solution) joinSmallSegments(img *Image) bool {
-	groups := GenoToConnectedComponents(s.genotype)
+func (p *Population) joinSegments(img *Image, segmentSizeThreshold int) {
+	var wg sync.WaitGroup
+	wg.Add(len(*p))
 
-	noSmallSegments := true
+	for i := 0; i < len(*p); i++ {
+		go func(index int) {
+			if (*p)[index].amountOfSegments < 5000 {
+				for {
+					foundGroup := false
+					groupsInner := GenoToConnectedComponents((*p)[index].genotype)
 
-	for _, group := range groups {
-		if len(group) > 100 {
-			continue
-		}
+					for _, group := range groupsInner {
+						if len(group) > segmentSizeThreshold {
+							continue
+						}
+						for i := range group {
+							possibleValues := GetTargets(img, int(i))
+							chosen := rand.Intn(len(possibleValues))
+							(*p)[index].genotype[uint64(i)] = uint64(possibleValues[chosen])
+						}
 
-		for i := range group {
-			possibleValues := GetTargets(img, int(i))
-			chosen := rand.Intn(len(possibleValues))
-			s.genotype[uint64(i)] = uint64(possibleValues[chosen])
-		}
+						foundGroup = true
+					}
+					if !foundGroup {
+						break
+					}
+				}
 
-		noSmallSegments = false
+				newGroups := GenoToConnectedComponents((*p)[index].genotype)
+				(*p)[index].connectivity = connectivity(img, newGroups)
+				(*p)[index].deviation = deviation(img, newGroups)
+				(*p)[index].edgeValue = edgeValues(img, newGroups)
+				(*p)[index].crowdingDistance = 0.0
+				(*p)[index].amountOfSegments = len(newGroups)
+			}
+			wg.Done()
+		}(i)
 	}
 
-	newGroups := GenoToConnectedComponents(s.genotype)
+	wg.Wait()
+}
 
-	s.connectivity = connectivity(img, newGroups)
-	s.deviation = deviation(img, newGroups)
-	s.crowdingDistance = 0.0
+func (p *Population) expandWithSolutions(img *Image, amount int) {
 
-	return noSmallSegments
+	size := len(*p)
+
+	s1 := rand.NewSource(time.Now().UnixNano())
+	r1 := rand.New(s1)
+
+	parentsA := make([]*Solution, 0, amount/2)
+	parentsB := make([]*Solution, 0, amount/2)
+
+	for i := 0; i < amount; i += 2 {
+		p1Idx := r1.Intn(size)
+		p2Idx := r1.Intn(size)
+		p3Idx := r1.Intn(size)
+		p4Idx := r1.Intn(size)
+
+		p1 := tournamentNSGA(p1Idx, p2Idx, p)
+		p2 := tournamentNSGA(p3Idx, p4Idx, p)
+
+		parentsA = append(parentsA, p1)
+		parentsB = append(parentsB, p2)
+	}
+
+	resultSize := len(parentsA)
+	result := make([]*Solution, 0, resultSize*2)
+
+	channel := make(chan *Solution)
+	var wg sync.WaitGroup
+	wg.Add(resultSize + resultSize*2)
+
+	for i := 0; i < resultSize; i++ {
+		go func(index int) {
+
+			leftChild, rightChild := crossover(img, parentsA[index], parentsB[index])
+
+			if r1.Float32() < .2 {
+				leftChild.mutate(img)
+			}
+
+			if r1.Float32() < .2 {
+				rightChild.mutate(img)
+			}
+
+			channel <- leftChild
+			channel <- rightChild
+			wg.Done()
+		}(i)
+	}
+
+	go func() {
+		for t := range channel {
+			result = append(result, t)
+			wg.Done()
+		}
+	}()
+
+	wg.Wait()
+	close(channel)
+
+	*p = append(*p, result...)
+
+}
+
+func (p *Population) hasTakenLeapOfFaith() bool {
+	for _, s := range *p {
+		if s.amountOfSegments < 500 && s.amountOfSegments > 1 {
+			return true
+		}
+	}
+
+	return false
 }
