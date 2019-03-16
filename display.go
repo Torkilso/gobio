@@ -95,8 +95,7 @@ func drawSolutionSegmentsBorders(img *Image, solution *Solution, col color.Color
 		}
 	}
 
-	gr := GenoToGraph(img, solution.genotype, false)
-	groups := gr.ConnectedComponents()
+	groups := GenoToConnectedComponents(solution.genotype)
 
 	width := len(*img)
 	for _, group := range groups {

@@ -7,13 +7,14 @@ import (
 	"math/rand"
 	"os"
 	"path"
+	"strings"
 	"time"
 )
 
 var (
-	generationsToRun = 100
-	popSize = 50
-	folderId         = "216066"
+	generationsToRun = 120
+	popSize = 80
+	folderId         = "176035"
 )
 
 func main() {
@@ -28,16 +29,10 @@ func main() {
 
 	//runGenerations(&image)
 	//runNSGA(&image)
-	//runSoniaMST(&image)
 	runAndStoreImagesForTesting(folderId, generationsToRun, popSize)
 	//runNSGAOnTestFolder("216066")
-	//img := readJPEGFile("./testimages/Untitled2.jpg")
-	//testMaxObjectives(&img)
-	//perf()
-
 
 }
-
 
 func runNSGA(img *Image) {
 
@@ -63,6 +58,7 @@ func runNSGA(img *Image) {
 	SaveJPEGRaw(edgedImg, "edges.jpg")
 }
 
+
 func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
 	imagePath := "./data/" + folderId + "/Test image.jpg"
 	image := readJPEGFile(imagePath)
@@ -70,7 +66,7 @@ func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
 	rand.Seed(time.Now().UTC().UnixNano())
 	setObjectivesMaxMinValues(&image)
 
-	fmt.Println("Max conn =", maxConnectivity, "Max dev =", maxDeviation)
+	fmt.Println("Max conn =", maxConnectivity, "Max dev =", maxDeviation, "Min edge =", minEdgeValues)
 
 	solutions := nsgaII(&image, generations, popSize)
 
@@ -80,6 +76,8 @@ func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
 	}
 
 	dir, err := ioutil.ReadDir("./solutions/Student_Segmentation_Files")
+	optimalDir, err := ioutil.ReadDir("./solutions/Optimal_Segmentation_Files")
+	dataDir, err := ioutil.ReadDir("./data/" + folderId + "/")
 
 	if err != nil {
 		panic(err)
@@ -88,41 +86,27 @@ func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
 	for _, d := range dir {
 		_ = os.RemoveAll(path.Join([]string{"./solutions/Student_Segmentation_Files", d.Name()}...))
 	}
+	for _, d := range optimalDir {
+		_ = os.RemoveAll(path.Join([]string{"./solutions/Optimal_Segmentation_Files", d.Name()}...))
+	}
+	for _, file := range dataDir {
+		if strings.Contains(file.Name(), "GT") {
+			copyTo("./data/" + folderId + "/" + file.Name(), "./solutions/Optimal_Segmentation_Files/" + file.Name())
+		}
+	}
 
 	for i, s := range solutions {
+		segments := GenoToConnectedComponents(s.genotype)
+		if len(segments) > 500 || len(segments) < 2 {
+			continue
+		}
 		filename := fmt.Sprintf("./solutions/Student_Segmentation_Files/sol%d.jpg", i)
-		//fmt.Println("Storing solution", s.weightedSum(), filename)
+
 		drawSolutionSegmentsBorders(&image, s, color.Black, filename)
 	}
 }
 
-func runNSGAOnTestFolder(folderId string) {
-	imagePath := "./data/" + folderId + "/colors.jpg"
-	image := readJPEGFile(imagePath)
-	rand.Seed(time.Now().UTC().UnixNano())
 
-	start := time.Now()
-
-	// Set max and min connectivity and deviation
-	setObjectivesMaxMinValues(&image)
-
-	solutions := nsgaII(&image, 10, 30)
-
-	fmt.Println("Used", time.Since(start).Seconds(), "seconds in total")
-	fmt.Println("\nSolutions:")
-
-	for id, s := range solutions {
-		graph := GenoToGraph(&image, s.genotype, true)
-		segments := graph.ConnectedComponents()
-		fmt.Println("Solution", id, ": segments:", len(segments), ", c:", s.connectivity, ", d:", s.deviation)
-
-		if len(segments) > 1 {
-
-			drawSolutionSegmentsBorders(&image, s, color.Black, "border.png")
-			drawSolutionSegmentsWithCentroidColor(&image, s, "segments.png")
-		}
-	}
-}
 
 func runGenerations(img *Image) {
 
