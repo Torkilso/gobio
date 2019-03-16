@@ -21,7 +21,7 @@ func (s *Solution) weightedSum() float64 {
 	return s.deviation/maxDeviation + s.connectivity/maxConnectivity
 }
 
-func BestSolution(solutions []*Solution) *Solution {
+func bestSolution(solutions []*Solution) *Solution {
 	bestFitness := math.MaxFloat64
 	bestIdx := 0
 	for i, s := range solutions {

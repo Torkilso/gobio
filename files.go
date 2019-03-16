@@ -8,33 +8,6 @@ import (
 	"os"
 )
 
-func GoImageToImageRGBA(src *image.RGBA) Image {
-	width := src.Bounds().Dx()
-	height := src.Bounds().Dy()
-
-	pixels := make([][]*Pixel, width)
-
-	for i := range pixels {
-		pixels[i] = make([]*Pixel, height)
-	}
-
-	for i := 0; i < width; i++ {
-		for j := 0; j < height; j++ {
-			r, g, b, _ := src.At(i, j).RGBA()
-
-			red := int16(r >> 8)
-			green := int16(g >> 8)
-			blue := int16(b >> 8)
-
-			pixels[i][j] = &Pixel{
-				r: red,
-				g: green,
-				b: blue,
-			}
-		}
-	}
-	return pixels
-}
 
 func GoImageToImage(src image.Image) Image {
 	width := src.Bounds().Dx()
