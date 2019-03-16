@@ -5,7 +5,6 @@ import (
 	"github.com/alonsovidales/go_graph"
 	"math"
 	"math/rand"
-	"sort"
 	"sync"
 	"time"
 )
@@ -149,51 +148,6 @@ func GraphToGeno(gr *graphs.Graph, size int) []uint64 {
 	return geno
 }
 
-func GetGraph(size int, edges []graphs.Edge, undirected bool) (ug *graphs.Graph) {
-	var weight float64
-
-	ug = &graphs.Graph{
-		RawEdges:    edges,
-		Vertices:    make(map[uint64]bool, size),
-		VertexEdges: make(map[uint64]map[uint64]float64, size),
-		Undirected:  undirected,
-		NegEdges:    false,
-	}
-
-	for _, edge := range edges {
-		weight = edge.Weight
-
-		ug.Vertices[edge.From] = true
-		ug.Vertices[edge.To] = true
-		if _, ok := ug.VertexEdges[edge.From]; ok {
-			ug.VertexEdges[edge.From][edge.To] = weight
-		} else {
-			ug.VertexEdges[edge.From] = map[uint64]float64{edge.To: weight}
-		}
-		if undirected {
-			if _, ok := ug.VertexEdges[edge.To]; ok {
-				ug.VertexEdges[edge.To][edge.From] = weight
-			} else {
-				ug.VertexEdges[edge.To] = map[uint64]float64{edge.From: weight}
-			}
-		}
-	}
-
-	return
-}
-
-func GenoToGraph(img *Image, geno []uint64, weight bool) *graphs.Graph {
-	edges := make([]graphs.Edge, len(geno))
-	var w float64
-	for i := range geno {
-		if weight {
-			w = Dist(img, i, int(geno[i]))
-		}
-		edges[i] = graphs.Edge{uint64(i), geno[i], w}
-	}
-
-	return GetGraph(ImageSize(img), edges, true)
-}
 
 func generatePopulation(img *Image, n int) Population {
 	solutions := make([]*Solution, 0, n)
@@ -296,11 +250,9 @@ func (p *Population) evolveWithTournament(img *Image) {
 	parentsB := make([]*Solution, 0, size)
 
 	for i := 0; i < size; i += 2 {
-
-		if r1.Float32() > .7 {
+		if rand.Float32() > 0.7 {
 			continue
 		}
-
 		p1Idx := r1.Intn(size)
 		p2Idx := r1.Intn(size)
 		p3Idx := r1.Intn(size)
@@ -381,7 +333,6 @@ func (s *Solution) mutate(img *Image) {
 	s.deviation = deviation(img, groups)
 	s.crowdingDistance = 0.0
 }
-
 func (s *Solution) mutateMultiple(img *Image) {
 	mutated := false
 	for i := range s.genotype {
@@ -393,7 +344,6 @@ func (s *Solution) mutateMultiple(img *Image) {
 			mutated = true
 		}
 	}
-
 	if mutated {
 		groups := GenoToConnectedComponents(s.genotype)
 
@@ -402,7 +352,6 @@ func (s *Solution) mutateMultiple(img *Image) {
 		s.crowdingDistance = 0.0
 	}
 }
-
 func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 
 	n := len((*parent1).genotype)
@@ -418,18 +367,16 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 			offspring1[i], offspring2[i] = (*parent1).genotype[i], (*parent2).genotype[i]
 		}
 	}
-	//graph1 := GenoToGraph(img, offspring1, false)
-	//graph2 := GenoToGraph(img, offspring2, false)
 
 	groups1 := GenoToConnectedComponents(offspring1)
 	groups2 := GenoToConnectedComponents(offspring2)
 
 	s1 := &Solution{
-		offspring1, deviation(img, groups1), connectivity(img, groups1), 0.0, 0,
+		offspring1, deviation(img, groups1), connectivity(img, groups1), 0.0, edgeValues(img, groups1), 0,
 	}
 
 	s2 := &Solution{
-		offspring2, deviation(img, groups2), connectivity(img, groups2), 0.0, 0,
+		offspring2, deviation(img, groups2), connectivity(img, groups2), 0.0, edgeValues(img, groups2), 0,
 	}
 	return s1, s2
 }
@@ -439,45 +386,12 @@ func SolutionFromGenotypeNSGA(img *Image, g *graphs.Graph) *Solution {
 
 	deviation := deviation(img, groups)
 	connectivity := connectivity(img, groups)
+	edgeValue := edgeValues(img, groups)
 	crowdingDistance := 0.0
-	sol := &Solution{GraphToGeno(g, ImageSize(img)), deviation, connectivity, crowdingDistance, 0}
+	sol := &Solution{GraphToGeno(g, ImageSize(img)), deviation, connectivity, crowdingDistance, edgeValue, 0}
 
 	return sol
 }
 
-type GenoVertices struct {
-	edges int
-	value uint64
-}
 
-func GraphToGeno2(gr *graphs.Graph, size int) []uint64 {
-	geno := make([]uint64, size)
 
-	edgesForNode := make([]int, len(gr.Vertices))
-
-	vertices := make([]GenoVertices, len(gr.Vertices))
-
-	for _, edge := range gr.RawEdges {
-		edgesForNode[edge.From]++
-		edgesForNode[edge.To]++
-	}
-	for i := range gr.Vertices {
-		vertices[i] = GenoVertices{edgesForNode[i], i}
-	}
-
-	sort.Slice(vertices, func(i, j int) bool {
-		return vertices[i].edges < vertices[j].edges
-	})
-
-	for _, v := range vertices {
-		for to := range gr.VertexEdges[v.value] {
-			geno[v.value] = to
-			if len(gr.VertexEdges[to]) > 1 {
-				delete(gr.VertexEdges[to], v.value)
-			}
-			break
-		}
-	}
-
-	return geno
-}

@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"image"
 	"image/jpeg"
+	"io/ioutil"
 	"os"
 )
 
@@ -77,4 +79,22 @@ func readJPEGFile(path string) Image {
 	}
 
 	return GoImageToImage(src)
+}
+
+
+func copyTo(sourceFile, destinationFile string) {
+	input, err := ioutil.ReadFile(sourceFile)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	err = ioutil.WriteFile(destinationFile, input, 0644)
+	if err != nil {
+		fmt.Println("Error creating", destinationFile)
+		fmt.Println(err)
+		return
+	}
+
+
 }
