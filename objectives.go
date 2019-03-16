@@ -54,7 +54,6 @@ func timeTrack(start time.Time, name string) {
 	log.Printf("%s took %s", name, elapsed)
 }
 
-
 func deviation(img *Image, connectedGroups []map[uint64]bool) float64 {
 	var dist float64
 	width := len(*img)

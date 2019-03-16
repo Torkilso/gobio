@@ -87,7 +87,7 @@ func saveParetoPlotter(p *plot.Plot, name string) {
 	}
 }
 
-func visualizeFronts(population []*Solution, fronts map[int][]int) {
+func visualizeFronts(population []*Solution, fronts map[int][]int, name string) {
 	p, err := plot.New()
 	if err != nil {
 		panic(err)
@@ -124,7 +124,7 @@ func visualizeFronts(population []*Solution, fronts map[int][]int) {
 		p.Add(lpLine, lpPoints)
 	}
 
-	if err := p.Save(10*vg.Inch, 10*vg.Inch, "points.png"); err != nil {
+	if err := p.Save(10*vg.Inch, 10*vg.Inch, name); err != nil {
 		panic(err)
 	}
 }

@@ -12,8 +12,8 @@ import (
 
 var (
 	generationsToRun = 100
-	popSize = 50
-	folderId         = "216066"
+	popSize          = 20
+	folderId         = "86016"
 )
 
 func main() {
@@ -35,9 +35,7 @@ func main() {
 	//testMaxObjectives(&img)
 	//perf()
 
-
 }
-
 
 func runNSGA(img *Image) {
 
@@ -48,7 +46,7 @@ func runNSGA(img *Image) {
 	fmt.Println("Used", time.Since(start).Seconds(), "seconds in total")
 
 	fronts := fastNonDominatedSort(solutions)
-	visualizeFronts(solutions, fronts)
+	visualizeFronts(solutions, fronts, "final_pareto.png")
 
 	for id, solution := range solutions {
 		graph := GenoToGraph(img, solutions[0].genotype, true)
@@ -64,7 +62,7 @@ func runNSGA(img *Image) {
 }
 
 func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
-	imagePath := "./data/" + folderId + "/Test image.jpg"
+	imagePath := "./data/" + folderId + "/image.jpg"
 	image := readJPEGFile(imagePath)
 
 	rand.Seed(time.Now().UTC().UnixNano())
@@ -74,25 +72,44 @@ func runAndStoreImagesForTesting(folderId string, generations, popSize int) {
 
 	solutions := nsgaII(&image, generations, popSize)
 
+	fronts := fastNonDominatedSort(solutions)
+	visualizeFronts(solutions, fronts, "final_pareto.png")
+
 	for id, solution := range solutions {
 		segments := GenoToConnectedComponents(solutions[id].genotype)
 		fmt.Println("Solution", id, ": weightedSum:", solution.weightedSum(), ", segments:", len(segments), ", c:", solution.connectivity, ", d:", solution.deviation)
 	}
 
 	dir, err := ioutil.ReadDir("./solutions/Student_Segmentation_Files")
+	dir2, err2 := ioutil.ReadDir("./solutions/Solutions_With_Image")
 
 	if err != nil {
 		panic(err)
+	}
+
+	if err2 != nil {
+		panic(err2)
 	}
 
 	for _, d := range dir {
 		_ = os.RemoveAll(path.Join([]string{"./solutions/Student_Segmentation_Files", d.Name()}...))
 	}
 
+	for _, d := range dir2 {
+		_ = os.RemoveAll(path.Join([]string{"./solutions/Solutions_With_Image", d.Name()}...))
+	}
+
 	for i, s := range solutions {
+		segments := GenoToConnectedComponents(solutions[i].genotype)
+		if len(segments) > 2000 || len(segments) < 2 {
+			continue
+		}
+
 		filename := fmt.Sprintf("./solutions/Student_Segmentation_Files/sol%d.jpg", i)
+		filename2 := fmt.Sprintf("./solutions/Solutions_With_Image/sol%d.jpg", i)
 		//fmt.Println("Storing solution", s.weightedSum(), filename)
 		drawSolutionSegmentsBorders(&image, s, color.Black, filename)
+		drawSolutionSegmentsBordersWithImage(&image, s, color.RGBA{G: 255, A: 0xff}, filename2)
 	}
 }
 

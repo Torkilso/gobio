@@ -1,7 +1,7 @@
 
 import os
 from shutil import copyfile
-photo_id = "216066"
+photo_id = "86016"
 
 # Remove files in Optimal segmentation files
 sol_folder = "./solutions/Optimal_Segmentation_Files"
