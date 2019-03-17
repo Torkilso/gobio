@@ -281,7 +281,7 @@ func tournamentNSGA(id1, id2 int, p *Population) *Solution {
 func (s *Solution) mutate(img *Image) {
 
 	index := rand.Intn(len(s.genotype))
-	possibleValues := GetTargets(img, index)
+	possibleValues := GetTargets(img, index, true)
 	chosen := rand.Intn(len(possibleValues))
 
 	s.genotype[uint64(index)] = uint64(possibleValues[chosen])
@@ -317,7 +317,7 @@ func (s *Solution) mutateMultiple(img *Image) {
 
 	for i := range s.genotype {
 		if rand.Float32() < 0.00001 {
-			possibleValues := GetTargets(img, i)
+			possibleValues := GetCloseTargetsWithSelf(img, i)
 			chosen := rand.Intn(len(possibleValues))
 			s.genotype[uint64(i)] = uint64(possibleValues[chosen])
 
@@ -354,13 +354,13 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 
 	if rand.Float32() < 0.2 {
 		index := rand.Intn(len(offspring1))
-		possibleValues := GetTargets(img, index)
+		possibleValues := GetCloseTargetsWithSelf(img, index)
 		chosen := rand.Intn(len(possibleValues))
 		offspring1[uint64(index)] = uint64(possibleValues[chosen])
 	}
 	if rand.Float32() < 0.2 {
 		index := rand.Intn(len(offspring2))
-		possibleValues := GetTargets(img, index)
+		possibleValues := GetCloseTargetsWithSelf(img, index)
 		chosen := rand.Intn(len(possibleValues))
 		offspring2[uint64(index)] = uint64(possibleValues[chosen])
 	}
@@ -427,7 +427,7 @@ func (p *Population) joinSegments(img *Image, segmentSizeThreshold int) {
 							continue
 						}
 						for i := range group {
-							possibleValues := GetTargets(img, int(i))
+							possibleValues := GetTargets(img, int(i), true)
 							chosen := rand.Intn(len(possibleValues))
 							(*p)[index].genotype[uint64(i)] = uint64(possibleValues[chosen])
 						}

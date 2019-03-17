@@ -96,7 +96,7 @@ func crowdingDistanceAssignment(ids []int, population []*Solution) {
 	})
 
 	for i := 1; i < size-1; i++ {
-		population[ids[i]].edgeValue = population[ids[i]].edgeValue + (population[ids[i+1]].edgeValue-population[ids[i-1]].edgeValue)/(maxEdgeValues-minEdgeValues)
+		population[ids[i]].crowdingDistance = population[ids[i]].crowdingDistance + (population[ids[i+1]].edgeValue-population[ids[i-1]].edgeValue)/(maxEdgeValues-minEdgeValues)
 	}
 }
 
@@ -169,7 +169,7 @@ func nsgaII(image *Image, generations, populationSize int) Population {
 		fmt.Println(time.Since(startGeneration).Seconds(), "seconds, size of population:", len(population))
 		saveParetoPlotter(p, "pareto.png")
 	}
-	population.expandWithSolutions(image, 50)
+	//population.expandWithSolutions(image, 50)
 
 	fmt.Println("Used", time.Since(start).Seconds(), "seconds to evolve solutions")
 
