@@ -10,8 +10,6 @@ var (
 	minDeviation    float64 = 0
 	maxConnectivity float64 = 10000
 	minConnectivity float64 = 0
-	maxEdgeValues   float64 = 0
-	minEdgeValues   float64 = 0
 )
 
 func setObjectivesMaxMinValues(img *Image) {
@@ -80,7 +78,7 @@ func connectivity(img *Image, connectedGroups []map[uint64]bool) float64 {
 		for k := range group {
 			intK := int(k)
 			for j, neighbour := range GetTargets(img, intK, false) {
-				if _, ok := group[uint64(neighbour)]; !ok { // To nothing
+				if _, ok := group[uint64(neighbour)]; !ok { // Not neighbours
 					dist += 1.0 / (float64(j) + 1.0)
 				}
 			}

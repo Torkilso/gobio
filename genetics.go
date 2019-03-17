@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/alonsovidales/go_graph"
 	"github.com/google/gxui/math"
 	"math/rand"
 	"sync"
@@ -60,66 +59,6 @@ func GenoToConnectedComponents(geno []uint64) []map[uint64]bool {
 	return segments
 }
 
-func GraphToGeno(gr *graphs.Graph, size int) []uint64 {
-
-	geno := make([]uint64, size)
-
-	edgesForNode := make(map[uint64]map[uint64]bool)
-
-	for _, edge := range gr.RawEdges {
-		if edgesForNode[edge.From] == nil {
-			edgesForNode[edge.From] = make(map[uint64]bool)
-		}
-		if edgesForNode[edge.To] == nil {
-			edgesForNode[edge.To] = make(map[uint64]bool)
-		}
-		edgesForNode[edge.From][edge.To] = true
-		edgesForNode[edge.To][edge.From] = true
-	}
-
-	assigned := 0
-
-	for assigned < size-1 {
-		noneFound := true
-		for id, val := range edgesForNode {
-			if len(val) == 1 {
-				for key := range edgesForNode[id] {
-					geno[id] = key
-					noneFound = false
-					assigned++
-
-					delete(edgesForNode[key], id)
-					delete(edgesForNode, id)
-				}
-			}
-		}
-
-		if noneFound {
-			for id := range edgesForNode {
-				if len(edgesForNode[id]) == 0 {
-					geno[id] = id
-					assigned++
-
-					delete(edgesForNode, id)
-				} else {
-					for key := range edgesForNode[id] {
-						geno[id] = key
-						assigned++
-
-						delete(edgesForNode[key], id)
-						delete(edgesForNode, id)
-					}
-				}
-			}
-		}
-	}
-
-	for lastKey := range edgesForNode {
-		geno[lastKey] = lastKey
-	}
-
-	return geno
-}
 
 func generatePopulation(img *Image, n int) Population {
 	solutions := make([]*Solution, 0, n)
@@ -362,11 +301,14 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 	groups1 := GenoToConnectedComponents(offspring1)
 	groups2 := GenoToConnectedComponents(offspring2)
 
-	if rand.Float32() < 0.1 {
+	/*
+	if len(groups1) > 500 {
+		sort.Slice(groups1, func(i, j int) bool {
+			return len(groups1[i]) > len(groups1[j])
+		})
+
+		before := len(groups1)
 		for _, group := range groups1 {
-			if len(group) > 100 {
-				continue
-			}
 			for i := range group {
 				for _, neighbour := range GetCloseTargetsWithSelf(img, int(i)) {
 					if _, ok := group[uint64(neighbour)]; !ok { // Not in same segment
@@ -377,6 +319,7 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 			}
 		}
 		groups1 = GenoToConnectedComponents(offspring1)
+		fmt.Println("Num segments", before, len(groups1))
 
 	}
 	if rand.Float32() < 0.1 {
@@ -396,6 +339,8 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 		groups2 = GenoToConnectedComponents(offspring2)
 
 	}
+	*/
+
 
 	s1 := &Solution{
 		offspring1,

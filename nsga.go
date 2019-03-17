@@ -81,6 +81,7 @@ func crowdingDistanceAssignment(ids []int, population []*Solution) {
 		population[ids[i]].crowdingDistance = (population[ids[i+1]].deviation - population[ids[i-1]].deviation) / (maxDeviation - minDeviation)
 	}
 
+
 	// for connectivity
 	sort.Slice(ids, func(i, j int) bool {
 		return population[ids[i]].connectivity < population[ids[j]].connectivity
@@ -166,8 +167,10 @@ func nsgaII(image *Image, generations, populationSize int) Population {
 
 	bestFronts := make([]*Solution, len(fronts[0]))
 	for i, f := range fronts[0] {
+
 		bestFronts[i] = population[f]
 	}
+
 	return bestFronts
 }
 

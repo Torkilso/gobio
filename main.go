@@ -13,8 +13,8 @@ import (
 
 var (
 	generationsToRun = 300
-	popSize          = 50
-	folderId         = "176039"
+		popSize          = 200
+	folderId         = "176035"
 )
 
 func main() {
@@ -89,9 +89,13 @@ func runMultiObjective(folderId string, generations, popSize int) {
 
 		filename := fmt.Sprintf("./solutions/Student_Segmentation_Files/sol%d.jpg", i)
 		filenameGreen := fmt.Sprintf("./solutions/Solutions_With_Image/sol%d.jpg", i)
+		filenameFill := fmt.Sprintf("./solutions/Solutions_With_Fill/sol%d.jpg", i)
+
 
 		drawSolutionSegmentsBorders(image, s, color.Black, filename)
 		drawSolutionSegmentsBordersWithImage(image, s, color.RGBA{G: 255, A: 0xff}, filenameGreen)
+		drawSolutionSegmentsWithCentroidColor(image, s, filenameFill)
+
 	}
 }
 

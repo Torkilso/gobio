@@ -67,8 +67,8 @@ func addParetoFrontToPlotter(p *plot.Plot, population []*Solution, fronts map[in
 	pts := make(plotter.XYs, len(fronts[0]))
 
 	for i := range fronts[0] {
-		pts[i].X = population[fronts[0][i]].deviation / (maxDeviation - minDeviation)
-		pts[i].Y = population[fronts[0][i]].connectivity / (maxConnectivity - minConnectivity)
+		pts[i].X = population[fronts[0][i]].deviation
+		pts[i].Y = population[fronts[0][i]].connectivity
 	}
 
 	lpLine, lpPoints, err := plotter.NewLinePoints(pts)
