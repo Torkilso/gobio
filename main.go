@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	generationsToRun = 80
-	popSize          = 40
+	generationsToRun = 50
+	popSize          = 50
 	folderId         = "216066"
 )
 
@@ -69,6 +69,7 @@ func runMultiObjective(folderId string, generations, popSize int) {
 
 	for i, s := range solutions {
 
+
 		segmentsB := GenoToConnectedComponents(s.genotype)
 		fmt.Println("segments before:", len(segmentsB))
 		smallSegmentsGone := false
@@ -76,6 +77,7 @@ func runMultiObjective(folderId string, generations, popSize int) {
 		for !smallSegmentsGone {
 			smallSegmentsGone = s.joinSmallSegments(image)
 		}
+
 
 		segments := GenoToConnectedComponents(s.genotype)
 		fmt.Println("segments after:", len(segments))
