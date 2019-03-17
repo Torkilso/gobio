@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	generationsToRun = 150
-	popSize          = 30
-	folderId         = "178054"
+	generationsToRun = 100
+	popSize          = 50
+	folderId         = "147091"
 )
 
 func main() {
@@ -83,7 +83,7 @@ func runMultiObjective(folderId string, generations, popSize int) {
 		segments := GenoToConnectedComponents(s.genotype)
 		fmt.Println("segments:", len(segments))
 
-		if len(segments) > 50 || len(segments) < 2 {
+		if len(segments) > 100 || len(segments) < 2 {
 			continue
 		}
 
@@ -102,6 +102,9 @@ func runSingleObjective(folderId string, generations, popSize int) {
 	bestSolution := singleObjective(image, generations, popSize)
 
 	filename := "./solutions/Student_Segmentation_Files/sol.jpg"
+	filenameGreen := fmt.Sprintf("./solutions/Solutions_With_Image/sol.jpg")
 
 	drawSolutionSegmentsBorders(image, bestSolution, color.Black, filename)
+	drawSolutionSegmentsBordersWithImage(image, bestSolution, color.RGBA{G: 255, A: 0xff}, filenameGreen)
+
 }
