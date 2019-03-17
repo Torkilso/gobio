@@ -84,11 +84,15 @@ func connectivityAndEdge(img *Image, connectedGroups []map[uint64]bool) (float64
 			for j, neighbour := range GetTargets(img, intK) {
 				if _, ok := group[uint64(neighbour)]; !ok { // To nothing
 					dist += 1.0 / (float64(j) + 1.0)
-					x2, y2 := Flatten(width, neighbour)
-					edgeDist -= ColorDist((*img)[x1][y1], (*img)[x2][y2])
-
 				}
 			}
+			for _, neighbour := range GetCloseTargets(img, intK) {
+				if _, ok := group[uint64(neighbour)]; !ok { // To nothing
+					x2, y2 := Flatten(width, neighbour)
+					edgeDist -= ColorDist((*img)[x1][y1], (*img)[x2][y2])
+				}
+			}
+
 		}
 	}
 	return dist, edgeDist

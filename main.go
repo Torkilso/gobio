@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	generationsToRun = 250
-	popSize          = 10
-	folderId         = "86016"
+	generationsToRun = 120
+	popSize          = 50
+	folderId         = "178054"
 )
 
 func main() {
@@ -67,7 +67,7 @@ func runMultiObjective(folderId string, generations, popSize int) {
 	solutions := nsgaII(image, generations, popSize)
 
 	joinSegmentsStart := time.Now()
-	solutions.joinSegments(image, 1000)
+	solutions.joinSegments(image, 100)
 	fmt.Print("Used ", time.Since(joinSegmentsStart).Seconds(), " to join segments\n\n")
 
 	fronts := fastNonDominatedSort(solutions)

@@ -60,6 +60,7 @@ func GenoToConnectedComponents(geno []uint64) []map[uint64]bool {
 }
 
 func GraphToGeno(gr *graphs.Graph, size int) []uint64 {
+
 	geno := make([]uint64, size)
 
 	edgesForNode := make(map[uint64]map[uint64]bool)
@@ -142,11 +143,15 @@ func generatePopulation(img *Image, n int) Population {
 	for i := 0; i < n; i++ {
 		go func(index int) {
 			start := r1.Intn(width * height)
-			mst := Prim(uint64(start), primGraph, labels, imgAsGraph)
+			geno := Prim(uint64(start), primGraph, labels, imgAsGraph, width * height)
 
-			mstGraph := graphs.GetGraph(mst, true)
-
-			channel <- SolutionFromGenotypeNSGA(img, mstGraph)
+			//mstGraph := graphs.GetGraph(mst, true)
+			//s := SolutionFromGenotypeNSGA(img, mstGraph)
+			groups := GenoToConnectedComponents(geno)
+			e, c := connectivityAndEdge(img, groups)
+			d := deviation(img, groups)
+			s2 := &Solution{geno, d, c, 0.0, e, 0, len(groups)}
+			channel <- s2
 			defer wg.Done()
 		}(i)
 	}
@@ -241,17 +246,6 @@ func (p *Population) evolveWithTournament(img *Image) {
 
 			leftChild, rightChild := crossover(img, parentsA[index], parentsB[index])
 
-			/*
-				leftChild.mutateMultiple(img)
-				rightChild.mutateMultiple(img)
-			*/
-			if r1.Float32() < .2 {
-				leftChild.mutate(img)
-			}
-
-			if r1.Float32() < .2 {
-				rightChild.mutate(img)
-			}
 
 			channel <- leftChild
 			channel <- rightChild
@@ -358,6 +352,20 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 		}
 	}
 
+	if rand.Float32() < 0.2 {
+		index := rand.Intn(len(offspring1))
+		possibleValues := GetTargets(img, index)
+		chosen := rand.Intn(len(possibleValues))
+		offspring1[uint64(index)] = uint64(possibleValues[chosen])
+	}
+	if rand.Float32() < 0.2 {
+		index := rand.Intn(len(offspring2))
+		possibleValues := GetTargets(img, index)
+		chosen := rand.Intn(len(possibleValues))
+		offspring2[uint64(index)] = uint64(possibleValues[chosen])
+	}
+
+
 	groups1 := GenoToConnectedComponents(offspring1)
 	groups2 := GenoToConnectedComponents(offspring2)
 
@@ -454,6 +462,7 @@ func (p *Population) expandWithSolutions(img *Image, amount int) {
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
 
+
 	parentsA := make([]*Solution, 0, amount/2)
 	parentsB := make([]*Solution, 0, amount/2)
 
@@ -481,14 +490,6 @@ func (p *Population) expandWithSolutions(img *Image, amount int) {
 		go func(index int) {
 
 			leftChild, rightChild := crossover(img, parentsA[index], parentsB[index])
-
-			if r1.Float32() < .2 {
-				leftChild.mutate(img)
-			}
-
-			if r1.Float32() < .2 {
-				rightChild.mutate(img)
-			}
 
 			channel <- leftChild
 			channel <- rightChild
