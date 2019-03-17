@@ -58,7 +58,7 @@ func Prim(start uint64, g *graph.LabeledUndirected, labels []graph.LI, gr *graph
 	_, _ = g.Prim(actualStart, w, &f, labels, &leaves)
 
 	geno = make([]uint64, size)
-	for i := 0 ; i < size ; i++ {
+	for i := 0; i < size; i++ {
 		if int(start) == i {
 			geno[i] = uint64(i)
 			continue
@@ -68,10 +68,8 @@ func Prim(start uint64, g *graph.LabeledUndirected, labels []graph.LI, gr *graph
 	}
 	geno[start] = uint64(start)
 
-
 	return geno
 }
-
 
 func Prim2(g *graph.LabeledUndirected, start graph.NI, w graph.WeightFunc, f *graph.FromList, labels []graph.LI, componentLeaves *bits.Bits) (numSpanned int, dist float64, geno []uint64) {
 	al := g.LabeledAdjacencyList
@@ -167,6 +165,7 @@ func (p *prHeap) Pop() interface{} {
 	*p = r[:last]
 	return r[last]
 }
+
 type fromHalf struct {
 	From  graph.NI
 	Label graph.LI
