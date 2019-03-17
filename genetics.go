@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/alonsovidales/go_graph"
+	"github.com/google/gxui/math"
 	"math/rand"
 	"sync"
 	"time"
@@ -145,8 +146,6 @@ func generatePopulation(img *Image, n int) Population {
 			start := r1.Intn(width * height)
 			geno := Prim(uint64(start), primGraph, labels, imgAsGraph, width*height)
 
-			//mstGraph := graphs.GetGraph(mst, true)
-			//s := SolutionFromGenotypeNSGA(img, mstGraph)
 			groups := GenoToConnectedComponents(geno)
 			d := deviation(img, groups)
 			s2 := &Solution{geno, d, connectivity(img, groups), 0.0,0, len(groups)}
@@ -211,9 +210,6 @@ func (p *Population) evolveSingleObjective(img *Image) {
 func (p *Population) evolveWithTournament(img *Image) {
 	size := len(*p)
 
-	s1 := rand.NewSource(time.Now().UnixNano())
-	r1 := rand.New(s1)
-
 	parentsA := make([]*Solution, 0, size)
 	parentsB := make([]*Solution, 0, size)
 
@@ -221,13 +217,8 @@ func (p *Population) evolveWithTournament(img *Image) {
 		if rand.Float32() > 0.7 {
 			continue
 		}
-		p1Idx := r1.Intn(size)
-		p2Idx := r1.Intn(size)
-		p3Idx := r1.Intn(size)
-		p4Idx := r1.Intn(size)
-
-		p1 := tournamentNSGA(p1Idx, p2Idx, p)
-		p2 := tournamentNSGA(p3Idx, p4Idx, p)
+		p1 := tournamentNSGA(p, 4)
+		p2 := tournamentNSGA(p, 4)
 
 		parentsA = append(parentsA, p1)
 		parentsB = append(parentsB, p2)
@@ -264,16 +255,25 @@ func (p *Population) evolveWithTournament(img *Image) {
 	*p = append(*p, result...)
 }
 
-func tournamentNSGA(id1, id2 int, p *Population) *Solution {
-	if (*p)[id1].frontNumber < (*p)[id2].frontNumber {
-		return (*p)[id1]
-	} else if (*p)[id1].frontNumber == (*p)[id2].frontNumber {
-		if (*p)[id1].crowdingDistance > (*p)[id2].crowdingDistance {
-			return (*p)[id1]
+func tournamentNSGA(p *Population, k int) *Solution {
+	bestIdx := -1
+	bestFront := math.MaxInt
+	bestCrowding := -1.0
+
+	for i := 0 ; i <= k ; i++ {
+		id := rand.Intn(len(*p))
+
+		if (*p)[id].frontNumber < bestFront {
+			bestIdx = id
+			bestFront = (*p)[id].frontNumber
+			bestCrowding = (*p)[id].crowdingDistance
+		} else if (*p)[id].frontNumber == bestFront && (*p)[id].crowdingDistance > bestCrowding {
+			bestIdx = id
+			bestFront = (*p)[id].frontNumber
+			bestCrowding = (*p)[id].crowdingDistance
 		}
 	}
-
-	return (*p)[id2]
+	return (*p)[bestIdx]
 }
 
 func (s *Solution) mutate(img *Image) {
@@ -362,6 +362,40 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 	groups1 := GenoToConnectedComponents(offspring1)
 	groups2 := GenoToConnectedComponents(offspring2)
 
+	if rand.Float32() < 0.1 {
+		for _, group := range groups1 {
+			if len(group) > 100 {
+				continue
+			}
+			for i := range group {
+				for _, neighbour := range GetCloseTargetsWithSelf(img, int(i)) {
+					if _, ok := group[uint64(neighbour)]; !ok { // Not in same segment
+						offspring1[int(i)] = uint64(neighbour)
+						break
+					}
+				}
+			}
+		}
+		groups1 = GenoToConnectedComponents(offspring1)
+
+	}
+	if rand.Float32() < 0.1 {
+		for _, group := range groups2 {
+			if len(group) > 100 {
+				continue
+			}
+			for i := range group {
+				for _, neighbour := range GetCloseTargetsWithSelf(img, int(i)) {
+					if _, ok := group[uint64(neighbour)]; !ok { // Not in same segment
+						offspring2[int(i)] = uint64(neighbour)
+						break
+					}
+				}
+			}
+		}
+		groups2 = GenoToConnectedComponents(offspring2)
+
+	}
 
 	s1 := &Solution{
 		offspring1,
@@ -429,22 +463,13 @@ func (p *Population) joinSegments(img *Image, segmentSizeThreshold int) {
 }
 
 func (p *Population) expandWithSolutions(img *Image, amount int) {
-	size := len(*p)
-
-	s1 := rand.NewSource(time.Now().UnixNano())
-	r1 := rand.New(s1)
 
 	parentsA := make([]*Solution, 0, amount/2)
 	parentsB := make([]*Solution, 0, amount/2)
 
 	for i := 0; i < amount; i += 2 {
-		p1Idx := r1.Intn(size)
-		p2Idx := r1.Intn(size)
-		p3Idx := r1.Intn(size)
-		p4Idx := r1.Intn(size)
-
-		p1 := tournamentNSGA(p1Idx, p2Idx, p)
-		p2 := tournamentNSGA(p3Idx, p4Idx, p)
+		p1 := tournamentNSGA(p, 4)
+		p2 := tournamentNSGA(p, 4)
 
 		parentsA = append(parentsA, p1)
 		parentsB = append(parentsB, p2)

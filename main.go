@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	generationsToRun = 100
+	generationsToRun = 300
 	popSize          = 50
 	folderId         = "147091"
 )
@@ -81,7 +81,7 @@ func runMultiObjective(folderId string, generations, popSize int) {
 
 	for i, s := range solutions {
 		segments := GenoToConnectedComponents(s.genotype)
-		fmt.Println("segments:", len(segments))
+		fmt.Println("solution", i, ":   segments:", len(segments), ", connectivity:", s.connectivity, ", deviation:", s.deviation)
 
 		if len(segments) > 100 || len(segments) < 2 {
 			continue
