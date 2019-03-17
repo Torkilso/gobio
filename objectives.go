@@ -28,7 +28,7 @@ func setObjectivesMaxMinValues(img *Image) {
 			connectedGroupsInDifferent[idx] = map[uint64]bool{uint64(idx): true}
 		}
 	}
-	maxConnectivity, minEdgeValues = connectivityAndEdge(img, connectedGroupsInDifferent)
+	maxConnectivity = connectivity(img, connectedGroupsInDifferent)
 
 	connectedGroupsInSame := make([]map[uint64]bool, 1)
 	connectedGroupsInSame[0] = make(map[uint64]bool)
@@ -40,6 +40,7 @@ func setObjectivesMaxMinValues(img *Image) {
 		}
 	}
 	maxDeviation = deviation(img, connectedGroupsInSame)
+
 
 	// max deviation -> all pixels in one segment
 
@@ -71,29 +72,19 @@ func deviation(img *Image, connectedGroups []map[uint64]bool) float64 {
 	return dist
 }
 
-func connectivityAndEdge(img *Image, connectedGroups []map[uint64]bool) (float64, float64) {
+func connectivity(img *Image, connectedGroups []map[uint64]bool) float64 {
 
 	var dist float64
-	var edgeDist float64
-	width := len(*img)
 
 	for _, group := range connectedGroups {
 		for k := range group {
 			intK := int(k)
-			x1, y1 := Flatten(width, intK)
-			for j, neighbour := range GetTargets(img, intK) {
+			for j, neighbour := range GetTargets(img, intK, false) {
 				if _, ok := group[uint64(neighbour)]; !ok { // To nothing
 					dist += 1.0 / (float64(j) + 1.0)
 				}
 			}
-			for _, neighbour := range GetCloseTargets(img, intK) {
-				if _, ok := group[uint64(neighbour)]; !ok { // To nothing
-					x2, y2 := Flatten(width, neighbour)
-					edgeDist -= ColorDist((*img)[x1][y1], (*img)[x2][y2])
-				}
-			}
-
 		}
 	}
-	return dist, edgeDist
+	return dist
 }

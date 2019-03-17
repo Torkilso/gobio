@@ -93,17 +93,6 @@ func crowdingDistanceAssignment(ids []int, population []*Solution) {
 		population[ids[i]].crowdingDistance = population[ids[i]].crowdingDistance + (population[ids[i+1]].connectivity-population[ids[i-1]].connectivity)/(maxConnectivity-minConnectivity)
 	}
 
-	// for edge values
-	sort.Slice(ids, func(i, j int) bool {
-		return population[ids[i]].edgeValue < population[ids[j]].edgeValue
-	})
-
-	population[ids[0]].crowdingDistance = math.Inf(1)
-	population[ids[size-1]].crowdingDistance = math.Inf(1)
-
-	for i := 1; i < size-1; i++ {
-		population[ids[i]].crowdingDistance = population[ids[i]].crowdingDistance + (population[ids[i+1]].edgeValue-population[ids[i-1]].edgeValue)/(maxEdgeValues-minEdgeValues)
-	}
 }
 
 func (p *Population) sortAndSelectParetoSolutions(populationSize, generation int, plotter *plot.Plot) {

@@ -148,9 +148,8 @@ func generatePopulation(img *Image, n int) Population {
 			//mstGraph := graphs.GetGraph(mst, true)
 			//s := SolutionFromGenotypeNSGA(img, mstGraph)
 			groups := GenoToConnectedComponents(geno)
-			e, c := connectivityAndEdge(img, groups)
 			d := deviation(img, groups)
-			s2 := &Solution{geno, d, c, 0.0, e, 0, len(groups)}
+			s2 := &Solution{geno, d, connectivity(img, groups), 0.0,0, len(groups)}
 			channel <- s2
 			defer wg.Done()
 		}(i)
@@ -280,17 +279,15 @@ func tournamentNSGA(id1, id2 int, p *Population) *Solution {
 func (s *Solution) mutate(img *Image) {
 
 	index := rand.Intn(len(s.genotype))
-	possibleValues := GetTargets(img, index)
+	possibleValues := GetTargets(img, index, true)
 	chosen := rand.Intn(len(possibleValues))
 
 	s.genotype[uint64(index)] = uint64(possibleValues[chosen])
 
 	groups := GenoToConnectedComponents(s.genotype)
 
-	c, e := connectivityAndEdge(img, groups)
-	s.connectivity = c
+	s.connectivity = connectivity(img, groups)
 	s.deviation = deviation(img, groups)
-	s.edgeValue = e
 	s.crowdingDistance = 0.0
 	s.amountOfSegments = len(groups)
 }
@@ -316,7 +313,7 @@ func (s *Solution) mutateMultiple(img *Image) {
 
 	for i := range s.genotype {
 		if rand.Float32() < 0.00001 {
-			possibleValues := GetTargets(img, i)
+			possibleValues := GetCloseTargetsWithSelf(img, i)
 			chosen := rand.Intn(len(possibleValues))
 			s.genotype[uint64(i)] = uint64(possibleValues[chosen])
 
@@ -326,11 +323,8 @@ func (s *Solution) mutateMultiple(img *Image) {
 
 	if mutated {
 		groups := GenoToConnectedComponents(s.genotype)
-		c, e := connectivityAndEdge(img, groups)
-
-		s.connectivity = c
+		s.connectivity = connectivity(img, groups)
 		s.deviation = deviation(img, groups)
-		s.edgeValue = e
 		s.crowdingDistance = 0.0
 		s.amountOfSegments = len(groups)
 	}
@@ -354,13 +348,13 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 
 	if rand.Float32() < 0.2 {
 		index := rand.Intn(len(offspring1))
-		possibleValues := GetTargets(img, index)
+		possibleValues := GetCloseTargetsWithSelf(img, index)
 		chosen := rand.Intn(len(possibleValues))
 		offspring1[uint64(index)] = uint64(possibleValues[chosen])
 	}
 	if rand.Float32() < 0.2 {
 		index := rand.Intn(len(offspring2))
-		possibleValues := GetTargets(img, index)
+		possibleValues := GetCloseTargetsWithSelf(img, index)
 		chosen := rand.Intn(len(possibleValues))
 		offspring2[uint64(index)] = uint64(possibleValues[chosen])
 	}
@@ -368,15 +362,12 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 	groups1 := GenoToConnectedComponents(offspring1)
 	groups2 := GenoToConnectedComponents(offspring2)
 
-	c1, e1 := connectivityAndEdge(img, groups1)
-	c2, e2 := connectivityAndEdge(img, groups2)
 
 	s1 := &Solution{
 		offspring1,
 		deviation(img, groups1),
-		c1,
+		connectivity(img, groups1),
 		0.0,
-		e1,
 		0,
 		len(groups2),
 	}
@@ -384,9 +375,8 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 	s2 := &Solution{
 		offspring2,
 		deviation(img, groups2),
-		c2,
+		connectivity(img, groups2),
 		0.0,
-		e2,
 		0,
 		len(groups2),
 	}
@@ -394,23 +384,6 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 	return s1, s2
 }
 
-func SolutionFromGenotypeNSGA(img *Image, g *graphs.Graph) *Solution {
-	groups := g.ConnectedComponents()
-
-	deviation := deviation(img, groups)
-	connectivity, edgeValue := connectivityAndEdge(img, groups)
-	crowdingDistance := 0.0
-
-	sol := &Solution{GraphToGeno(g, ImageSize(img)),
-		deviation,
-		connectivity,
-		crowdingDistance,
-		edgeValue,
-		0,
-		len(groups)}
-
-	return sol
-}
 
 func (p *Population) joinSegments(img *Image, segmentSizeThreshold int) {
 	var wg sync.WaitGroup
@@ -428,7 +401,7 @@ func (p *Population) joinSegments(img *Image, segmentSizeThreshold int) {
 							continue
 						}
 						for i := range group {
-							possibleValues := GetTargets(img, int(i))
+							possibleValues := GetTargets(img, int(i), true)
 							chosen := rand.Intn(len(possibleValues))
 							(*p)[index].genotype[uint64(i)] = uint64(possibleValues[chosen])
 						}
@@ -441,11 +414,10 @@ func (p *Population) joinSegments(img *Image, segmentSizeThreshold int) {
 				}
 
 				newGroups := GenoToConnectedComponents((*p)[index].genotype)
-				connectivity, edgeValue := connectivityAndEdge(img, newGroups)
+				connectivity := connectivity(img, newGroups)
 
 				(*p)[index].connectivity = connectivity
 				(*p)[index].deviation = deviation(img, newGroups)
-				(*p)[index].edgeValue = edgeValue
 				(*p)[index].crowdingDistance = 0.0
 				(*p)[index].amountOfSegments = len(newGroups)
 			}
