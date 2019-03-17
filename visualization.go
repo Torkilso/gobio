@@ -60,9 +60,9 @@ func createParetoPlotter() *plot.Plot {
 
 func addParetoFrontToPlotter(p *plot.Plot, population []*Solution, fronts map[int][]int, generation int) {
 
-	if generation % 10 != 0 {
+	/*if generation % 10 != 0 {
 		return
-	}
+	}*/
 
 	pts := make(plotter.XYs, len(fronts[0]))
 

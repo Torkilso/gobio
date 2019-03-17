@@ -9,15 +9,20 @@ import (
 	"time"
 )
 
-func tournamentWeighted(solutions []*Solution) int {
+func tournamentWeighted(solutions []*Solution, k int) int {
 
-	idx1 := rand.Intn(len(solutions))
-	idx2 := rand.Intn(len(solutions))
+	bestIdx := -1
+	minFitness := 999999999.0
 
-	if solutions[idx1].weightedSum() < solutions[idx2].weightedSum() {
-		return idx1
+	for i := 0 ; i <= k ; i++ {
+		id := rand.Intn(len(solutions))
+		if solutions[id].weightedSum() < minFitness {
+			bestIdx = id
+			minFitness = solutions[id].weightedSum()
+		}
 	}
-	return idx2
+
+	return bestIdx
 }
 
 /**
@@ -113,8 +118,8 @@ func (p *Population) evolveSingleObjective(img *Image) {
 
 	for i := 0; i < size; i += 2 {
 		go func(index int) {
-			p1Idx := tournamentWeighted(*p)
-			p2Idx := tournamentWeighted(*p)
+			p1Idx := tournamentWeighted(*p, 4)
+			p2Idx := tournamentWeighted(*p, 4)
 
 			p1 := (*p)[p1Idx]
 			p2 := (*p)[p2Idx]

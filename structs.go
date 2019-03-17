@@ -18,7 +18,7 @@ type Solution struct {
 }
 
 func (s *Solution) weightedSum() float64 {
-	return 2 * s.deviation/maxDeviation + s.connectivity/maxConnectivity
+	return s.deviation/maxDeviation + 10 * (s.connectivity/maxConnectivity)
 }
 
 func bestSolution(solutions []*Solution) *Solution {
