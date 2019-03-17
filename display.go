@@ -33,7 +33,7 @@ func drawSolutionSegmentsBorders(img *Image, solution *Solution, col color.Color
 	for _, group := range groups {
 		for k := range group {
 			intK := int(k)
-			for _, neighbour := range GetTargets(img, intK) {
+			for _, neighbour := range GetCloseTargets(img, intK) {
 				if _, ok := group[uint64(neighbour)]; ok { // Same segments
 				} else {
 					// Two neighbours are not in same segment.
@@ -72,7 +72,7 @@ func drawSolutionSegmentsBordersWithImage(img *Image, solution *Solution, col co
 	for _, group := range groups {
 		for k := range group {
 			intK := int(k)
-			for _, neighbour := range GetTargets(img, intK) {
+			for _, neighbour := range GetCloseTargets(img, intK) {
 				if _, ok := group[uint64(neighbour)]; ok { // Same segments
 				} else {
 					// Two neighbours are not in same segment.

@@ -148,9 +148,8 @@ func generatePopulation(img *Image, n int) Population {
 			//mstGraph := graphs.GetGraph(mst, true)
 			//s := SolutionFromGenotypeNSGA(img, mstGraph)
 			groups := GenoToConnectedComponents(geno)
-			e, c := connectivityAndEdge(img, groups)
 			d := deviation(img, groups)
-			s2 := &Solution{geno, d, c, 0.0, e, 0, len(groups)}
+			s2 := &Solution{geno, d, connectivity(img, groups), 0.0,0, len(groups)}
 			channel <- s2
 			defer wg.Done()
 		}(i)
@@ -287,10 +286,8 @@ func (s *Solution) mutate(img *Image) {
 
 	groups := GenoToConnectedComponents(s.genotype)
 
-	c, e := connectivityAndEdge(img, groups)
-	s.connectivity = c
+	s.connectivity = connectivity(img, groups)
 	s.deviation = deviation(img, groups)
-	s.edgeValue = e
 	s.crowdingDistance = 0.0
 	s.amountOfSegments = len(groups)
 }
@@ -326,11 +323,8 @@ func (s *Solution) mutateMultiple(img *Image) {
 
 	if mutated {
 		groups := GenoToConnectedComponents(s.genotype)
-		c, e := connectivityAndEdge(img, groups)
-
-		s.connectivity = c
+		s.connectivity = connectivity(img, groups)
 		s.deviation = deviation(img, groups)
-		s.edgeValue = e
 		s.crowdingDistance = 0.0
 		s.amountOfSegments = len(groups)
 	}
@@ -368,15 +362,12 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 	groups1 := GenoToConnectedComponents(offspring1)
 	groups2 := GenoToConnectedComponents(offspring2)
 
-	c1, e1 := connectivityAndEdge(img, groups1)
-	c2, e2 := connectivityAndEdge(img, groups2)
 
 	s1 := &Solution{
 		offspring1,
 		deviation(img, groups1),
-		c1,
+		connectivity(img, groups1),
 		0.0,
-		e1,
 		0,
 		len(groups2),
 	}
@@ -384,9 +375,8 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 	s2 := &Solution{
 		offspring2,
 		deviation(img, groups2),
-		c2,
+		connectivity(img, groups2),
 		0.0,
-		e2,
 		0,
 		len(groups2),
 	}
@@ -394,23 +384,6 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 	return s1, s2
 }
 
-func SolutionFromGenotypeNSGA(img *Image, g *graphs.Graph) *Solution {
-	groups := g.ConnectedComponents()
-
-	deviation := deviation(img, groups)
-	connectivity, edgeValue := connectivityAndEdge(img, groups)
-	crowdingDistance := 0.0
-
-	sol := &Solution{GraphToGeno(g, ImageSize(img)),
-		deviation,
-		connectivity,
-		crowdingDistance,
-		edgeValue,
-		0,
-		len(groups)}
-
-	return sol
-}
 
 func (p *Population) joinSegments(img *Image, segmentSizeThreshold int) {
 	var wg sync.WaitGroup
@@ -441,11 +414,10 @@ func (p *Population) joinSegments(img *Image, segmentSizeThreshold int) {
 				}
 
 				newGroups := GenoToConnectedComponents((*p)[index].genotype)
-				connectivity, edgeValue := connectivityAndEdge(img, newGroups)
+				connectivity := connectivity(img, newGroups)
 
 				(*p)[index].connectivity = connectivity
 				(*p)[index].deviation = deviation(img, newGroups)
-				(*p)[index].edgeValue = edgeValue
 				(*p)[index].crowdingDistance = 0.0
 				(*p)[index].amountOfSegments = len(newGroups)
 			}

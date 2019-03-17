@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	generationsToRun = 100
+	generationsToRun = 80
 	popSize          = 50
-	folderId         = "86016"
+	folderId         = "176039"
 )
 
 func main() {
