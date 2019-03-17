@@ -13,7 +13,7 @@ import (
 
 var (
 	generationsToRun = 300
-		popSize          = 200
+	popSize          = 200
 	folderId         = "176035"
 )
 
@@ -81,9 +81,9 @@ func runMultiObjective(folderId string, generations, popSize int) {
 
 	for i, s := range solutions {
 		segments := GenoToConnectedComponents(s.genotype)
-		fmt.Println("segments:", len(segments))
+		fmt.Println("solution", i, ":   segments:", len(segments), ", connectivity:", s.connectivity, ", deviation:", s.deviation)
 
-		if len(segments) > 50 || len(segments) < 2 {
+		if len(segments) > 100 || len(segments) < 2 {
 			continue
 		}
 
@@ -106,6 +106,9 @@ func runSingleObjective(folderId string, generations, popSize int) {
 	bestSolution := singleObjective(image, generations, popSize)
 
 	filename := "./solutions/Student_Segmentation_Files/sol.jpg"
+	filenameGreen := fmt.Sprintf("./solutions/Solutions_With_Image/sol.jpg")
 
 	drawSolutionSegmentsBorders(image, bestSolution, color.Black, filename)
+	drawSolutionSegmentsBordersWithImage(image, bestSolution, color.RGBA{G: 255, A: 0xff}, filenameGreen)
+
 }
