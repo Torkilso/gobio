@@ -42,6 +42,7 @@ func cleanTestingDirs(folderId string) {
 	dir, err := ioutil.ReadDir("./solutions/Student_Segmentation_Files")
 	optimalDir, err := ioutil.ReadDir("./solutions/Optimal_Segmentation_Files")
 	dataDir, err := ioutil.ReadDir("./data/" + folderId + "/")
+	greenBordersDir, err := ioutil.ReadDir("./solutions/Solutions_With_Image")
 
 	if err != nil {
 		panic(err)
@@ -52,6 +53,9 @@ func cleanTestingDirs(folderId string) {
 	}
 	for _, d := range optimalDir {
 		_ = os.RemoveAll(path.Join([]string{"./solutions/Optimal_Segmentation_Files", d.Name()}...))
+	}
+	for _, d := range greenBordersDir {
+		_ = os.RemoveAll(path.Join([]string{"./solutions/Solutions_With_Image", d.Name()}...))
 	}
 	for _, file := range dataDir {
 		if strings.Contains(file.Name(), "GT") {
@@ -70,19 +74,24 @@ func runMultiObjective(folderId string, generations, popSize int) {
 	solutions.joinSegments(image, 100)
 	fmt.Print("Used ", time.Since(joinSegmentsStart).Seconds(), " to join segments\n\n")
 
+	fronts := fastNonDominatedSort(solutions)
+	visualizeFronts(solutions, fronts, "final_pareto.png")
+
 	fmt.Println("\nSolutions:")
 
 	for i, s := range solutions {
 		segments := GenoToConnectedComponents(s.genotype)
 		fmt.Println("segments:", len(segments))
 
-		if len(segments) > 500 || len(segments) < 1 {
+		if len(segments) > 50 || len(segments) < 2 {
 			continue
 		}
 
 		filename := fmt.Sprintf("./solutions/Student_Segmentation_Files/sol%d.jpg", i)
+		filenameGreen := fmt.Sprintf("./solutions/Solutions_With_Image/sol%d.jpg", i)
 
 		drawSolutionSegmentsBorders(image, s, color.Black, filename)
+		drawSolutionSegmentsBordersWithImage(image, s, color.RGBA{G: 255, A: 0xff}, filenameGreen)
 	}
 }
 

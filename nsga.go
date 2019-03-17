@@ -86,6 +86,9 @@ func crowdingDistanceAssignment(ids []int, population []*Solution) {
 		return population[ids[i]].connectivity < population[ids[j]].connectivity
 	})
 
+	population[ids[0]].crowdingDistance = math.Inf(1)
+	population[ids[size-1]].crowdingDistance = math.Inf(1)
+
 	for i := 1; i < size-1; i++ {
 		population[ids[i]].crowdingDistance = population[ids[i]].crowdingDistance + (population[ids[i+1]].connectivity-population[ids[i-1]].connectivity)/(maxConnectivity-minConnectivity)
 	}
@@ -94,6 +97,9 @@ func crowdingDistanceAssignment(ids []int, population []*Solution) {
 	sort.Slice(ids, func(i, j int) bool {
 		return population[ids[i]].edgeValue < population[ids[j]].edgeValue
 	})
+
+	population[ids[0]].crowdingDistance = math.Inf(1)
+	population[ids[size-1]].crowdingDistance = math.Inf(1)
 
 	for i := 1; i < size-1; i++ {
 		population[ids[i]].crowdingDistance = population[ids[i]].crowdingDistance + (population[ids[i+1]].edgeValue-population[ids[i-1]].edgeValue)/(maxEdgeValues-minEdgeValues)
@@ -161,15 +167,9 @@ func nsgaII(image *Image, generations, populationSize int) Population {
 		population.evolveWithTournament(image)
 		population.sortAndSelectParetoSolutions(populationSize, t, p)
 
-		/*if t%25 == 0 && t > 1 {
-			population.joinSegments(image, 100)
-			population.expandWithSolutions(image, 4)
-		}*/
-
 		fmt.Println(time.Since(startGeneration).Seconds(), "seconds, size of population:", len(population))
 		saveParetoPlotter(p, "pareto.png")
 	}
-	//population.expandWithSolutions(image, 50)
 
 	fmt.Println("Used", time.Since(start).Seconds(), "seconds to evolve solutions")
 

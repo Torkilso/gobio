@@ -143,7 +143,7 @@ func generatePopulation(img *Image, n int) Population {
 	for i := 0; i < n; i++ {
 		go func(index int) {
 			start := r1.Intn(width * height)
-			geno := Prim(uint64(start), primGraph, labels, imgAsGraph, width * height)
+			geno := Prim(uint64(start), primGraph, labels, imgAsGraph, width*height)
 
 			//mstGraph := graphs.GetGraph(mst, true)
 			//s := SolutionFromGenotypeNSGA(img, mstGraph)
@@ -246,7 +246,6 @@ func (p *Population) evolveWithTournament(img *Image) {
 
 			leftChild, rightChild := crossover(img, parentsA[index], parentsB[index])
 
-
 			channel <- leftChild
 			channel <- rightChild
 			wg.Done()
@@ -336,6 +335,7 @@ func (s *Solution) mutateMultiple(img *Image) {
 		s.amountOfSegments = len(groups)
 	}
 }
+
 func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 
 	n := len((*parent1).genotype)
@@ -365,12 +365,12 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 		offspring2[uint64(index)] = uint64(possibleValues[chosen])
 	}
 
-
 	groups1 := GenoToConnectedComponents(offspring1)
 	groups2 := GenoToConnectedComponents(offspring2)
 
 	c1, e1 := connectivityAndEdge(img, groups1)
 	c2, e2 := connectivityAndEdge(img, groups2)
+
 	s1 := &Solution{
 		offspring1,
 		deviation(img, groups1),
@@ -390,6 +390,7 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 		0,
 		len(groups2),
 	}
+
 	return s1, s2
 }
 
@@ -456,12 +457,10 @@ func (p *Population) joinSegments(img *Image, segmentSizeThreshold int) {
 }
 
 func (p *Population) expandWithSolutions(img *Image, amount int) {
-
 	size := len(*p)
 
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
-
 
 	parentsA := make([]*Solution, 0, amount/2)
 	parentsB := make([]*Solution, 0, amount/2)
@@ -508,7 +507,6 @@ func (p *Population) expandWithSolutions(img *Image, amount int) {
 	close(channel)
 
 	*p = append(*p, result...)
-
 }
 
 func (p *Population) hasTakenLeapOfFaith() bool {
