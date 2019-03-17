@@ -29,7 +29,7 @@ func Dist(img *Image, idx1, idx2 int) float64 {
 }
 
 func ColorDist(p1 *Pixel, p2 *Pixel) float64 {
-	r, g, b := float64(p1.r-p2.r), float64(p1.g - p2.g), float64(p1.b - p2.b)
+	r, g, b := float64(p1.r-p2.r), float64(p1.g-p2.g), float64(p1.b-p2.b)
 	return math.Sqrt(r*r + g*g + b*b)
 }
 

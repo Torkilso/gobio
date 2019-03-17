@@ -141,7 +141,7 @@ func (p *Population) sortAndSelectParetoSolutions(populationSize, generation int
 	*p = append(newParents, lastFrontier...)
 }
 
-func nsgaII(image *Image, generations, populationSize int) []*Solution {
+func nsgaII(image *Image, generations, populationSize int) Population {
 	start := time.Now()
 
 	fmt.Println("Generating", populationSize, "solutions")
@@ -161,9 +161,15 @@ func nsgaII(image *Image, generations, populationSize int) []*Solution {
 		population.evolveWithTournament(image)
 		population.sortAndSelectParetoSolutions(populationSize, t, p)
 
-		fmt.Println(time.Since(startGeneration).Seconds(), "seconds")
+		/*if t%25 == 0 && t > 1 {
+			population.joinSegments(image, 100)
+			population.expandWithSolutions(image, 4)
+		}*/
+
+		fmt.Println(time.Since(startGeneration).Seconds(), "seconds, size of population:", len(population))
 		saveParetoPlotter(p, "pareto.png")
 	}
+	population.expandWithSolutions(image, 50)
 
 	fmt.Println("Used", time.Since(start).Seconds(), "seconds to evolve solutions")
 

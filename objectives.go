@@ -97,4 +97,3 @@ func connectivityAndEdge(img *Image, connectedGroups []map[uint64]bool) (float64
 	}
 	return dist, edgeDist
 }
-

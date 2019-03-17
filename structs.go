@@ -15,10 +15,11 @@ type Solution struct {
 	crowdingDistance float64
 	edgeValue        float64
 	frontNumber      int
+	amountOfSegments int
 }
 
 func (s *Solution) weightedSum() float64 {
-	return s.deviation/maxDeviation + s.connectivity/maxConnectivity + s.edgeValue / (maxEdgeValues - minEdgeValues)
+	return s.deviation/maxDeviation + s.connectivity/maxConnectivity + s.edgeValue/(maxEdgeValues-minEdgeValues)
 }
 
 func bestSolution(solutions []*Solution) *Solution {

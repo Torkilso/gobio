@@ -55,7 +55,7 @@ func Prim(start uint64, g *graph.LabeledUndirected, labels []graph.LI, gr *graph
 	f := graph.NewFromList(len(g.LabeledAdjacencyList))
 
 	var leaves bits.Bits
-	_, _, _ = Prim2(g, actualStart, w, &f, labels, &leaves)
+	_, _ = g.Prim(actualStart, w, &f, labels, &leaves)
 
 	geno = make([]uint64, size)
 	for i := 0 ; i < size ; i++ {
@@ -69,6 +69,7 @@ func Prim(start uint64, g *graph.LabeledUndirected, labels []graph.LI, gr *graph
 	geno[start] = uint64(start)
 
 	/*
+>>>>>>> b914575993eeaeba4c07203e94ab6fa97ffd628c
 	res, _ := f.LabeledUndirected(labels, nil)
 	edges := make([]graphs.Edge, 0, len(labels))
 	res.Edges(func(e graph.LabeledEdge) {
