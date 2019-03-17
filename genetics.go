@@ -246,19 +246,6 @@ func (p *Population) evolveWithTournament(img *Image) {
 
 			leftChild, rightChild := crossover(img, parentsA[index], parentsB[index])
 
-			/*
-				leftChild.mutateMultiple(img)
-				rightChild.mutateMultiple(img)
-			*/
-			/*
-			if r1.Float32() < .2 {
-				leftChild.mutate(img)
-			}
-
-			if r1.Float32() < .2 {
-				rightChild.mutate(img)
-			}
-			*/
 
 			channel <- leftChild
 			channel <- rightChild
@@ -475,6 +462,7 @@ func (p *Population) expandWithSolutions(img *Image, amount int) {
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
 
+
 	parentsA := make([]*Solution, 0, amount/2)
 	parentsB := make([]*Solution, 0, amount/2)
 
@@ -502,14 +490,6 @@ func (p *Population) expandWithSolutions(img *Image, amount int) {
 		go func(index int) {
 
 			leftChild, rightChild := crossover(img, parentsA[index], parentsB[index])
-
-			if r1.Float32() < .2 {
-				leftChild.mutate(img)
-			}
-
-			if r1.Float32() < .2 {
-				rightChild.mutate(img)
-			}
 
 			channel <- leftChild
 			channel <- rightChild

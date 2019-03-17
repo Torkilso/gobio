@@ -68,13 +68,6 @@ func Prim(start uint64, g *graph.LabeledUndirected, labels []graph.LI, gr *graph
 	}
 	geno[start] = uint64(start)
 
-	/*
->>>>>>> b914575993eeaeba4c07203e94ab6fa97ffd628c
-	res, _ := f.LabeledUndirected(labels, nil)
-	edges := make([]graphs.Edge, 0, len(labels))
-	res.Edges(func(e graph.LabeledEdge) {
-		edges = append(edges, graphs.Edge{uint64(e.Edge.N1), uint64(e.Edge.N2), w(e.LI)})
-	})*/
 
 	return geno
 }

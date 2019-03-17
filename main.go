@@ -66,7 +66,6 @@ func runMultiObjective(folderId string, generations, popSize int) {
 
 	solutions := nsgaII(image, generations, popSize)
 
-
 	joinSegmentsStart := time.Now()
 	solutions.joinSegments(image, 100)
 	fmt.Print("Used ", time.Since(joinSegmentsStart).Seconds(), " to join segments\n\n")
