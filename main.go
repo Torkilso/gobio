@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	generationsToRun = 100
-	popSize          = 20
-	folderId         = "216066"
+	generationsToRun = 250
+	popSize          = 10
+	folderId         = "86016"
 )
 
 func main() {
@@ -69,6 +69,9 @@ func runMultiObjective(folderId string, generations, popSize int) {
 	joinSegmentsStart := time.Now()
 	solutions.joinSegments(image, 1000)
 	fmt.Print("Used ", time.Since(joinSegmentsStart).Seconds(), " to join segments\n\n")
+
+	fronts := fastNonDominatedSort(solutions)
+	visualizeFronts(solutions, fronts, "final_pareto.png")
 
 	fmt.Println("\nSolutions:")
 
