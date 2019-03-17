@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	generationsToRun = 50
+	generationsToRun = 120
 	popSize          = 50
-	folderId         = "216066"
+	folderId         = "178054"
 )
 
 func main() {
@@ -68,7 +68,7 @@ func runMultiObjective(folderId string, generations, popSize int) {
 
 
 	joinSegmentsStart := time.Now()
-	solutions.joinSegments(image, 1000)
+	solutions.joinSegments(image, 100)
 	fmt.Print("Used ", time.Since(joinSegmentsStart).Seconds(), " to join segments\n\n")
 
 	fmt.Println("\nSolutions:")
@@ -77,7 +77,7 @@ func runMultiObjective(folderId string, generations, popSize int) {
 		segments := GenoToConnectedComponents(s.genotype)
 		fmt.Println("segments:", len(segments))
 
-		if len(segments) > 100 || len(segments) < 2 {
+		if len(segments) > 500 || len(segments) < 2 {
 			continue
 		}
 

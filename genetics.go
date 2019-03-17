@@ -150,7 +150,7 @@ func generatePopulation(img *Image, n int) Population {
 			groups := GenoToConnectedComponents(geno)
 			e, c := connectivityAndEdge(img, groups)
 			d := deviation(img, groups)
-			s2 := &Solution{geno, d, c, 0.0, e, 0 }
+			s2 := &Solution{geno, d, c, 0.0, e, 0, len(groups)}
 			channel <- s2
 			defer wg.Done()
 		}(i)
