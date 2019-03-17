@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	generationsToRun = 300
-	popSize          = 200
+	generationsToRun = 100
+	popSize          = 50
 	folderId         = "176035"
 )
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/google/gxui/math"
 	"math/rand"
+	"sort"
 	"sync"
 	"time"
 )
@@ -99,13 +100,12 @@ func generatePopulation(img *Image, n int) Population {
 		}
 	}()
 	wg.Wait()
-	fmt.Println("Done generation creation", time.Now().Sub(startT))
 
 	return solutions
 }
 func (p *Population) evolveSingleObjective(img *Image) {
 	size := len(*p)
-	result := make([]*Solution, 0, size)
+	result := make([]*Solution, 0, size * 2)
 
 	channel := make(chan *Solution)
 	var wg sync.WaitGroup
@@ -127,6 +127,7 @@ func (p *Population) evolveSingleObjective(img *Image) {
 			if rand.Float32() < 0.2 {
 				rightChild.mutate(img)
 			}
+
 			channel <- leftChild
 			channel <- rightChild
 			wg.Done()
@@ -143,7 +144,24 @@ func (p *Population) evolveSingleObjective(img *Image) {
 	wg.Wait()
 	close(channel)
 
-	*p = result
+
+	sort.Slice(*p, func(i, j int) bool {
+		return (*p)[i].weightedSum() < (*p)[j].weightedSum()
+	})
+
+	result = append(result, (*p)[:10]...)
+
+
+
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].weightedSum() < result[j].weightedSum()
+	})
+
+	*p = result[:size]
+
+	if rand.Float32() > 0.9 {
+		p.joinSegments(img, 100)
+	}
 }
 
 func (p *Population) evolveWithTournament(img *Image) {
@@ -231,44 +249,6 @@ func (s *Solution) mutate(img *Image) {
 	s.amountOfSegments = len(groups)
 }
 
-func (s *Solution) mutateMultiple(img *Image) {
-	mutated := false
-
-	/*groups := GenoToConnectedComponents(s.genotype)
-
-	for _, group := range groups {
-		if len(group) > 5 {
-			continue
-		}
-
-		for i := range group {
-			possibleValues := GetTargets(img, int(i))
-			chosen := rand.Intn(len(possibleValues))
-			s.genotype[uint64(i)] = uint64(possibleValues[chosen])
-
-			mutated = true
-		}
-	}*/
-
-	for i := range s.genotype {
-		if rand.Float32() < 0.00001 {
-			possibleValues := GetCloseTargetsWithSelf(img, i)
-			chosen := rand.Intn(len(possibleValues))
-			s.genotype[uint64(i)] = uint64(possibleValues[chosen])
-
-			mutated = true
-		}
-	}
-
-	if mutated {
-		groups := GenoToConnectedComponents(s.genotype)
-		s.connectivity = connectivity(img, groups)
-		s.deviation = deviation(img, groups)
-		s.crowdingDistance = 0.0
-		s.amountOfSegments = len(groups)
-	}
-}
-
 func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 
 	n := len((*parent1).genotype)
@@ -300,46 +280,6 @@ func crossover(img *Image, parent1, parent2 *Solution) (*Solution, *Solution) {
 
 	groups1 := GenoToConnectedComponents(offspring1)
 	groups2 := GenoToConnectedComponents(offspring2)
-
-	/*
-	if len(groups1) > 500 {
-		sort.Slice(groups1, func(i, j int) bool {
-			return len(groups1[i]) > len(groups1[j])
-		})
-
-		before := len(groups1)
-		for _, group := range groups1 {
-			for i := range group {
-				for _, neighbour := range GetCloseTargetsWithSelf(img, int(i)) {
-					if _, ok := group[uint64(neighbour)]; !ok { // Not in same segment
-						offspring1[int(i)] = uint64(neighbour)
-						break
-					}
-				}
-			}
-		}
-		groups1 = GenoToConnectedComponents(offspring1)
-		fmt.Println("Num segments", before, len(groups1))
-
-	}
-	if rand.Float32() < 0.1 {
-		for _, group := range groups2 {
-			if len(group) > 100 {
-				continue
-			}
-			for i := range group {
-				for _, neighbour := range GetCloseTargetsWithSelf(img, int(i)) {
-					if _, ok := group[uint64(neighbour)]; !ok { // Not in same segment
-						offspring2[int(i)] = uint64(neighbour)
-						break
-					}
-				}
-			}
-		}
-		groups2 = GenoToConnectedComponents(offspring2)
-
-	}
-	*/
 
 
 	s1 := &Solution{
@@ -380,7 +320,7 @@ func (p *Population) joinSegments(img *Image, segmentSizeThreshold int) {
 							continue
 						}
 						for i := range group {
-							possibleValues := GetTargets(img, int(i), true)
+							possibleValues := GetCloseTargetsWithSelf(img, int(i))
 							chosen := rand.Intn(len(possibleValues))
 							(*p)[index].genotype[uint64(i)] = uint64(possibleValues[chosen])
 						}
